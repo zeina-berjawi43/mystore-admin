@@ -1,0 +1,868 @@
+/* ============================================================
+SLIDESHOW PAGE
+============================================================ */
+
+.slideshow-page {
+padding: 30px;
+background: #f7f7f7;
+min-height: 100vh;
+box-sizing: border-box;
+}
+
+/* ============================================================
+HEADER
+============================================================ */
+
+.slideshow-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 20px;
+margin-bottom: 25px;
+}
+
+.slideshow-header h1 {
+margin: 0;
+font-size: 30px;
+font-weight: 700;
+color: #111;
+}
+
+.slideshow-header p {
+margin: 7px 0 0;
+color: #777;
+font-size: 14px;
+}
+
+/* ============================================================
+ADD BUTTON
+============================================================ */
+
+.add-slide-button {
+border: none;
+background: #000;
+color: #fff;
+padding: 12px 20px;
+border-radius: 8px;
+cursor: pointer;
+font-weight: 600;
+font-size: 14px;
+transition: 0.2s ease;
+white-space: nowrap;
+}
+
+.add-slide-button:hover {
+background: #222;
+transform: translateY(-1px);
+}
+
+.add-slide-button:active {
+transform: translateY(0);
+}
+
+/* ============================================================
+COUNT
+============================================================ */
+
+.slideshow-count {
+margin-bottom: 20px;
+color: #666;
+font-size: 14px;
+}
+
+/* ============================================================
+SLIDES GRID
+============================================================ */
+
+.slideshow-grid {
+display: grid;
+grid-template-columns: repeat(
+auto-fill,
+minmax(300px, 1fr)
+);
+gap: 20px;
+}
+
+/* ============================================================
+SLIDE CARD
+============================================================ */
+
+.slide-card {
+background: #fff;
+border-radius: 12px;
+overflow: hidden;
+border: 1px solid #e5e5e5;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+transition: 0.2s ease;
+}
+
+.slide-card:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================================
+SLIDE IMAGE
+============================================================ */
+
+.slide-image-container {
+width: 100%;
+height: 180px;
+position: relative;
+background: #eee;
+overflow: hidden;
+}
+
+.slide-image-container img {
+width: 100%;
+height: 100%;
+display: block;
+object-fit: cover;
+}
+
+/* ============================================================
+ORDER BADGE
+============================================================ */
+
+.slide-order {
+position: absolute;
+top: 10px;
+left: 10px;
+background: #000;
+color: #fff;
+padding: 5px 9px;
+border-radius: 6px;
+font-size: 13px;
+font-weight: 600;
+}
+
+/* ============================================================
+CARD CONTENT
+============================================================ */
+
+.slide-card-content {
+padding: 15px;
+}
+
+.slide-info {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 10px;
+margin-bottom: 15px;
+font-size: 14px;
+}
+
+.slide-info > span {
+font-weight: 600;
+color: #222;
+}
+
+/* ============================================================
+ACTIVE / INACTIVE
+============================================================ */
+
+.active-text {
+color: #16803c;
+font-size: 13px;
+font-weight: 600;
+}
+
+.inactive-text {
+color: #999;
+font-size: 13px;
+font-weight: 600;
+}
+
+/* ============================================================
+ACTIONS
+============================================================ */
+
+.slide-actions {
+display: flex;
+gap: 8px;
+}
+
+.slide-actions button {
+flex: 1;
+border: none;
+padding: 9px 8px;
+border-radius: 7px;
+cursor: pointer;
+font-size: 13px;
+font-weight: 600;
+transition: 0.2s ease;
+}
+
+.slide-actions button:hover {
+transform: translateY(-1px);
+}
+
+/* ============================================================
+EDIT
+============================================================ */
+
+.edit-slide-button {
+background: #eee;
+color: #222;
+}
+
+.edit-slide-button:hover {
+background: #e2e2e2;
+}
+
+/* ============================================================
+TOGGLE
+============================================================ */
+
+.toggle-slide-button {
+background: #f1f1f1;
+color: #333;
+}
+
+.toggle-slide-button:hover {
+background: #e5e5e5;
+}
+
+/* ============================================================
+DELETE
+============================================================ */
+
+.delete-slide-button {
+background: #ffe5e5;
+color: #c00;
+}
+
+.delete-slide-button:hover {
+background: #ffd5d5;
+}
+
+/* ============================================================
+EMPTY STATE
+============================================================ */
+
+.slideshow-empty {
+background: #fff;
+border: 1px solid #e5e5e5;
+border-radius: 12px;
+padding: 60px 20px;
+text-align: center;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.empty-slide-icon {
+font-size: 45px;
+margin-bottom: 10px;
+}
+
+.slideshow-empty h3 {
+margin: 0 0 8px;
+color: #222;
+font-size: 20px;
+}
+
+.slideshow-empty p {
+margin: 0;
+color: #777;
+font-size: 14px;
+}
+
+.slideshow-empty button {
+margin-top: 18px;
+padding: 10px 18px;
+border: none;
+background: #000;
+color: #fff;
+border-radius: 7px;
+cursor: pointer;
+font-weight: 600;
+transition: 0.2s ease;
+}
+
+.slideshow-empty button:hover {
+background: #222;
+}
+
+/* ============================================================
+ERROR
+============================================================ */
+
+.slideshow-error {
+background: #ffe5e5;
+color: #8b0000;
+padding: 15px;
+border-radius: 8px;
+margin-bottom: 20px;
+display: flex;
+gap: 12px;
+align-items: center;
+flex-wrap: wrap;
+border: 1px solid #ffcaca;
+}
+
+.slideshow-error strong {
+font-weight: 700;
+}
+
+.slideshow-error span {
+flex: 1;
+}
+
+.slideshow-error button {
+margin-left: auto;
+border: none;
+background: #fff;
+color: #8b0000;
+padding: 7px 12px;
+border-radius: 6px;
+cursor: pointer;
+font-weight: 600;
+}
+
+/* ============================================================
+LOADING
+============================================================ */
+
+.slideshow-loading {
+min-height: 60vh;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+color: #555;
+}
+
+.slideshow-loading p {
+margin-top: 15px;
+}
+
+.slideshow-spinner {
+width: 35px;
+height: 35px;
+border: 4px solid #ddd;
+border-top-color: #000;
+border-radius: 50%;
+animation: slideSpin 0.8s linear infinite;
+}
+
+@keyframes slideSpin {
+to {
+transform: rotate(360deg);
+}
+}
+
+/* ============================================================
+MODAL OVERLAY
+============================================================ */
+
+.slide-modal-overlay {
+position: fixed;
+inset: 0;
+background: rgba(0, 0, 0, 0.55);
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 20px;
+z-index: 9999;
+box-sizing: border-box;
+}
+
+/* ============================================================
+MODAL
+============================================================ */
+
+.slide-modal {
+width: 100%;
+max-width: 520px;
+max-height: 90vh;
+overflow-y: auto;
+background: #fff;
+border-radius: 14px;
+box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================
+MODAL HEADER
+============================================================ */
+
+.slide-modal-header {
+padding: 20px;
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+gap: 15px;
+border-bottom: 1px solid #eee;
+}
+
+.slide-modal-header h2 {
+margin: 0;
+color: #111;
+font-size: 22px;
+}
+
+.slide-modal-header p {
+margin: 6px 0 0;
+color: #777;
+font-size: 13px;
+line-height: 1.5;
+}
+
+.slide-modal-close {
+border: none;
+background: transparent;
+color: #555;
+font-size: 20px;
+cursor: pointer;
+width: 34px;
+height: 34px;
+border-radius: 7px;
+display: flex;
+justify-content: center;
+align-items: center;
+transition: 0.2s ease;
+}
+
+.slide-modal-close:hover {
+background: #f1f1f1;
+color: #000;
+}
+
+/* ============================================================
+FORM
+============================================================ */
+
+.slide-form {
+padding: 20px;
+}
+
+.slide-form-group {
+margin-bottom: 18px;
+}
+
+.slide-form-group > label:first-child {
+display: block;
+margin-bottom: 7px;
+font-weight: 600;
+color: #222;
+font-size: 14px;
+}
+
+.slide-form-group input[type="number"] {
+width: 100%;
+box-sizing: border-box;
+padding: 11px 12px;
+border: 1px solid #ddd;
+border-radius: 7px;
+outline: none;
+font-size: 14px;
+transition: 0.2s ease;
+}
+
+.slide-form-group input[type="number"]:focus {
+border-color: #999;
+box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.slide-form-group input::placeholder {
+color: #aaa;
+}
+
+/* ============================================================
+IMAGE UPLOAD / DROP ZONE
+============================================================ */
+
+.hidden-slide-file-input {
+display: none !important;
+}
+
+/*
+IMPORTANT:
+The label is the actual clickable drop zone.
+The file input stays hidden.
+*/
+
+.slide-image-upload-box {
+width: 100%;
+min-height: 230px;
+box-sizing: border-box;
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+position: relative;
+overflow: hidden;
+
+border: 2px dashed #cfcfcf;
+border-radius: 12px;
+
+background: #fafafa;
+
+cursor: pointer;
+
+transition:
+border-color 0.2s ease,
+background 0.2s ease,
+transform 0.2s ease,
+box-shadow 0.2s ease;
+}
+
+.slide-image-upload-box:hover {
+border-color: #000;
+background: #f6f6f6;
+}
+
+.slide-image-upload-box:active {
+transform: scale(0.995);
+}
+
+/*
+This class can also be added later from React
+when dragOver is implemented.
+*/
+
+.slide-image-upload-box.drag-active {
+border-color: #000;
+background: #f1f1f1;
+box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================================
+UPLOAD PLACEHOLDER
+============================================================ */
+
+.slide-upload-placeholder {
+width: 100%;
+min-height: 230px;
+
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+
+gap: 8px;
+
+padding: 25px;
+
+text-align: center;
+
+box-sizing: border-box;
+
+pointer-events: none;
+}
+
+.slide-upload-icon {
+width: 58px;
+height: 58px;
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+border-radius: 14px;
+
+background: #ededed;
+
+font-size: 26px;
+
+margin-bottom: 4px;
+}
+
+.slide-upload-placeholder strong {
+color: #222;
+font-size: 14px;
+}
+
+.slide-upload-placeholder small {
+color: #999;
+font-size: 11px;
+line-height: 1.6;
+}
+
+/* ============================================================
+UPLOAD PREVIEW
+============================================================ */
+
+.slide-image-upload-preview {
+width: 100%;
+height: 270px;
+
+display: block;
+
+object-fit: contain;
+
+background: #f8f8f8;
+
+pointer-events: none;
+}
+
+/* ============================================================
+SELECTED FILE
+============================================================ */
+
+.selected-slide-image-info {
+margin-top: 8px;
+
+padding: 9px 11px;
+
+border-radius: 7px;
+
+background: #f6f6f6;
+
+color: #666;
+
+font-size: 10px;
+
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+
+.current-slide-text {
+display: block;
+
+margin-top: 7px;
+
+color: #999;
+
+font-size: 10px;
+
+line-height: 1.5;
+}
+
+/* ============================================================
+PREVIEW
+============================================================ */
+
+.slide-preview {
+margin-bottom: 18px;
+padding: 12px;
+background: #f7f7f7;
+border-radius: 9px;
+}
+
+.slide-preview span {
+display: block;
+font-weight: 600;
+margin-bottom: 8px;
+color: #333;
+font-size: 14px;
+}
+
+.slide-preview img {
+width: 100%;
+height: 160px;
+display: block;
+object-fit: cover;
+border-radius: 8px;
+background: #eee;
+}
+
+/* ============================================================
+ACTIVE CHECKBOX
+============================================================ */
+
+.slide-active-row {
+display: flex;
+gap: 10px;
+align-items: center;
+margin-bottom: 20px;
+color: #333;
+font-size: 14px;
+cursor: pointer;
+}
+
+.slide-active-row input {
+width: 17px;
+height: 17px;
+cursor: pointer;
+}
+
+/* ============================================================
+FORM ACTIONS
+============================================================ */
+
+.slide-form-actions {
+display: flex;
+justify-content: flex-end;
+gap: 10px;
+padding-top: 5px;
+}
+
+.slide-form-actions button {
+padding: 11px 18px;
+border-radius: 7px;
+border: none;
+cursor: pointer;
+font-size: 14px;
+font-weight: 600;
+transition: 0.2s ease;
+}
+
+.slide-form-actions button:disabled {
+opacity: 0.6;
+cursor: not-allowed;
+}
+
+/* ============================================================
+CANCEL
+============================================================ */
+
+.slide-cancel-button {
+background: #eee;
+color: #222;
+}
+
+.slide-cancel-button:hover:not(:disabled) {
+background: #e2e2e2;
+}
+
+/* ============================================================
+SAVE
+============================================================ */
+
+.slide-save-button {
+background: #000;
+color: #fff;
+}
+
+.slide-save-button:hover:not(:disabled) {
+background: #222;
+}
+
+/* ============================================================
+RESPONSIVE - TABLET
+============================================================ */
+
+@media (max-width: 900px) {
+.slideshow-page {
+padding: 25px 20px;
+}
+
+.slideshow-grid {
+grid-template-columns: repeat(
+2,
+minmax(0, 1fr)
+);
+}
+}
+
+/* ============================================================
+RESPONSIVE - MOBILE
+============================================================ */
+
+@media (max-width: 650px) {
+.slideshow-page {
+padding: 20px 15px;
+}
+
+.slideshow-header {
+flex-direction: column;
+align-items: flex-start;
+}
+
+.slideshow-header h1 {
+font-size: 25px;
+}
+
+.add-slide-button {
+width: 100%;
+}
+
+.slideshow-grid {
+grid-template-columns: 1fr;
+}
+
+.slide-image-container {
+height: 200px;
+}
+
+.slide-actions {
+flex-direction: column;
+}
+
+.slide-actions button {
+width: 100%;
+}
+
+.slideshow-error {
+align-items: flex-start;
+flex-direction: column;
+}
+
+.slideshow-error button {
+margin-left: 0;
+}
+
+.slide-modal-overlay {
+padding: 12px;
+}
+
+.slide-modal {
+max-height: 94vh;
+border-radius: 12px;
+}
+
+.slide-modal-header {
+padding: 16px;
+}
+
+.slide-form {
+padding: 16px;
+}
+
+.slide-form-actions {
+flex-direction: column-reverse;
+}
+
+.slide-form-actions button {
+width: 100%;
+}
+
+.slide-image-upload-box {
+min-height: 210px;
+}
+
+.slide-upload-placeholder {
+min-height: 210px;
+}
+
+.slide-image-upload-preview {
+height: 230px;
+}
+}
+
+/* ============================================================
+VERY SMALL SCREENS
+============================================================ */
+
+@media (max-width: 400px) {
+.slideshow-page {
+padding: 15px 10px;
+}
+
+.slide-image-container {
+height: 170px;
+}
+
+.slide-card-content {
+padding: 12px;
+}
+
+.slide-info {
+font-size: 13px;
+}
+
+.slide-image-upload-box {
+min-height: 190px;
+}
+
+.slide-upload-placeholder {
+min-height: 190px;
+padding: 18px;
+}
+
+.slide-image-upload-preview {
+height: 210px;
+}
+}

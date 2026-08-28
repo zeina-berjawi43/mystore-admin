@@ -4,33 +4,27 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 
 function AdminLayout() {
-
   const [isOpen, setIsOpen] = useState(false);
 
-
   return (
-    <div className="admin-layout">
-
-      {/* ======================================================
-          SIDEBAR
-      ====================================================== */}
-
+    <div
+      className={`admin-layout ${
+        isOpen ? "sidebar-is-open" : ""
+      }`}
+    >
       <Sidebar
         isOpen={isOpen}
         setIsOpen={setIsOpen}
       />
-
-
-      {/* ======================================================
-          HAMBURGER
-      ====================================================== */}
 
       <button
         type="button"
         className={`sidebar-toggle ${
           isOpen ? "toggle-open" : ""
         }`}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() =>
+          setIsOpen((previous) => !previous)
+        }
         aria-label={
           isOpen
             ? "Close sidebar"
@@ -38,22 +32,12 @@ function AdminLayout() {
         }
         aria-expanded={isOpen}
       >
-
         {isOpen ? "✕" : "☰"}
-
       </button>
 
-
-      {/* ======================================================
-          MAIN CONTENT
-      ====================================================== */}
-
       <main className="admin-content">
-
         <Outlet />
-
       </main>
-
     </div>
   );
 }

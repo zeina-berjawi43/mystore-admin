@@ -1,4 +1,3 @@
-
 import { NavLink, useNavigate } from "react-router-dom";
 
 function Sidebar({ isOpen, setIsOpen }) {
@@ -26,6 +25,11 @@ function Sidebar({ isOpen, setIsOpen }) {
       icon: "👥",
     },
     {
+      name: "Add Admin",
+      path: "/add-admin",
+      icon: "👤➕",
+    },
+    {
       name: "Categories",
       path: "/categories",
       icon: "🗂️",
@@ -35,12 +39,11 @@ function Sidebar({ isOpen, setIsOpen }) {
       path: "/brands",
       icon: "🏷️",
     },
-    
     {
-  name: "Slideshow",
-  path: "/slideshow",
-  icon: "🖼️",
-},
+      name: "Slideshow",
+      path: "/slideshow",
+      icon: "🖼️",
+    },
     {
       name: "Notifications",
       path: "/notifications",
@@ -64,7 +67,7 @@ function Sidebar({ isOpen, setIsOpen }) {
   };
 
   // ============================================================
-  // CLOSE SIDEBAR ON MOBILE
+  // MOBILE NAVIGATION
   // ============================================================
 
   const handleNavigation = () => {
@@ -73,114 +76,99 @@ function Sidebar({ isOpen, setIsOpen }) {
     }
   };
 
-  // ============================================================
-  // CLOSE SIDEBAR WITH OVERLAY
-  // ============================================================
-
-  const handleOverlayClick = () => {
-    setIsOpen(false);
-  };
-
-  // ============================================================
-  // SIDEBAR
-  // ============================================================
-
   return (
-    <>
-      {/* ======================================================
-          OVERLAY
-      ====================================================== */}
-
-      {isOpen && (
-        <div
-          className="sidebar-overlay"
-          onClick={handleOverlayClick}
-          aria-hidden="true"
-        />
-      )}
+    <aside
+      className={`sidebar ${
+        isOpen ? "sidebar-open" : ""
+      }`}
+    >
 
       {/* ======================================================
-          SIDEBAR
+          LOGO
       ====================================================== */}
 
-      <aside
-        className={`sidebar ${
-          isOpen ? "sidebar-open" : ""
-        }`}
-        aria-label="Admin navigation"
-      >
-        {/* ====================================================
-            LOGO
-        ==================================================== */}
+      <div className="sidebar-logo">
 
-        <div className="sidebar-logo">
-          <div className="sidebar-logo-icon">
-            🛍️
-          </div>
-
-          <div className="sidebar-logo-text">
-            <h2>
-              MyStore
-            </h2>
-
-            <span>
-              Admin Panel
-            </span>
-          </div>
+        <div className="sidebar-logo-icon">
+          🛍️
         </div>
 
-        {/* ====================================================
-            MENU
-        ==================================================== */}
+        <div className="sidebar-logo-text">
 
-        <nav className="sidebar-menu">
-          <p className="sidebar-section-title">
-            MAIN MENU
-          </p>
+          <h2>
+            MyStore
+          </h2>
 
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={handleNavigation}
-              className={({ isActive }) =>
-                `sidebar-link ${
-                  isActive ? "active" : ""
-                }`
-              }
-            >
-              <span className="sidebar-icon">
-                {item.icon}
-              </span>
+          <span>
+            Admin Panel
+          </span>
 
-              <span className="sidebar-link-text">
-                {item.name}
-              </span>
-            </NavLink>
-          ))}
-        </nav>
+        </div>
 
-        {/* ====================================================
-            LOGOUT
-        ==================================================== */}
+      </div>
 
-        <div className="sidebar-bottom">
-          <button
-            type="button"
-            className="sidebar-logout"
-            onClick={handleLogout}
+
+      {/* ======================================================
+          MENU
+      ====================================================== */}
+
+      <nav className="sidebar-menu">
+
+        <p className="sidebar-section-title">
+          MAIN MENU
+        </p>
+
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            onClick={handleNavigation}
+            className={({ isActive }) =>
+              `sidebar-link ${
+                isActive ? "active" : ""
+              }`
+            }
           >
+
             <span className="sidebar-icon">
-              🚪
+              {item.icon}
             </span>
 
             <span className="sidebar-link-text">
-              Logout
+              {item.name}
             </span>
-          </button>
-        </div>
-      </aside>
-    </>
+
+          </NavLink>
+        ))}
+
+      </nav>
+
+
+      {/* ======================================================
+          LOGOUT
+      ====================================================== */}
+
+      <div className="sidebar-bottom">
+
+        <button
+          type="button"
+          className="sidebar-logout"
+          onClick={handleLogout}
+        >
+
+          <span className="sidebar-icon">
+            🚪
+          </span>
+
+          <span className="sidebar-link-text">
+            Logout
+          </span>
+
+        </button>
+
+      </div>
+
+    </aside>
   );
 }
 

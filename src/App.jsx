@@ -1,4 +1,3 @@
-
 import React from "react";
 
 import {
@@ -24,18 +23,23 @@ import Users from "./pages/Users";
 import Slideshow from "./pages/Slideshow";
 import Notifications from "./pages/Notifications";
 
-// ============================================================
-// COMPONENTS
-// ============================================================
-
-import Sidebar from "./components/Sidebar";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import AddAdmin from "./pages/AddAdmin";
 
 // ============================================================
-// PROTECTED ROUTE
+// LAYOUT
+// ============================================================
+
+import AdminLayout from "./layouts/AdminLayout";
+
+// ============================================================
+// PROTECTED ADMIN ROUTE
 // ============================================================
 
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("accessToken");
+  const token =
+    localStorage.getItem("accessToken");
 
   let user = null;
 
@@ -44,19 +48,32 @@ function ProtectedRoute({ children }) {
       localStorage.getItem("user") || "null"
     );
   } catch (error) {
-    console.log("USER PARSE ERROR:", error);
+    console.log(
+      "USER PARSE ERROR:",
+      error
+    );
+
     user = null;
   }
 
   // ==========================================================
-  // CHECK LOGIN + ADMIN
+  // CHECK LOGIN
   // ==========================================================
 
-  if (
-    !token ||
-    !user ||
-    user.role !== "admin"
-  ) {
+  if (!token) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+  // ==========================================================
+  // CHECK ADMIN
+  // ==========================================================
+
+  if (!user || user.role !== "admin") {
     return (
       <Navigate
         to="/login"
@@ -69,81 +86,16 @@ function ProtectedRoute({ children }) {
 }
 
 // ============================================================
-// ADMIN LAYOUT
-// ============================================================
-
-function AdminLayout({ children }) {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  return (
-    <div
-      className={`admin-layout ${
-        isOpen ? "sidebar-is-open" : ""
-      }`}
-    >
-
-      {/* ====================================================
-          SIDEBAR
-      ==================================================== */}
-
-      <Sidebar
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
-
-      {/* ====================================================
-          SIDEBAR TOGGLE
-      ==================================================== */}
-
-      <button
-        type="button"
-        className={`sidebar-toggle ${
-          isOpen ? "sidebar-toggle-open" : ""
-        }`}
-        onClick={() =>
-          setIsOpen((prev) => !prev)
-        }
-        aria-label="Toggle sidebar"
-      >
-        {isOpen ? "✕" : "☰"}
-      </button>
-
-      {/* ====================================================
-          MAIN CONTENT
-      ==================================================== */}
-
-      <main className="admin-content">
-        {children}
-      </main>
-
-    </div>
-  );
-}
-
-// ============================================================
 // APP
 // ============================================================
 
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
 
-<Route path="/notifications" element={ <ProtectedRoute> <AdminLayout> <Notifications /> </AdminLayout> </ProtectedRoute> } />
-
-<Route
-  path="/slideshow"
-  element={
-    <ProtectedRoute>
-      <AdminLayout>
-        <Slideshow />
-      </AdminLayout>
-    </ProtectedRoute>
-  }
-/>
         {/* ==================================================
-            LOGIN
+            PUBLIC ROUTES
         ================================================== */}
 
         <Route
@@ -151,97 +103,120 @@ function App() {
           element={<Login />}
         />
 
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPassword />}
+        />
+
+
         {/* ==================================================
-            DASHBOARD
+            PROTECTED ADMIN AREA
         ================================================== */}
 
         <Route
-          path="/dashboard"
           element={
             <ProtectedRoute>
-              <AdminLayout>
-                <Dashboard />
-              </AdminLayout>
+              <AdminLayout />
             </ProtectedRoute>
           }
-        />
+        >
 
-        {/* ==================================================
-            PRODUCTS
-        ================================================== */}
+          {/* ==================================================
+              DASHBOARD
+          ================================================== */}
 
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <Products />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
+          />
 
-        {/* ==================================================
-            CATEGORIES
-        ================================================== */}
 
-        <Route
-          path="/categories"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <Categories />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
+          {/* ==================================================
+              ORDERS
+          ================================================== */}
 
-        {/* ==================================================
-            BRANDS
-        ================================================== */}
+          <Route
+            path="/orders"
+            element={<Orders />}
+          />
 
-        <Route
-          path="/brands"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <Brands />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
 
-        {/* ==================================================
-            ORDERS
-        ================================================== */}
+          {/* ==================================================
+              PRODUCTS
+          ================================================== */}
 
-        <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <Orders />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/products"
+            element={<Products />}
+          />
 
-        
 
-        {/* ==================================================
-            USERS
-        ================================================== */}
+          {/* ==================================================
+              USERS
+          ================================================== */}
 
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <AdminLayout>
-                <Users />
-              </AdminLayout>
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/users"
+            element={<Users />}
+          />
+
+
+          {/* ==================================================
+              ADD ADMIN
+          ================================================== */}
+
+          <Route
+            path="/add-admin"
+            element={<AddAdmin />}
+          />
+
+
+          {/* ==================================================
+              CATEGORIES
+          ================================================== */}
+
+          <Route
+            path="/categories"
+            element={<Categories />}
+          />
+
+
+          {/* ==================================================
+              BRANDS
+          ================================================== */}
+
+          <Route
+            path="/brands"
+            element={<Brands />}
+          />
+
+
+          {/* ==================================================
+              SLIDESHOW
+          ================================================== */}
+
+          <Route
+            path="/slideshow"
+            element={<Slideshow />}
+          />
+
+
+          {/* ==================================================
+              NOTIFICATIONS
+          ================================================== */}
+
+          <Route
+            path="/notifications"
+            element={<Notifications />}
+          />
+
+        </Route>
+
 
         {/* ==================================================
             DEFAULT
@@ -251,11 +226,12 @@ function App() {
           path="/"
           element={
             <Navigate
-              to="/dashboard"
+              to="/login"
               replace
             />
           }
         />
+
 
         {/* ==================================================
             UNKNOWN ROUTE
@@ -265,24 +241,15 @@ function App() {
           path="*"
           element={
             <Navigate
-              to="/dashboard"
+              to="/login"
               replace
             />
           }
         />
 
       </Routes>
-
     </BrowserRouter>
   );
-  
 }
 
-
-
-// ============================================================
-// EXPORT
-// ============================================================
-
 export default App;
-

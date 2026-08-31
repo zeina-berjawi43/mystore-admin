@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
 
 function Users() {
@@ -413,6 +412,8 @@ function Users() {
             <tr>
               <th>User</th>
               <th>Phone</th>
+              <th>OTP</th>
+              <th>OTP Expires</th>
               <th>Address</th>
               <th>Role</th>
               <th>Joined</th>
@@ -425,11 +426,14 @@ function Users() {
             {filteredUsers.length === 0 ? (
 
               <tr>
+
                 <td
-                  colSpan="6"
+                  colSpan="8"
                   className="users-empty"
                 >
+
                   <div>
+
                     <span>👥</span>
 
                     <h3>
@@ -440,8 +444,11 @@ function Users() {
                       Try changing your search
                       or filters.
                     </p>
+
                   </div>
+
                 </td>
+
               </tr>
 
             ) : (
@@ -450,7 +457,9 @@ function Users() {
 
                 <tr key={user._id}>
 
-                  {/* USER */}
+                  {/* ==================================================
+                      USER
+                  ================================================== */}
 
                   <td>
 
@@ -469,7 +478,7 @@ function Users() {
                         </strong>
 
                         <small>
-                          {user.email}
+                          {user.email || "—"}
                         </small>
 
                       </div>
@@ -479,21 +488,65 @@ function Users() {
                   </td>
 
 
-                  {/* PHONE */}
+                  {/* ==================================================
+                      PHONE
+                  ================================================== */}
 
                   <td>
                     {user.phone || "—"}
                   </td>
 
 
-                  {/* ADDRESS */}
+                  {/* ==================================================
+                      OTP
+                  ================================================== */}
+
+                  <td>
+
+                    {user.whatsappOtp ? (
+
+                      <span className="user-otp">
+                        {user.whatsappOtp}
+                      </span>
+
+                    ) : (
+
+                      <span className="user-no-otp">
+                        —
+                      </span>
+
+                    )}
+
+                  </td>
+
+
+                  {/* ==================================================
+                      OTP EXPIRATION
+                  ================================================== */}
+
+                  <td>
+
+                    {user.whatsappOtpExpires
+                      ? new Date(
+                          user.whatsappOtpExpires
+                        ).toLocaleString()
+                      : "—"}
+
+                  </td>
+
+
+                  {/* ==================================================
+                      ADDRESS
+                  ================================================== */}
 
                   <td>
                     {user.address || "—"}
                   </td>
 
 
-                  {/* ROLE */}
+                  {/* ==================================================
+                      ROLE
+                  ================================================== */}
 
                   <td>
 
@@ -504,26 +557,34 @@ function Users() {
                           : "user"
                       }`}
                     >
+
                       {user.role === "admin"
                         ? "Admin"
                         : "User"}
+
                     </span>
 
                   </td>
 
 
-                  {/* DATE */}
+                  {/* ==================================================
+                      DATE
+                  ================================================== */}
 
                   <td>
+
                     {user.createdAt
                       ? new Date(
                           user.createdAt
                         ).toLocaleDateString()
                       : "—"}
+
                   </td>
 
 
-                  {/* ACTIONS */}
+                  {/* ==================================================
+                      ACTIONS
+                  ================================================== */}
 
                   <td>
 
@@ -588,7 +649,9 @@ function Users() {
 
           <div className="user-modal">
 
-            {/* HEADER */}
+            {/* ==================================================
+                MODAL HEADER
+            ================================================== */}
 
             <div className="user-modal-header">
 
@@ -615,7 +678,9 @@ function Users() {
             </div>
 
 
-            {/* FORM */}
+            {/* ==================================================
+                FORM
+            ================================================== */}
 
             <form
               className="user-form"
@@ -780,4 +845,3 @@ function Users() {
 }
 
 export default Users;
-

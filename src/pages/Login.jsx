@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -9,17 +8,11 @@ const API_URL =
 function Login() {
   const navigate = useNavigate();
 
-  const [email, setEmail] =
-    useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [password, setPassword] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const [error, setError] =
-    useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // ============================================================
   // LOGIN
@@ -34,11 +27,8 @@ function Login() {
     // VALIDATION
     // ==========================================================
 
-    if (!email || !password) {
-      setError(
-        "Please enter email and password"
-      );
-
+    if (!email.trim() || !password) {
+      setError("Please enter email and password");
       return;
     }
 
@@ -49,14 +39,13 @@ function Login() {
       // ADMIN LOGIN
       // ========================================================
 
-      const response =
-        await axios.post(
-          `${API_URL}/auth/admin/login`,
-          {
-            email,
-            password,
-          }
-        );
+      const response = await axios.post(
+        `${API_URL}/auth/admin/login`,
+        {
+          email: email.trim().toLowerCase(),
+          password,
+        }
+      );
 
       console.log(
         "ADMIN LOGIN RESPONSE:",
@@ -76,6 +65,18 @@ function Login() {
       if (!user || user.role !== "admin") {
         setError(
           "Access denied. Admin account required."
+        );
+
+        return;
+      }
+
+      // ========================================================
+      // CHECK TOKENS
+      // ========================================================
+
+      if (!accessToken || !refreshToken) {
+        setError(
+          "Login failed. Authentication tokens are missing."
         );
 
         return;
@@ -117,12 +118,22 @@ function Login() {
         error
       );
 
+      // ========================================================
+      // SERVER ERROR
+      // ========================================================
+
       if (error.response) {
         setError(
           error.response.data?.message ||
             "Login failed"
         );
-      } else {
+      }
+
+      // ========================================================
+      // NETWORK ERROR
+      // ========================================================
+
+      else {
         setError(
           "Cannot connect to the server"
         );
@@ -151,22 +162,37 @@ function Login() {
         </div>
 
         {/* ====================================================
-            TITLE
+            HEADER
         ==================================================== */}
 
-        <h1>
-          Admin Panel
-        </h1>
+        <div className="login-header">
 
-        <p className="login-subtitle">
-          Sign in to manage your store
-        </p>
+          <h1>
+            BStore
+          </h1>
+
+          <p>
+            Admin Panel
+          </p>
+
+        </div>
+
+        {/* ====================================================
+            ERROR
+        ==================================================== */}
+
+        {error && (
+          <div className="login-error">
+            {error}
+          </div>
+        )}
 
         {/* ====================================================
             FORM
         ==================================================== */}
 
         <form
+          className="login-form"
           onSubmit={handleLogin}
         >
 
@@ -174,23 +200,22 @@ function Login() {
               EMAIL
           ================================================== */}
 
-          <div className="input-group">
+          <div className="login-form-group">
 
-            <label>
+            <label htmlFor="email">
               Email
             </label>
 
             <input
+              id="email"
               type="email"
-              placeholder="Enter admin email"
               value={email}
               onChange={(e) =>
-                setEmail(
-                  e.target.value
-                )
+                setEmail(e.target.value)
               }
-              autoCapitalize="none"
+              placeholder="Enter admin email"
               autoComplete="email"
+              disabled={loading}
             />
 
           </div>
@@ -199,49 +224,43 @@ function Login() {
               PASSWORD
           ================================================== */}
 
-          <div className="input-group">
+          <div className="login-form-group">
 
-            <label>
+            <label htmlFor="password">
               Password
             </label>
 
             <input
+              id="password"
               type="password"
-              placeholder="Enter password"
               value={password}
               onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
+                setPassword(e.target.value)
               }
+              placeholder="Enter password"
               autoComplete="current-password"
+              disabled={loading}
             />
 
           </div>
 
-          
-{/* ============================================================
-    FORGOT PASSWORD
-============================================================ */}
-
-<div className="forgot-password-container">
-  <button
-    type="button"
-    className="forgot-password-button"
-    onClick={() => navigate("/forgot-password")}
-  >
-    Forgot Password?
-  </button>
-</div>
           {/* ==================================================
-              ERROR
+              FORGOT PASSWORD
           ================================================== */}
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+          <div className="login-forgot">
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate("/forgot-password")
+              }
+              disabled={loading}
+            >
+              Forgot Password?
+            </button>
+
+          </div>
 
           {/* ==================================================
               LOGIN BUTTON
@@ -249,14 +268,29 @@ function Login() {
 
           <button
             type="submit"
+            className="login-button"
             disabled={loading}
           >
+
             {loading
-              ? "Signing in..."
-              : "Sign In"}
+              ? "Logging in..."
+              : "Login"}
+
           </button>
 
         </form>
+
+        {/* ====================================================
+            FOOTER
+        ==================================================== */}
+
+        <div className="login-footer">
+
+          <span>
+            BStore Admin Panel
+          </span>
+
+        </div>
 
       </div>
 

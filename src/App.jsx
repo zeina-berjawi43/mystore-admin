@@ -1,3 +1,4 @@
+
 import React from "react";
 
 import {
@@ -22,6 +23,7 @@ import Orders from "./pages/Orders";
 import Users from "./pages/Users";
 import Slideshow from "./pages/Slideshow";
 import Notifications from "./pages/Notifications";
+import PhoneVerification from "./pages/PhoneVerification";
 
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -163,6 +165,16 @@ function App() {
           <Route
             path="/users"
             element={<Users />}
+          />
+
+
+          {/* ==================================================
+              PHONE VERIFICATION / OTP
+          ================================================== */}
+
+          <Route
+            path="/phone-verification"
+            element={<PhoneVerification />}
           />
 
 

@@ -1,3 +1,4 @@
+
 import { NavLink, useNavigate } from "react-router-dom";
 
 function Sidebar({ isOpen, setIsOpen }) {
@@ -24,6 +25,17 @@ function Sidebar({ isOpen, setIsOpen }) {
       path: "/users",
       icon: "👥",
     },
+
+    // ============================================================
+    // PHONE VERIFICATION / OTP
+    // ============================================================
+
+    {
+      name: "Phone Verification",
+      path: "/phone-verification",
+      icon: "📱",
+    },
+
     {
       name: "Add Admin",
       path: "/add-admin",
@@ -96,7 +108,7 @@ function Sidebar({ isOpen, setIsOpen }) {
         <div className="sidebar-logo-text">
 
           <h2>
-            MyStore
+            BStore
           </h2>
 
           <span>

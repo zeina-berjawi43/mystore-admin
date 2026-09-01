@@ -91,7 +91,7 @@ function PhoneVerification() {
         err
       );
 
-      // Don't show polling errors every 3 seconds
+      // Don't show polling errors every 5 minutes
       if (showLoading) {
         setError(
           err.message ||
@@ -110,12 +110,14 @@ function PhoneVerification() {
   // ============================================================
 
   useEffect(() => {
+    // Load immediately when page opens
     fetchRequests(true);
 
+    // Check for new requests every 5 minutes
     const interval =
       setInterval(() => {
         fetchRequests(false);
-      }, 3000);
+      }, 5 * 60 * 1000);
 
     return () => {
       clearInterval(interval);
@@ -303,6 +305,7 @@ function PhoneVerification() {
         );
       }
 
+      // Refresh immediately after completing
       await fetchRequests(
         false
       );
@@ -468,7 +471,7 @@ function PhoneVerification() {
 
             <small>
               This page automatically checks
-              for new requests.
+              for new requests every 5 minutes.
             </small>
 
           </div>

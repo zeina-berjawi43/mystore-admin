@@ -13,40 +13,55 @@ function PhoneVerification() {
   // ============================================================
 
   const getToken = () => {
-    return localStorage.getItem("accessToken");
+    return localStorage.getItem(
+      "accessToken"
+    );
   };
 
   // ============================================================
   // FETCH REQUESTS
   // ============================================================
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (
+    showLoading = false
+  ) => {
     try {
-      setLoading(true);
-      setError("");
-
-      const token = getToken();
-
-      if (!token) {
-        throw new Error("Admin session expired.");
+      if (showLoading) {
+        setLoading(true);
       }
 
-      const response = await fetch(
-        `${API_URL}/users/admin/phone-verification`,
-        {
-          method: "GET",
+      setError("");
 
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      );
+      const token =
+        getToken();
+
+      if (!token) {
+        throw new Error(
+          "Admin session expired."
+        );
+      }
+
+      const response =
+        await fetch(
+          `${API_URL}/users/admin/phone-verification`,
+          {
+            method: "GET",
+
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+
+              Accept:
+                "application/json",
+            },
+          }
+        );
 
       let data = {};
 
       try {
-        data = await response.json();
+        data =
+          await response.json();
       } catch {
         data = {};
       }
@@ -64,7 +79,9 @@ function PhoneVerification() {
       );
 
       setRequests(
-        Array.isArray(data.requests)
+        Array.isArray(
+          data.requests
+        )
           ? data.requests
           : []
       );
@@ -74,34 +91,51 @@ function PhoneVerification() {
         err
       );
 
-      setError(
-        err.message ||
-          "Unable to load verification requests."
-      );
+      // Don't show polling errors every 3 seconds
+      if (showLoading) {
+        setError(
+          err.message ||
+            "Unable to load verification requests."
+        );
+      }
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
   // ============================================================
-  // INITIAL LOAD
+  // INITIAL LOAD + AUTO REFRESH
   // ============================================================
 
   useEffect(() => {
-    fetchRequests();
+    fetchRequests(true);
+
+    const interval =
+      setInterval(() => {
+        fetchRequests(false);
+      }, 3000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   // ============================================================
   // GET REQUEST ID
   // ============================================================
 
-  const getRequestId = (request) => {
+  const getRequestId = (
+    request
+  ) => {
     if (!request) {
       return null;
     }
 
     if (
-      typeof request._id === "string" &&
+      typeof request._id ===
+        "string" &&
       request._id.trim()
     ) {
       return request._id;
@@ -109,14 +143,17 @@ function PhoneVerification() {
 
     if (
       request._id &&
-      typeof request._id === "object" &&
-      typeof request._id.$oid === "string"
+      typeof request._id ===
+        "object" &&
+      typeof request._id.$oid ===
+        "string"
     ) {
       return request._id.$oid;
     }
 
     if (
-      typeof request.id === "string" &&
+      typeof request.id ===
+        "string" &&
       request.id.trim()
     ) {
       return request.id;
@@ -129,7 +166,9 @@ function PhoneVerification() {
   // GET REQUEST TYPE
   // ============================================================
 
-  const getRequestType = (request) => {
+  const getRequestType = (
+    request
+  ) => {
     const type =
       request?.phoneVerificationType ||
       request?.requestType ||
@@ -151,18 +190,25 @@ function PhoneVerification() {
   // OPEN WHATSAPP
   // ============================================================
 
-  const openWhatsApp = (phone, otp) => {
+  const openWhatsApp = (
+    phone,
+    otp
+  ) => {
     if (!phone || !otp) {
       return;
     }
 
-    const cleanPhone = phone.replace(
-      /[^0-9]/g,
-      ""
-    );
+    const cleanPhone =
+      phone.replace(
+        /[^0-9]/g,
+        ""
+      );
 
     if (!cleanPhone) {
-      alert("Invalid phone number.");
+      alert(
+        "Invalid phone number."
+      );
+
       return;
     }
 
@@ -185,9 +231,12 @@ function PhoneVerification() {
   // MARK REQUEST COMPLETED
   // ============================================================
 
-  const markCompleted = async (request) => {
+  const markCompleted = async (
+    request
+  ) => {
     try {
-      const token = getToken();
+      const token =
+        getToken();
 
       if (!token) {
         throw new Error(
@@ -209,27 +258,35 @@ function PhoneVerification() {
         requestId
       );
 
-      const response = await fetch(
-        `${API_URL}/users/admin/phone-verification/${requestId}`,
-        {
-          method: "PUT",
+      const response =
+        await fetch(
+          `${API_URL}/users/admin/phone-verification/${requestId}`,
+          {
+            method: "PUT",
 
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
 
-          body: JSON.stringify({
-            status: "completed",
-          }),
-        }
-      );
+              Accept:
+                "application/json",
+
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              status:
+                "completed",
+            }),
+          }
+        );
 
       let data = {};
 
       try {
-        data = await response.json();
+        data =
+          await response.json();
       } catch {
         data = {};
       }
@@ -246,8 +303,9 @@ function PhoneVerification() {
         );
       }
 
-      await fetchRequests();
-
+      await fetchRequests(
+        false
+      );
     } catch (err) {
       console.log(
         "MARK COMPLETED ERROR:",
@@ -265,7 +323,9 @@ function PhoneVerification() {
   // FORMAT DATE
   // ============================================================
 
-  const formatDate = (date) => {
+  const formatDate = (
+    date
+  ) => {
     if (!date) {
       return "—";
     }
@@ -328,10 +388,6 @@ function PhoneVerification() {
   return (
     <div className="phone-verification-page">
 
-      {/* ======================================================
-          HEADER
-      ====================================================== */}
-
       <div className="phone-verification-header">
 
         <div>
@@ -350,13 +406,14 @@ function PhoneVerification() {
         <button
           type="button"
           className="phone-verification-refresh"
-          onClick={fetchRequests}
+          onClick={() =>
+            fetchRequests(true)
+          }
         >
           🔄 Refresh
         </button>
 
       </div>
-
 
       {/* ======================================================
           ERROR
@@ -377,14 +434,15 @@ function PhoneVerification() {
 
           <button
             type="button"
-            onClick={fetchRequests}
+            onClick={() =>
+              fetchRequests(true)
+            }
           >
             Try Again
           </button>
 
         </div>
       )}
-
 
       {/* ======================================================
           EMPTY
@@ -408,9 +466,13 @@ function PhoneVerification() {
               for approval.
             </p>
 
+            <small>
+              This page automatically checks
+              for new requests.
+            </small>
+
           </div>
         )}
-
 
       {/* ======================================================
           REQUEST LIST
@@ -419,230 +481,219 @@ function PhoneVerification() {
       {requests.length > 0 && (
         <div className="phone-verification-list">
 
-          {requests.map((request, index) => {
+          {requests.map(
+            (
+              request,
+              index
+            ) => {
 
-            const requestId =
-              getRequestId(request);
+              const requestId =
+                getRequestId(
+                  request
+                );
 
-            const firstName =
-              request.firstName ||
-              request.name ||
-              "";
+              const firstName =
+                request.firstName ||
+                request.name ||
+                "";
 
-            const lastName =
-              request.lastName ||
-              "";
+              const lastName =
+                request.lastName ||
+                "";
 
-            const fullName =
-              `${firstName} ${lastName}`.trim() ||
-              "Unknown User";
+              const fullName =
+                `${firstName} ${lastName}`.trim() ||
+                "Unknown User";
 
-            const phone =
-              request.phone ||
-              "—";
+              const phone =
+                request.phone ||
+                "—";
 
-            const otp =
-              request.otp ||
-              request.verificationCode ||
-              request.whatsappOtp ||
-              "—";
+              const otp =
+                request.otp ||
+                request.verificationCode ||
+                request.whatsappOtp ||
+                "—";
 
-            const requestType =
-              getRequestType(request);
+              const requestType =
+                getRequestType(
+                  request
+                );
 
-            const expires =
-              request.expiresAt ||
-              request.whatsappOtpExpires;
+              const expires =
+                request.expiresAt ||
+                request.whatsappOtpExpires;
 
-            return (
-              <div
-                className="phone-verification-card"
-                key={
-                  requestId ||
-                  `request-${index}`
-                }
-              >
+              return (
+                <div
+                  className="phone-verification-card"
+                  key={
+                    requestId ||
+                    `request-${index}`
+                  }
+                >
 
-                {/* ==================================================
-                    TOP
-                ================================================== */}
+                  {/* TOP */}
 
-                <div className="phone-verification-card-top">
+                  <div className="phone-verification-card-top">
 
-                  <div className="phone-verification-card-user">
+                    <div className="phone-verification-card-user">
 
-                    <div className="phone-verification-avatar">
-                      {fullName
-                        .charAt(0)
-                        .toUpperCase()}
+                      <div className="phone-verification-avatar">
+                        {fullName
+                          .charAt(0)
+                          .toUpperCase()}
+                      </div>
+
+                      <div>
+
+                        <h3>
+                          {fullName}
+                        </h3>
+
+                        <p>
+                          {phone}
+                        </p>
+
+                      </div>
+
                     </div>
 
-                    <div>
+                    <div className="phone-verification-status waiting">
 
-                      <h3>
-                        {fullName}
-                      </h3>
+                      <span className="phone-verification-status-dot"></span>
+
+                      Waiting
+
+                    </div>
+
+                  </div>
+
+                  {/* INFORMATION */}
+
+                  <div className="phone-verification-details">
+
+                    <div className="phone-verification-info">
+
+                      <span className="phone-verification-label">
+                        Request Type
+                      </span>
+
+                      <strong
+                        className={`phone-verification-type ${
+                          requestType ===
+                          "Register"
+                            ? "register"
+                            : requestType ===
+                              "Login"
+                            ? "login"
+                            : ""
+                        }`}
+                      >
+                        {requestType}
+                      </strong>
+
+                    </div>
+
+                    <div className="phone-verification-info">
+
+                      <span className="phone-verification-label">
+                        Status
+                      </span>
+
+                      <strong className="phone-verification-waiting">
+                        Waiting
+                      </strong>
+
+                    </div>
+
+                    <div className="phone-verification-info">
+
+                      <span className="phone-verification-label">
+                        OTP
+                      </span>
+
+                      <strong className="phone-verification-otp">
+                        {otp}
+                      </strong>
+
+                    </div>
+
+                    <div className="phone-verification-info">
+
+                      <span className="phone-verification-label">
+                        Expires
+                      </span>
+
+                      <strong>
+                        {formatDate(
+                          expires
+                        )}
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+                  {/* ADDRESS */}
+
+                  {request.address && (
+                    <div className="phone-verification-address">
+
+                      <span className="phone-verification-label">
+                        Address
+                      </span>
 
                       <p>
-                        {phone}
+                        {request.address}
                       </p>
 
                     </div>
+                  )}
 
-                  </div>
+                  {/* ACTIONS */}
 
+                  <div className="phone-verification-actions">
 
-                  {/* STATUS */}
-
-                  <div className="phone-verification-status waiting">
-
-                    <span className="phone-verification-status-dot"></span>
-
-                    Waiting
-
-                  </div>
-
-                </div>
-
-
-                {/* ==================================================
-                    INFORMATION
-                ================================================== */}
-
-                <div className="phone-verification-details">
-
-                  {/* REQUEST TYPE */}
-
-                  <div className="phone-verification-info">
-
-                    <span className="phone-verification-label">
-                      Request Type
-                    </span>
-
-                    <strong
-                      className={`phone-verification-type ${
-                        requestType ===
-                        "Register"
-                          ? "register"
-                          : requestType ===
-                            "Login"
-                          ? "login"
-                          : ""
-                      }`}
+                    <button
+                      type="button"
+                      className="phone-verification-whatsapp"
+                      disabled={
+                        !request.phone ||
+                        !otp ||
+                        otp === "—"
+                      }
+                      onClick={() =>
+                        openWhatsApp(
+                          request.phone,
+                          otp
+                        )
+                      }
                     >
-                      {requestType}
-                    </strong>
+                      💬 Send WhatsApp
+                    </button>
 
-                  </div>
-
-
-                  {/* STATUS */}
-
-                  <div className="phone-verification-info">
-
-                    <span className="phone-verification-label">
-                      Status
-                    </span>
-
-                    <strong className="phone-verification-waiting">
-                      Waiting
-                    </strong>
-
-                  </div>
-
-
-                  {/* OTP */}
-
-                  <div className="phone-verification-info">
-
-                    <span className="phone-verification-label">
-                      OTP
-                    </span>
-
-                    <strong className="phone-verification-otp">
-                      {otp}
-                    </strong>
-
-                  </div>
-
-
-                  {/* EXPIRES */}
-
-                  <div className="phone-verification-info">
-
-                    <span className="phone-verification-label">
-                      Expires
-                    </span>
-
-                    <strong>
-                      {formatDate(expires)}
-                    </strong>
+                    <button
+                      type="button"
+                      className="phone-verification-complete"
+                      disabled={
+                        !requestId
+                      }
+                      onClick={() =>
+                        markCompleted(
+                          request
+                        )
+                      }
+                    >
+                      ✓ Completed
+                    </button>
 
                   </div>
 
                 </div>
-
-
-                {/* ==================================================
-                    ADDRESS
-                ================================================== */}
-
-                {request.address && (
-                  <div className="phone-verification-address">
-
-                    <span className="phone-verification-label">
-                      Address
-                    </span>
-
-                    <p>
-                      {request.address}
-                    </p>
-
-                  </div>
-                )}
-
-
-                {/* ==================================================
-                    ACTIONS
-                ================================================== */}
-
-                <div className="phone-verification-actions">
-
-                  <button
-                    type="button"
-                    className="phone-verification-whatsapp"
-                    disabled={
-                      !request.phone ||
-                      !otp ||
-                      otp === "—"
-                    }
-                    onClick={() =>
-                      openWhatsApp(
-                        request.phone,
-                        otp
-                      )
-                    }
-                  >
-                    💬 Send WhatsApp
-                  </button>
-
-
-                  <button
-                    type="button"
-                    className="phone-verification-complete"
-                    disabled={!requestId}
-                    onClick={() =>
-                      markCompleted(request)
-                    }
-                  >
-                    ✓ Completed
-                  </button>
-
-                </div>
-
-              </div>
-            );
-          })}
+              );
+            }
+          )}
 
         </div>
       )}

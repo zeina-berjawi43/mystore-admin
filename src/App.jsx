@@ -32,9 +32,6 @@ import Users from "./pages/Users";
 import Slideshow from "./pages/Slideshow";
 import Notifications from "./pages/Notifications";
 import PhoneVerification from "./pages/PhoneVerification";
-
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
 import AddAdmin from "./pages/AddAdmin";
 
 // ============================================================
@@ -280,16 +277,6 @@ function App() {
         <Route
           path="/login"
           element={<Login />}
-        />
-
-        <Route
-          path="/forgot-password"
-          element={<ForgotPassword />}
-        />
-
-        <Route
-          path="/reset-password/:token"
-          element={<ResetPassword />}
         />
 
 

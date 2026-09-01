@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -241,24 +242,6 @@ function Login() {
               autoComplete="current-password"
               disabled={loading}
             />
-
-          </div>
-
-          {/* ==================================================
-              FORGOT PASSWORD
-          ================================================== */}
-
-          <div className="login-forgot">
-
-            <button
-              type="button"
-              onClick={() =>
-                navigate("/forgot-password")
-              }
-              disabled={loading}
-            >
-              Forgot Password?
-            </button>
 
           </div>
 

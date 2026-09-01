@@ -13,13 +13,13 @@ function urlBase64ToUint8Array(base64String) {
   const padding =
     "=".repeat((4 - (base64String.length % 4)) % 4);
 
-  const base64 = (
-    base64String + padding
-  )
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
+  const base64 =
+    (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
 
-  const rawData = window.atob(base64);
+  const rawData =
+    window.atob(base64);
 
   return Uint8Array.from(
     [...rawData].map((char) =>
@@ -39,18 +39,28 @@ export async function registerServiceWorker() {
     );
   }
 
-  const registration =
-    await navigator.serviceWorker.register(
-      "/service-worker.js"
+  // Use the existing registration if available.
+  let registration =
+    await navigator.serviceWorker.getRegistration(
+      "/"
     );
+
+  // Register only if one does not already exist.
+  if (!registration) {
+    registration =
+      await navigator.serviceWorker.register(
+        "/service-worker.js"
+      );
+  }
 
   console.log(
     "✅ Service Worker registered:",
     registration
   );
 
-  // Make sure the Service Worker is ready
-  await navigator.serviceWorker.ready;
+  // Wait until the Service Worker is ready.
+  registration =
+    await navigator.serviceWorker.ready;
 
   console.log(
     "✅ Service Worker is ready."
@@ -64,17 +74,25 @@ export async function registerServiceWorker() {
 // ============================================================
 
 async function getVapidPublicKey() {
-  const response = await fetch(
-    `${API_URL}/api/web-push/public-key`
-  );
+  const response =
+    await fetch(
+      `${API_URL}/web-push/public-key`
+    );
 
   if (!response.ok) {
+    const data =
+      await response.json().catch(
+        () => ({})
+      );
+
     throw new Error(
+      data.message ||
       "Failed to get VAPID public key from backend."
     );
   }
 
-  const data = await response.json();
+  const data =
+    await response.json();
 
   if (!data.publicKey) {
     throw new Error(
@@ -95,6 +113,7 @@ async function getVapidPublicKey() {
 
 export async function subscribeToWebPush(token) {
   try {
+
     // ----------------------------------------------------------
     // CHECK BROWSER SUPPORT
     // ----------------------------------------------------------
@@ -117,8 +136,14 @@ export async function subscribeToWebPush(token) {
       );
     }
 
+    if (!token) {
+      throw new Error(
+        "Authentication token is missing."
+      );
+    }
+
     // ----------------------------------------------------------
-    // 1. REGISTER SERVICE WORKER
+    // 1. REGISTER / GET SERVICE WORKER
     // ----------------------------------------------------------
 
     const registration =
@@ -170,18 +195,21 @@ export async function subscribeToWebPush(token) {
     let subscription =
       await registration.pushManager.getSubscription();
 
+    console.log(
+      "🔎 Existing Web Push subscription:",
+      subscription
+        ? subscription.toJSON()
+        : null
+    );
+
     // ----------------------------------------------------------
     // 5. VALIDATE EXISTING SUBSCRIPTION
     // ----------------------------------------------------------
 
     if (subscription) {
+
       const existingJson =
         subscription.toJSON();
-
-      console.log(
-        "🔎 Existing Web Push subscription:",
-        existingJson
-      );
 
       if (
         !existingJson ||
@@ -190,6 +218,7 @@ export async function subscribeToWebPush(token) {
         !existingJson.keys.p256dh ||
         !existingJson.keys.auth
       ) {
+
         console.log(
           "⚠️ Existing subscription is invalid. Unsubscribing..."
         );
@@ -208,10 +237,11 @@ export async function subscribeToWebPush(token) {
     }
 
     // ----------------------------------------------------------
-    // 6. CREATE NEW SUBSCRIPTION
+    // 6. CREATE NEW SUBSCRIPTION IF NEEDED
     // ----------------------------------------------------------
 
     if (!subscription) {
+
       console.log(
         "🔔 Creating new Web Push subscription..."
       );
@@ -228,6 +258,12 @@ export async function subscribeToWebPush(token) {
 
       console.log(
         "✅ New Web Push subscription created."
+      );
+
+    } else {
+
+      console.log(
+        "✅ Using existing Web Push subscription."
       );
     }
 
@@ -274,7 +310,7 @@ export async function subscribeToWebPush(token) {
     );
 
     // ----------------------------------------------------------
-    // 8. FINAL VALIDATION BEFORE BACKEND
+    // 8. FINAL VALIDATION
     // ----------------------------------------------------------
 
     if (
@@ -304,23 +340,26 @@ export async function subscribeToWebPush(token) {
       "📤 Sending Web Push subscription to backend..."
     );
 
-    const response = await fetch(
-      `${API_URL}/api/web-push/subscribe`,
-      {
-        method: "POST",
+    const response =
+      await fetch(
+        `${API_URL}/web-push/subscribe`,
+        {
+          method: "POST",
 
-        headers: {
-          "Content-Type": "application/json",
+          headers: {
+            "Content-Type":
+              "application/json",
 
-          Authorization: `Bearer ${token}`,
-        },
+            Authorization:
+              `Bearer ${token}`,
+          },
 
-        body:
-          JSON.stringify(
-            subscriptionJSON
-          ),
-      }
-    );
+          body:
+            JSON.stringify(
+              subscriptionJSON
+            ),
+        }
+      );
 
     const result =
       await response.json().catch(
@@ -335,7 +374,7 @@ export async function subscribeToWebPush(token) {
     if (!response.ok) {
       throw new Error(
         result.message ||
-          "Failed to save push subscription."
+        "Failed to save push subscription."
       );
     }
 
@@ -362,10 +401,9 @@ export async function subscribeToWebPush(token) {
 
 export async function unsubscribeFromWebPush() {
   try {
+
     const registration =
-      await navigator.serviceWorker.getRegistration(
-        "/service-worker.js"
-      );
+      await navigator.serviceWorker.ready;
 
     if (!registration) {
       console.log(

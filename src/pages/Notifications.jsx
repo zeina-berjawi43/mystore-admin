@@ -93,24 +93,16 @@ function Notifications() {
         );
 
         // ------------------------------------------------------
-        // SERVICE WORKER
+        // WAIT FOR SERVICE WORKER
         // ------------------------------------------------------
 
         const registration =
-          await navigator.serviceWorker.getRegistration(
-            "/service-worker.js"
-          );
+          await navigator.serviceWorker.ready;
 
-        if (!registration) {
-
-          console.log(
-            "WEB PUSH: No service worker registration found."
-          );
-
-          setPushSubscribed(false);
-
-          return;
-        }
+        console.log(
+          "WEB PUSH CHECK - Service Worker:",
+          registration
+        );
 
         // ------------------------------------------------------
         // GET SUBSCRIPTION
@@ -128,6 +120,10 @@ function Notifications() {
           "WEB PUSH CHECK - Endpoint:",
           subscription?.endpoint
         );
+
+        // ------------------------------------------------------
+        // SUBSCRIPTION EXISTS
+        // ------------------------------------------------------
 
         if (subscription) {
 
@@ -586,7 +582,7 @@ function Notifications() {
 
             {enablingNotifications
               ? "Connecting..."
-              : "🔔 Enable Notifications"
+              : "🔔 Enable / Sync Notifications"
             }
 
           </button>
@@ -685,7 +681,7 @@ function Notifications() {
 
           <div className="notification-success">
 
-            {successMessage}
+            {successMessage }
 
           </div>
 

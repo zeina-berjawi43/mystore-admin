@@ -1,4 +1,3 @@
-
 import {
   useCallback,
   useEffect,
@@ -1413,50 +1412,97 @@ function Invoice() {
       setActionLoading("pdf");
 
       /*
-       * We generate the PDF directly from the visible invoice.
-       * No browser print dialog is used.
+       * IMPORTANT:
+       *
+       * The PDF must contain the final customer-facing
+       * invoice, not the editable invoice.
+       *
+       * Therefore we use the exact Preview component:
+       *
+       * 80mm -> ThermalPreview
+       * A4   -> A4Preview
+       *
+       * If Preview is not already open, we temporarily
+       * open it so its real DOM exists and can be captured.
        */
 
-      const invoiceElement =
-        document.querySelector(
-          ".invoice-paper"
-        );
+      let shouldClosePreview = false;
 
-      if (!invoiceElement) {
-        throw new Error(
-          "Invoice element could not be found."
+      if (!previewOpen) {
+        shouldClosePreview = true;
+
+        setPreviewOpen(true);
+
+        /*
+         * Give React/browser enough time to render
+         * the Preview modal and calculate its layout.
+         */
+        await new Promise((resolve) =>
+          setTimeout(resolve, 250)
+        );
+      } else {
+        /*
+         * Preview is already visible.
+         * Give the browser a short moment to finish
+         * any layout changes before capturing it.
+         */
+        await new Promise((resolve) =>
+          setTimeout(resolve, 100)
         );
       }
 
       /*
-       * Make sure all invoice images are loaded
-       * before creating the canvas.
+       * Capture ONLY the actual Preview paper.
+       *
+       * This means no edit inputs, no Remove button,
+       * no Add Product button, and no textarea.
        */
+
+      const previewElement =
+        document.querySelector(
+          ".invoice-preview-paper"
+        );
+
+      if (!previewElement) {
+        throw new Error(
+          "Invoice preview could not be found."
+        );
+      }
 
       await waitForImages(
-        invoiceElement
+        previewElement
       );
-
-      /*
-       * Small delay gives the browser time to
-       * finish layout calculations.
-       */
 
       await new Promise((resolve) =>
         setTimeout(resolve, 100)
       );
 
+      /*
+       * Capture the same visual invoice that the
+       * customer sees in Preview.
+       */
+
       const canvas =
         await html2canvas(
-          invoiceElement,
+          previewElement,
           {
             scale: 2,
             useCORS: true,
             allowTaint: false,
             backgroundColor: "#ffffff",
             logging: false,
+            imageTimeout: 15000,
           }
         );
+
+      if (
+        !canvas.width ||
+        !canvas.height
+      ) {
+        throw new Error(
+          "The invoice preview could not be converted to PDF."
+        );
+      }
 
       const imageData =
         canvas.toDataURL(
@@ -1467,22 +1513,26 @@ function Invoice() {
       const isA4 =
         format === "A4";
 
-      /*
-       * A4:
-       * 210mm x 297mm
-       *
-       * 80mm:
-       * fixed width 80mm and dynamic height
-       * according to the invoice content.
-       */
-
       let pdfWidth;
       let pdfHeight;
 
       if (isA4) {
+        /*
+         * A4 PDF.
+         *
+         * The preview itself is the source.
+         * We keep the standard A4 dimensions.
+         */
         pdfWidth = 210;
         pdfHeight = 297;
       } else {
+        /*
+         * 80mm PDF.
+         *
+         * Width is always exactly 80mm.
+         * Height follows the real Preview aspect ratio,
+         * so the invoice is not stretched or squeezed.
+         */
         pdfWidth = 80;
 
         pdfHeight =
@@ -1522,10 +1572,11 @@ function Invoice() {
         )}.pdf`;
 
       /*
-       * Chrome / Edge File System Access API.
+       * Chrome / Edge:
        *
-       * This opens a real Save As dialog so the
-       * user can choose the folder/path.
+       * Open the real Windows Save As dialog,
+       * allowing the user to choose the folder
+       * and file name.
        */
 
       if (
@@ -1559,14 +1610,21 @@ function Invoice() {
         await writable.close();
       } else {
         /*
-         * Fallback for browsers that do not
-         * support showSaveFilePicker.
-         *
-         * The browser will download the PDF
-         * using its normal download location.
+         * Browser fallback.
          */
-
         pdf.save(fileName);
+      }
+
+      /*
+       * Close the temporary Preview only if this
+       * function opened it.
+       *
+       * If the user was already looking at Preview,
+       * leave it open.
+       */
+
+      if (shouldClosePreview) {
+        setPreviewOpen(false);
       }
 
       setSuccess(
@@ -1574,14 +1632,14 @@ function Invoice() {
       );
     } catch (err) {
       /*
-       * If the user simply closes the Save As
-       * dialog, do not show an error.
+       * Closing the Save As dialog is not an error.
        */
 
       if (
         err?.name ===
         "AbortError"
       ) {
+        setPreviewOpen(false);
         return;
       }
 
@@ -2711,15 +2769,7 @@ function Invoice() {
                 disabled={
                   actionLoading === "pdf"
                 }
-                onClick={() => {
-                  setPreviewOpen(false);
-
-                  setTimeout(
-                    () =>
-                      handleSaveAsPdf(),
-                    100
-                  );
-                }}
+                onClick={handleSaveAsPdf}
               >
                 {actionLoading === "pdf"
                   ? "Creating PDF..."

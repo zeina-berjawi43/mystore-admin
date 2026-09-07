@@ -177,6 +177,7 @@ function ThermalPrintLayout({
 
         <div className="thermal-print-number">
           <strong>{invoice.invoiceNumber}</strong>
+
           <span>
             {formatDate(invoice.createdAt)}
           </span>
@@ -192,6 +193,7 @@ function ThermalPrintLayout({
 
         <div className="thermal-print-customer-row">
           <span>Name</span>
+
           <strong>
             {getCustomerName(invoice.customer)}
           </strong>
@@ -200,6 +202,7 @@ function ThermalPrintLayout({
         {invoice.customer?.phone && (
           <div className="thermal-print-customer-row">
             <span>Phone</span>
+
             <strong>
               {invoice.customer.phone}
             </strong>
@@ -209,6 +212,7 @@ function ThermalPrintLayout({
         {invoice.customer?.email && (
           <div className="thermal-print-customer-row">
             <span>Email</span>
+
             <strong>
               {invoice.customer.email}
             </strong>
@@ -218,6 +222,7 @@ function ThermalPrintLayout({
         {invoice.customer?.address && (
           <div className="thermal-print-customer-row">
             <span>Address</span>
+
             <strong>
               {invoice.customer.address}
             </strong>
@@ -284,6 +289,7 @@ function ThermalPrintLayout({
       <div className="thermal-print-summary">
         <div className="thermal-print-summary-row">
           <span>Subtotal</span>
+
           <strong>
             {formatPrice(totals.subtotal)}
           </strong>
@@ -293,6 +299,7 @@ function ThermalPrintLayout({
           <span>
             Discount ({totals.discount}%)
           </span>
+
           <strong>
             -{formatPrice(totals.discountAmount)}
           </strong>
@@ -300,6 +307,7 @@ function ThermalPrintLayout({
 
         <div className="thermal-print-total">
           <span>Total</span>
+
           <strong>
             {formatPrice(totals.total)}
           </strong>
@@ -312,6 +320,7 @@ function ThermalPrintLayout({
 
           <div className="thermal-print-notes">
             <strong>Notes</strong>
+
             <span>{notes}</span>
           </div>
         </>
@@ -321,7 +330,10 @@ function ThermalPrintLayout({
 
       <div className="thermal-print-footer">
         <strong>{copyType} Copy</strong>
-        <span>Thank you for your business</span>
+
+        <span>
+          Thank you for your business
+        </span>
       </div>
     </div>
   );
@@ -399,6 +411,13 @@ function Invoice() {
 
   const isCancelled =
     status === "Cancelled";
+
+  /*
+   * Draft AND Cancelled invoices can be edited.
+   * Saved invoices remain locked.
+   */
+  const canEdit =
+    isDraft || isCancelled;
 
   /* ==========================================================
      LOAD INVOICE
@@ -538,11 +557,12 @@ function Invoice() {
 
   const handleOpenAddProduct =
     async () => {
-      if (!isDraft) {
+      if (!canEdit) {
         return;
       }
 
       clearMessages();
+
       setShowAddProduct(true);
 
       if (products.length === 0) {
@@ -559,7 +579,7 @@ function Invoice() {
     field,
     value
   ) => {
-    if (!isDraft) {
+    if (!canEdit) {
       return;
     }
 
@@ -625,7 +645,7 @@ function Invoice() {
   const handleRemoveItem = (
     itemIndex
   ) => {
-    if (!isDraft) {
+    if (!canEdit) {
       return;
     }
 
@@ -666,7 +686,7 @@ function Invoice() {
   const handleAddProduct = (
     product
   ) => {
-    if (!isDraft || !product) {
+    if (!canEdit || !product) {
       return;
     }
 
@@ -816,7 +836,7 @@ function Invoice() {
   ========================================================== */
 
   const handleSave = async () => {
-    if (!invoice || !isDraft) {
+    if (!invoice || !canEdit) {
       return;
     }
 
@@ -1002,6 +1022,7 @@ function Invoice() {
 
   const handlePrint = () => {
     clearMessages();
+
     window.print();
   };
 
@@ -1314,7 +1335,10 @@ function Invoice() {
         </div>
 
         <div className="invoice-topbar-actions">
-          {isDraft && (
+
+          {/* SAVE FOR DRAFT + CANCELLED */}
+
+          {canEdit && (
             <button
               type="button"
               className="invoice-primary-button"
@@ -1340,6 +1364,8 @@ function Invoice() {
               : "Preview"}
           </button>
 
+          {/* PRINT */}
+
           {!isCancelled && (
             <button
               type="button"
@@ -1349,6 +1375,8 @@ function Invoice() {
               Print
             </button>
           )}
+
+          {/* REPRINT */}
 
           {isSaved && (
             <button
@@ -1365,6 +1393,8 @@ function Invoice() {
             </button>
           )}
 
+          {/* DUPLICATE */}
+
           {!isCancelled && (
             <button
               type="button"
@@ -1379,6 +1409,8 @@ function Invoice() {
                 : "Duplicate"}
             </button>
           )}
+
+          {/* CANCEL */}
 
           {!isCancelled && (
             <button
@@ -1451,7 +1483,7 @@ function Invoice() {
                   ? "active"
                   : ""
               }
-              disabled={!isDraft}
+              disabled={!canEdit}
               onClick={() =>
                 setFormat("80mm")
               }
@@ -1466,7 +1498,7 @@ function Invoice() {
                   ? "active"
                   : ""
               }
-              disabled={!isDraft}
+              disabled={!canEdit}
               onClick={() =>
                 setFormat("A4")
               }
@@ -1487,7 +1519,7 @@ function Invoice() {
                   ? "active"
                   : ""
               }
-              disabled={!isDraft}
+              disabled={!canEdit}
               onClick={() =>
                 setCopyType("Customer")
               }
@@ -1502,7 +1534,7 @@ function Invoice() {
                   ? "active"
                   : ""
               }
-              disabled={!isDraft}
+              disabled={!canEdit}
               onClick={() =>
                 setCopyType("Store")
               }
@@ -1608,7 +1640,7 @@ function Invoice() {
               Products
             </div>
 
-            {isDraft && (
+            {canEdit && (
               <button
                 type="button"
                 className="invoice-add-product-button no-print"
@@ -1623,14 +1655,14 @@ function Invoice() {
 
           <div
             className={`invoice-products-table ${
-              isDraft
+              canEdit
                 ? "draft"
                 : "readonly"
             }`}
           >
             <div
               className={`invoice-products-head ${
-                isDraft
+                canEdit
                   ? "draft"
                   : "readonly"
               }`}
@@ -1644,7 +1676,7 @@ function Invoice() {
               <span>Price</span>
               <span>Total</span>
 
-              {isDraft && (
+              {canEdit && (
                 <span className="no-print">
                   Action
                 </span>
@@ -1668,7 +1700,7 @@ function Invoice() {
                   return (
                     <div
                       className={`invoice-product-row ${
-                        isDraft
+                        canEdit
                           ? "draft"
                           : "readonly"
                       }`}
@@ -1688,7 +1720,7 @@ function Invoice() {
                       </div>
 
                       <div>
-                        {isDraft ? (
+                        {canEdit ? (
                           <input
                             type="number"
                             min="1"
@@ -1714,7 +1746,7 @@ function Invoice() {
                       </div>
 
                       <div>
-                        {isDraft ? (
+                        {canEdit ? (
                           <div className="invoice-price-input">
                             <span>$</span>
 
@@ -1751,7 +1783,7 @@ function Invoice() {
                         )}
                       </strong>
 
-                      {isDraft && (
+                      {canEdit && (
                         <button
                           type="button"
                           className="invoice-remove-button no-print"
@@ -1793,7 +1825,7 @@ function Invoice() {
             <div>
               <span>Discount</span>
 
-              {isDraft ? (
+              {canEdit ? (
                 <div className="invoice-discount-input">
                   <input
                     type="number"
@@ -1848,7 +1880,7 @@ function Invoice() {
             Notes
           </div>
 
-          {isDraft ? (
+          {canEdit ? (
             <textarea
               value={notes}
               onChange={(event) =>
@@ -1867,7 +1899,7 @@ function Invoice() {
             </div>
           )}
 
-          {isDraft && (
+          {canEdit && (
             <div className="invoice-notes-print">
               {notes || "No notes."}
             </div>
@@ -1958,6 +1990,7 @@ function Invoice() {
               {productLoading ? (
                 <div className="invoice-product-loading">
                   <div className="invoice-loading-spinner small" />
+
                   Loading products...
                 </div>
               ) : filteredProducts.length ===

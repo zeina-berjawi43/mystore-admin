@@ -1255,11 +1255,10 @@
 @media print {
 
   /* ==========================================================
-     PAGE SIZE
+     GLOBAL PRINT RESET
   ========================================================== */
 
   @page {
-    size: 80mm auto;
     margin: 0;
   }
 
@@ -1275,13 +1274,8 @@
 
   html,
   body {
-    width: 80mm !important;
-    min-width: 80mm !important;
-    max-width: 80mm !important;
-
     margin: 0 !important;
     padding: 0 !important;
-
     background: #ffffff !important;
   }
 
@@ -1313,7 +1307,7 @@
     background: #ffffff !important;
   }
 
-  .invoice-page-a4 .invoice-paper {
+  .invoice-page-a4 > .invoice-paper {
     display: block !important;
 
     width: 210mm !important;
@@ -1332,7 +1326,7 @@
     border-radius: 0 !important;
   }
 
-  .invoice-page-a4 .invoice-thermal-print {
+  .invoice-page-a4 > .invoice-thermal-print {
     display: none !important;
   }
 
@@ -1356,25 +1350,13 @@
   }
 
   /*
-    Hide everything except the dedicated thermal invoice.
+    Hide normal invoice paper.
+    Only the dedicated thermal layout is printed.
   */
 
   .invoice-page-80mm > *:not(.invoice-thermal-print) {
     display: none !important;
   }
-
-  /*
-    ============================================================
-    THERMAL PAPER
-
-    80mm total paper width.
-
-    Left margin 3mm
-    Right margin 6mm
-
-    This intentionally leaves more white space on the right,
-    as requested.
-  */
 
   .invoice-page-80mm > .invoice-thermal-print {
     display: block !important;
@@ -1386,7 +1368,7 @@
     margin: 0 !important;
 
     padding-top: 4mm !important;
-    padding-right: 6mm !important;
+    padding-right: 3mm !important;
     padding-bottom: 4mm !important;
     padding-left: 3mm !important;
 
@@ -1401,9 +1383,9 @@
     line-height: 1.25 !important;
   }
 
-  /* ============================================================
+  /* ==========================================================
      THERMAL HEADER
-  ============================================================ */
+  ========================================================== */
 
   .thermal-print-header {
     display: grid !important;
@@ -1511,9 +1493,9 @@
     border-top: 1px dashed #111111;
   }
 
-  /* ============================================================
+  /* ==========================================================
      THERMAL CUSTOMER
-  ============================================================ */
+  ========================================================== */
 
   .thermal-print-customer {
     padding: 3mm 0;
@@ -1572,9 +1554,9 @@
     word-break: break-word;
   }
 
-  /* ============================================================
+  /* ==========================================================
      THERMAL PRODUCTS
-  ============================================================ */
+  ========================================================== */
 
   .thermal-print-products {
     padding: 3mm 0;
@@ -1583,18 +1565,6 @@
 
     width: 100%;
   }
-
-  /*
-    IMPORTANT:
-
-    Product gets the biggest possible space.
-
-    Qty   = 7mm
-    Price = 13mm
-    Total = 15mm
-
-    The remaining width goes to Product.
-  */
 
   .thermal-print-products-head,
   .thermal-print-product-row {
@@ -1658,13 +1628,6 @@
     border-bottom: none;
   }
 
-  /*
-    PRODUCT NAME
-
-    Full available space.
-    Long names wrap naturally.
-  */
-
   .thermal-print-product-name {
     min-width: 0;
 
@@ -1684,10 +1647,6 @@
     word-break: break-word;
   }
 
-  /*
-    QTY
-  */
-
   .thermal-print-product-qty {
     min-width: 0;
 
@@ -1701,12 +1660,6 @@
 
     white-space: nowrap;
   }
-
-  /*
-    PRICE + TOTAL
-
-    Never break $12.50 into separate lines.
-  */
 
   .thermal-print-product-price,
   .thermal-print-product-total {
@@ -1739,9 +1692,9 @@
     font-size: 8px;
   }
 
-  /* ============================================================
+  /* ==========================================================
      THERMAL SUMMARY
-  ============================================================ */
+  ========================================================== */
 
   .thermal-print-summary {
     padding: 3mm 0;
@@ -1807,9 +1760,9 @@
     font-weight: 800;
   }
 
-  /* ============================================================
+  /* ==========================================================
      THERMAL NOTES
-  ============================================================ */
+  ========================================================== */
 
   .thermal-print-notes {
     display: flex;
@@ -1845,9 +1798,9 @@
     word-break: break-word;
   }
 
-  /* ============================================================
+  /* ==========================================================
      THERMAL FOOTER
-  ============================================================ */
+  ========================================================== */
 
   .thermal-print-footer {
     display: flex;
@@ -1880,9 +1833,9 @@
     font-size: 7px;
   }
 
-  /* ============================================================
+  /* ==========================================================
      HIDE SCREEN-ONLY ELEMENTS
-  ============================================================ */
+  ========================================================== */
 
   .invoice-notes-input,
   .invoice-notes-display {

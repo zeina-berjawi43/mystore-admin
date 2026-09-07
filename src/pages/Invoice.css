@@ -318,7 +318,7 @@
 
 /* ============================================================
    DEDICATED THERMAL PRINT LAYOUT
-   Hidden on screen.
+   Hidden on screen
 ============================================================ */
 
 .invoice-thermal-print {
@@ -1254,12 +1254,19 @@
 ============================================================ */
 
 @media print {
+
+  /*
+    Default print page.
+    This makes 80mm the default roll size.
+    A4 mode uses the named A4 page below.
+  */
   @page {
+    size: 80mm auto;
     margin: 0;
   }
 
   @page invoiceA4 {
-    size: A4;
+    size: A4 portrait;
     margin: 0;
   }
 
@@ -1270,8 +1277,13 @@
 
   html,
   body {
+    width: 80mm !important;
+    min-width: 80mm !important;
+    max-width: 80mm !important;
+
     margin: 0 !important;
     padding: 0 !important;
+
     background: #ffffff !important;
   }
 
@@ -1280,32 +1292,49 @@
     print-color-adjust: exact;
   }
 
+  /*
+    Hide all normal UI.
+  */
   .no-print {
     display: none !important;
   }
 
-  .invoice-page {
-    width: 100% !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-  }
-
-  /* ==========================================================
-     A4
-  ========================================================== */
+  /*
+    ============================================================
+    A4 MODE
+    ============================================================
+  */
 
   .invoice-page-a4 {
     page: invoiceA4;
+
+    width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: #ffffff !important;
   }
 
   .invoice-page-a4 .invoice-paper {
     display: block !important;
+
     width: 210mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+
     min-height: 297mm !important;
+
     margin: 0 !important;
     padding: 15mm !important;
+
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
     box-shadow: none !important;
     border-radius: 0 !important;
   }
@@ -1314,75 +1343,120 @@
     display: none !important;
   }
 
-  /* ==========================================================
-     80MM THERMAL
-  ========================================================== */
+  /*
+    ============================================================
+    80MM MODE
+    ============================================================
+  */
 
   .invoice-page-80mm {
     page: invoice80;
+
+    width: 80mm !important;
+    min-width: 80mm !important;
+    max-width: 80mm !important;
+
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: #ffffff !important;
   }
 
   /*
-     Completely hide the normal invoice paper.
-     This prevents the desktop/table layout from being
-     squeezed into the thermal printer width.
+    VERY IMPORTANT:
+
+    Hide every direct child of the invoice page,
+    except the dedicated thermal invoice.
+
+    This guarantees that Chrome does NOT print:
+    - top bar
+    - settings
+    - normal invoice paper
+    - modals
+    - anything else
   */
 
-  .invoice-page-80mm .invoice-paper {
+  .invoice-page-80mm > *:not(.invoice-thermal-print) {
     display: none !important;
   }
 
   /*
-     Show ONLY the dedicated thermal layout.
+    Show ONLY the dedicated thermal invoice.
   */
 
-  .invoice-page-80mm .invoice-thermal-print {
+  .invoice-page-80mm > .invoice-thermal-print {
     display: block !important;
+
     width: 80mm !important;
-    max-width: 80mm !important;
     min-width: 80mm !important;
-    box-sizing: border-box !important;
+    max-width: 80mm !important;
+
     margin: 0 !important;
     padding: 4mm !important;
+
+    box-sizing: border-box !important;
+
     background: #ffffff !important;
     color: #111111 !important;
+
     font-family: Arial, Helvetica, sans-serif !important;
+
     font-size: 9px !important;
     line-height: 1.25 !important;
   }
 
-  /* ==========================================================
-     THERMAL HEADER
-  ========================================================== */
+  /*
+    ============================================================
+    THERMAL HEADER
+    ============================================================
+  */
 
   .thermal-print-header {
     display: grid !important;
-    grid-template-columns: 22mm minmax(0, 1fr) auto;
+
+    grid-template-columns:
+      18mm
+      minmax(0, 1fr)
+      20mm;
+
     align-items: center;
+
     gap: 2mm;
+
     width: 100%;
+
     padding-bottom: 3mm;
+
     box-sizing: border-box;
   }
 
   .thermal-print-logo {
     display: block !important;
-    width: 20mm !important;
-    max-width: 20mm !important;
+
+    width: 17mm !important;
+    max-width: 17mm !important;
+
     height: auto !important;
     max-height: 14mm !important;
+
     object-fit: contain !important;
   }
 
   .thermal-print-brand {
     min-width: 0;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    overflow: hidden;
   }
 
   .thermal-print-brand strong {
     color: #111111;
+
     font-size: 14px;
     line-height: 1.1;
     font-weight: 800;
@@ -1390,68 +1464,98 @@
 
   .thermal-print-brand span {
     margin-top: 1mm;
+
     color: #555555;
+
     font-size: 7px;
     font-weight: 700;
+
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
 
   .thermal-print-number {
     display: flex;
+
     flex-direction: column;
     align-items: flex-end;
     justify-content: center;
+
     min-width: 0;
+
     text-align: right;
+
+    overflow: hidden;
   }
 
   .thermal-print-number strong {
+    width: 100%;
+
     color: #111111;
-    font-size: 8px;
+
+    font-size: 7px;
     font-weight: 800;
+
     overflow-wrap: anywhere;
     word-break: break-word;
   }
 
   .thermal-print-number span {
     margin-top: 1mm;
+
     color: #555555;
-    font-size: 7px;
+
+    font-size: 6.5px;
+
     white-space: nowrap;
   }
 
   .thermal-print-divider {
     width: 100%;
     height: 0;
+
     margin: 0;
+
     border-top: 1px dashed #111111;
   }
 
-  /* ==========================================================
-     THERMAL CUSTOMER
-  ========================================================== */
+  /*
+    ============================================================
+    THERMAL CUSTOMER
+    ============================================================
+  */
 
   .thermal-print-customer {
     padding: 3mm 0;
+
     box-sizing: border-box;
   }
 
   .thermal-print-section-title {
     margin-bottom: 1.5mm;
+
     color: #111111;
+
     font-size: 7px;
     font-weight: 800;
+
     text-transform: uppercase;
     letter-spacing: 0.07em;
   }
 
   .thermal-print-customer-row {
     display: grid;
-    grid-template-columns: 13mm minmax(0, 1fr);
+
+    grid-template-columns:
+      13mm
+      minmax(0, 1fr);
+
     gap: 2mm;
+
     align-items: start;
+
     margin-bottom: 1mm;
+
     width: 100%;
   }
 
@@ -1461,48 +1565,66 @@
 
   .thermal-print-customer-row span {
     color: #666666;
+
     font-size: 7px;
     font-weight: 700;
   }
 
   .thermal-print-customer-row strong {
     min-width: 0;
+
     color: #111111;
+
     font-size: 8px;
     font-weight: 600;
+
     overflow-wrap: anywhere;
     word-break: break-word;
   }
 
-  /* ==========================================================
-     THERMAL PRODUCTS
-  ========================================================== */
+  /*
+    ============================================================
+    THERMAL PRODUCTS
+    ============================================================
+  */
 
   .thermal-print-products {
     padding: 3mm 0;
+
     box-sizing: border-box;
+
+    width: 100%;
   }
 
   .thermal-print-products-head,
   .thermal-print-product-row {
     display: grid;
+
     grid-template-columns:
       minmax(0, 1fr)
       8mm
-      16mm
-      18mm;
+      15mm
+      17mm;
+
     gap: 1mm;
+
     align-items: start;
+
     width: 100%;
+
     box-sizing: border-box;
   }
 
   .thermal-print-products-head {
     padding-bottom: 1.5mm;
+
     border-bottom: 1px solid #111111;
+
     color: #111111;
+
     font-size: 7px;
     font-weight: 800;
+
     text-transform: uppercase;
   }
 
@@ -1517,7 +1639,9 @@
 
   .thermal-print-product-row {
     padding: 1.8mm 0;
+
     border-bottom: 1px dotted #cccccc;
+
     page-break-inside: avoid;
     break-inside: avoid;
   }
@@ -1528,11 +1652,19 @@
 
   .thermal-print-product-name {
     min-width: 0;
+
     color: #111111;
+
     font-size: 8px;
     font-weight: 600;
+
     line-height: 1.25;
+
     white-space: normal;
+
+    overflow: visible;
+    text-overflow: clip;
+
     overflow-wrap: anywhere;
     word-break: break-word;
   }
@@ -1541,10 +1673,15 @@
   .thermal-print-product-price,
   .thermal-print-product-total {
     min-width: 0;
+
     color: #111111;
+
     font-size: 8px;
+
     line-height: 1.25;
+
     overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .thermal-print-product-qty {
@@ -1562,45 +1699,65 @@
 
   .thermal-print-empty {
     padding: 4mm 0;
+
     text-align: center;
+
     color: #666666;
+
     font-size: 8px;
   }
 
-  /* ==========================================================
-     THERMAL SUMMARY
-  ========================================================== */
+  /*
+    ============================================================
+    THERMAL SUMMARY
+    ============================================================
+  */
 
   .thermal-print-summary {
     padding: 3mm 0;
+
     box-sizing: border-box;
   }
 
   .thermal-print-summary-row {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 4mm;
+
     padding: 1mm 0;
+
     color: #333333;
+
     font-size: 8px;
   }
 
   .thermal-print-summary-row strong {
     color: #111111;
+
     font-weight: 700;
+
     text-align: right;
   }
 
   .thermal-print-total {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 4mm;
+
     margin-top: 2mm;
+
     padding-top: 2mm;
+
     border-top: 1px solid #111111;
+
     color: #111111;
+
     font-size: 11px;
     font-weight: 800;
   }
@@ -1609,63 +1766,88 @@
     font-weight: 800;
   }
 
-  /* ==========================================================
-     THERMAL NOTES
-  ========================================================== */
+  /*
+    ============================================================
+    THERMAL NOTES
+    ============================================================
+  */
 
   .thermal-print-notes {
     display: flex;
+
     flex-direction: column;
+
     gap: 1.5mm;
+
     padding: 3mm 0;
+
     box-sizing: border-box;
   }
 
   .thermal-print-notes strong {
     color: #111111;
+
     font-size: 7px;
     font-weight: 800;
+
     text-transform: uppercase;
   }
 
   .thermal-print-notes span {
     color: #333333;
+
     font-size: 8px;
+
     line-height: 1.35;
+
     white-space: pre-wrap;
+
     overflow-wrap: anywhere;
     word-break: break-word;
   }
 
-  /* ==========================================================
-     THERMAL FOOTER
-  ========================================================== */
+  /*
+    ============================================================
+    THERMAL FOOTER
+    ============================================================
+  */
 
   .thermal-print-footer {
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 1mm;
+
     padding-top: 3mm;
+
     text-align: center;
+
     color: #555555;
+
     font-size: 7px;
   }
 
   .thermal-print-footer strong {
     color: #111111;
+
     font-size: 8px;
     font-weight: 800;
   }
 
   .thermal-print-footer span {
     color: #555555;
+
     font-size: 7px;
   }
 
-  /* ==========================================================
-     HIDE SCREEN-ONLY ELEMENTS DURING PRINT
-  ========================================================== */
+  /*
+    ============================================================
+    HIDE SCREEN-ONLY ELEMENTS
+    ============================================================
+  */
 
   .invoice-notes-input,
   .invoice-notes-display {
@@ -1674,14 +1856,16 @@
 
   .invoice-notes-print {
     display: block !important;
+
     color: #111111 !important;
+
     white-space: pre-wrap !important;
+
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
   }
 
-  .invoice-brand-logo {
-    display: block !important;
-  }
-
+  .invoice-brand-logo,
   .invoice-preview-logo {
     display: block !important;
   }

@@ -1,4 +1,3 @@
-
 /* ============================================================
    INVOICE PAGE
 ============================================================ */
@@ -606,9 +605,6 @@
 
 /* ============================================================
    80MM SCREEN TABLE
-   IMPORTANT:
-   Compact layout only for the screen invoice.
-   Print layout remains controlled by @media print below.
 ============================================================ */
 
 .invoice-products-table.thermal-screen-table {
@@ -693,17 +689,12 @@
   display: block;
   width: 100%;
   min-width: 0;
-
   color: #111827;
-
   font-size: 8.5px;
   line-height: 1.2;
-
   white-space: normal;
   overflow: hidden;
-
   text-overflow: clip;
-
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -719,11 +710,8 @@
   width: 100%;
   min-width: 0;
   height: 25px;
-
   padding: 3px 3px;
-
   border-radius: 4px;
-
   font-size: 8px;
   text-align: center;
 }
@@ -738,11 +726,9 @@
   .invoice-price-input {
   width: 100%;
   min-width: 0;
-
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
   gap: 1px;
 }
 
@@ -761,10 +747,8 @@
 .invoice-products-table.thermal-screen-table
   .invoice-product-row > strong {
   min-width: 0;
-
   font-size: 8px;
   text-align: right;
-
   white-space: nowrap;
 }
 
@@ -772,16 +756,11 @@
   .invoice-remove-button {
   width: 100%;
   min-width: 0;
-
   justify-self: stretch;
-
   padding: 4px 2px;
-
   border-radius: 4px;
-
   font-size: 7px;
   line-height: 1;
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
@@ -1183,7 +1162,7 @@
 }
 
 /* ============================================================
-   80MM PREVIEW
+   80MM PREVIEW MODAL
 ============================================================ */
 
 .invoice-preview-modal.thermal {
@@ -1191,8 +1170,9 @@
 }
 
 .invoice-preview-modal.thermal .invoice-preview-body {
-  padding: 25px;
-  background: #f3f4f6;
+  padding: 28px;
+  background: #eef0f3;
+  overflow-y: auto;
 }
 
 .invoice-preview-modal.thermal .invoice-preview-paper {
@@ -1200,14 +1180,362 @@
   max-width: 80mm;
   min-height: 100mm;
   margin: 0 auto;
-  padding: 22px 16px;
+  padding: 0;
   box-sizing: border-box;
   background: #ffffff;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
 }
 
 /* ============================================================
-   A4 PREVIEW
+   80MM PREVIEW CONTENT
+============================================================ */
+
+.thermal-preview-content {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7mm 5mm;
+  background: #ffffff;
+  color: #111111;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.thermal-preview-header {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 17mm minmax(0, 1fr) 20mm;
+  grid-template-rows: auto auto auto;
+  align-items: center;
+  column-gap: 2mm;
+  box-sizing: border-box;
+  padding-bottom: 4mm;
+}
+
+.thermal-preview-logo {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  display: block;
+  width: 15mm;
+  max-width: 15mm;
+  height: auto;
+  max-height: 15mm;
+  object-fit: contain;
+  margin: 0;
+}
+
+.thermal-preview-header > strong {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  color: #111111;
+  font-size: 15px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-align: left;
+}
+
+.thermal-preview-header > span {
+  grid-column: 2;
+  grid-row: 2;
+  color: #666666;
+  font-size: 7px;
+  line-height: 1.2;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+
+.thermal-preview-header > small:nth-of-type(1) {
+  grid-column: 3;
+  grid-row: 1;
+  color: #111111;
+  font-size: 6.5px;
+  line-height: 1.2;
+  font-weight: 800;
+  text-align: right;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.thermal-preview-header > small:nth-of-type(2) {
+  grid-column: 3;
+  grid-row: 2;
+  color: #666666;
+  font-size: 6.5px;
+  line-height: 1.2;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.thermal-preview-divider {
+  width: 100%;
+  height: 0;
+  margin: 0;
+  border-top: 1px dashed #a3a3a3;
+}
+
+/* ============================================================
+   80MM CUSTOMER
+============================================================ */
+
+.thermal-preview-customer {
+  padding: 4mm 0;
+  box-sizing: border-box;
+}
+
+.thermal-preview-title {
+  display: block;
+  margin-bottom: 2.5mm;
+  color: #111111;
+  font-size: 7px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.thermal-preview-customer-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 13mm minmax(0, 1fr);
+  column-gap: 2mm;
+  align-items: start;
+  margin-bottom: 1.5mm;
+  box-sizing: border-box;
+}
+
+.thermal-preview-customer-row:last-child {
+  margin-bottom: 0;
+}
+
+.thermal-preview-customer-row > span {
+  color: #777777;
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.thermal-preview-customer-row > strong {
+  min-width: 0;
+  color: #111111;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* ============================================================
+   80MM PRODUCTS
+============================================================ */
+
+.thermal-preview-products {
+  width: 100%;
+  padding: 4mm 0;
+  box-sizing: border-box;
+}
+
+.thermal-preview-products-head,
+.thermal-preview-product-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    8mm
+    15mm
+    16mm;
+  column-gap: 1mm;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+.thermal-preview-products-head {
+  padding-bottom: 2mm;
+  border-bottom: 1px solid #111111;
+  color: #555555;
+  font-size: 6.5px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.thermal-preview-products-head span:nth-child(1) {
+  text-align: left;
+}
+
+.thermal-preview-products-head span:nth-child(2) {
+  text-align: center;
+}
+
+.thermal-preview-products-head span:nth-child(3),
+.thermal-preview-products-head span:nth-child(4) {
+  text-align: right;
+}
+
+.thermal-preview-product-row {
+  min-height: 7mm;
+  padding: 2mm 0;
+  border-bottom: 1px dotted #cccccc;
+}
+
+.thermal-preview-product-row:last-child {
+  border-bottom: none;
+}
+
+.thermal-preview-product-name {
+  min-width: 0;
+  color: #111111;
+  font-size: 7.5px;
+  line-height: 1.3;
+  font-weight: 600;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.thermal-preview-qty {
+  min-width: 0;
+  color: #111111;
+  font-size: 7.5px;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.thermal-preview-price {
+  min-width: 0;
+  color: #111111;
+  font-size: 7.5px;
+  line-height: 1.3;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.thermal-preview-total {
+  min-width: 0;
+  color: #111111;
+  font-size: 7.5px;
+  line-height: 1.3;
+  font-weight: 800;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.thermal-preview-empty {
+  padding: 5mm 0;
+  color: #777777;
+  font-size: 8px;
+  text-align: center;
+}
+
+/* ============================================================
+   80MM SUMMARY
+============================================================ */
+
+.thermal-preview-summary {
+  width: 100%;
+  padding: 4mm 0;
+  box-sizing: border-box;
+}
+
+.thermal-preview-summary > div {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4mm;
+  padding: 1.2mm 0;
+  box-sizing: border-box;
+  color: #444444;
+  font-size: 8px;
+}
+
+.thermal-preview-summary > div > span {
+  min-width: 0;
+}
+
+.thermal-preview-summary > div > strong {
+  flex-shrink: 0;
+  color: #111111;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.thermal-preview-grand-total {
+  margin-top: 2mm;
+  padding-top: 2.5mm !important;
+  border-top: 1px solid #111111;
+  color: #111111 !important;
+  font-size: 11px !important;
+  font-weight: 800;
+}
+
+.thermal-preview-grand-total strong {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+/* ============================================================
+   80MM NOTES
+============================================================ */
+
+.thermal-preview-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 2mm;
+  padding: 4mm 0;
+  box-sizing: border-box;
+}
+
+.thermal-preview-notes > strong {
+  color: #111111;
+  font-size: 7px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.thermal-preview-notes > span {
+  color: #444444;
+  font-size: 8px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* ============================================================
+   80MM FOOTER
+============================================================ */
+
+.thermal-preview-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5mm;
+  padding-top: 4mm;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.thermal-preview-footer > strong {
+  color: #111111;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.thermal-preview-footer > span {
+  color: #666666;
+  font-size: 7px;
+}
+
+/* ============================================================
+   A4 PREVIEW MODAL
 ============================================================ */
 
 .invoice-preview-modal.a4 {
@@ -1217,6 +1545,7 @@
 .invoice-preview-modal.a4 .invoice-preview-body {
   padding: 30px;
   background: #e5e7eb;
+  overflow-y: auto;
 }
 
 .invoice-preview-modal.a4 .invoice-preview-paper {
@@ -1224,10 +1553,338 @@
   max-width: 210mm;
   min-height: 297mm;
   margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* ============================================================
+   A4 PREVIEW CONTENT
+============================================================ */
+
+.a4-preview-content {
+  width: 100%;
+  min-height: 297mm;
   padding: 18mm 16mm;
   box-sizing: border-box;
   background: #ffffff;
-  box-shadow: 0 3px 18px rgba(0, 0, 0, 0.12);
+  color: #111111;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.a4-preview-header {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 7mm;
+  box-sizing: border-box;
+}
+
+.a4-preview-header > div:first-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.a4-preview-logo {
+  display: block;
+  width: 105px;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 4px;
+  object-fit: contain;
+}
+
+.a4-preview-header > div:first-child > strong {
+  color: #111111;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.a4-preview-header > div:first-child > span {
+  margin-top: 3px;
+  color: #6b7280;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.a4-preview-number {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  min-width: 0;
+  text-align: right;
+}
+
+.a4-preview-number > strong {
+  color: #111111;
+  font-size: 15px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.a4-preview-number > span {
+  color: #6b7280;
+  font-size: 10px;
+}
+
+.a4-preview-divider {
+  width: 100%;
+  height: 0;
+  margin: 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ============================================================
+   A4 CUSTOMER
+============================================================ */
+
+.a4-preview-customer {
+  padding: 7mm 0;
+  box-sizing: border-box;
+}
+
+.a4-preview-title {
+  display: block;
+  margin-bottom: 5mm;
+  color: #374151;
+  font-size: 9px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.a4-preview-customer-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20mm;
+  row-gap: 5mm;
+}
+
+.a4-preview-customer-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2mm;
+  min-width: 0;
+}
+
+.a4-preview-customer-grid > div > span {
+  color: #9ca3af;
+  font-size: 8px;
+  line-height: 1.1;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.a4-preview-customer-grid > div > strong {
+  min-width: 0;
+  color: #111827;
+  font-size: 10px;
+  line-height: 1.35;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* ============================================================
+   A4 PRODUCTS
+============================================================ */
+
+.a4-preview-products {
+  width: 100%;
+  padding: 7mm 0;
+  box-sizing: border-box;
+}
+
+.a4-preview-products-head,
+.a4-preview-product-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns:
+    12mm
+    minmax(0, 1fr)
+    20mm
+    30mm
+    32mm;
+  column-gap: 3mm;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.a4-preview-products-head {
+  min-height: 11mm;
+  padding: 3mm 3mm;
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-bottom: 2px solid #111827;
+  color: #4b5563;
+  font-size: 8px;
+  line-height: 1.1;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.a4-preview-products-head span:nth-child(1),
+.a4-preview-products-head span:nth-child(3) {
+  text-align: center;
+}
+
+.a4-preview-products-head span:nth-child(4),
+.a4-preview-products-head span:nth-child(5) {
+  text-align: right;
+}
+
+.a4-preview-products-head span:nth-child(2) {
+  text-align: left;
+}
+
+.a4-preview-product-row {
+  min-height: 12mm;
+  padding: 3mm 3mm;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #eeeeee;
+  color: #374151;
+  font-size: 9px;
+}
+
+.a4-preview-product-row:last-child {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.a4-preview-product-row > span:first-child {
+  text-align: center;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.a4-preview-product-row > span:nth-child(2) {
+  min-width: 0;
+  color: #111827;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.a4-preview-product-row > span:nth-child(3) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.a4-preview-product-row > span:nth-child(4),
+.a4-preview-product-row > strong {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.a4-preview-product-row > strong {
+  color: #111827;
+  font-weight: 800;
+}
+
+/* ============================================================
+   A4 SUMMARY
+============================================================ */
+
+.a4-preview-summary {
+  width: 78mm;
+  max-width: 100%;
+  margin-left: auto;
+  padding-top: 8mm;
+  box-sizing: border-box;
+}
+
+.a4-preview-summary > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10mm;
+  padding: 2.5mm 0;
+  color: #4b5563;
+  font-size: 10px;
+}
+
+.a4-preview-summary > div > strong {
+  color: #111827;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.a4-preview-grand-total {
+  margin-top: 3mm;
+  padding-top: 4mm !important;
+  border-top: 2px solid #111827;
+  color: #111827 !important;
+  font-size: 14px !important;
+  font-weight: 800;
+}
+
+.a4-preview-grand-total strong {
+  font-size: 14px;
+  font-weight: 800 !important;
+}
+
+/* ============================================================
+   A4 NOTES
+============================================================ */
+
+.a4-preview-notes {
+  margin-top: 8mm;
+  padding: 5mm;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  background: #fafafa;
+}
+
+.a4-preview-notes > strong {
+  display: block;
+  margin-bottom: 3mm;
+  color: #374151;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.a4-preview-notes > span {
+  display: block;
+  color: #4b5563;
+  font-size: 9px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* ============================================================
+   A4 FOOTER
+============================================================ */
+
+.a4-preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 12mm;
+  padding-top: 4mm;
+  border-top: 1px solid #e5e7eb;
+  color: #9ca3af;
+  font-size: 8px;
 }
 
 /* ============================================================
@@ -1266,78 +1923,8 @@
 }
 
 /* ============================================================
-   PREVIEW PAPER DEFAULT
+   PREVIEW FOOTER BUTTONS
 ============================================================ */
-
-.invoice-preview-paper {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 28px;
-  box-sizing: border-box;
-  background: #ffffff;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
-}
-
-.invoice-preview-logo {
-  display: block;
-  width: 100px;
-  max-width: 100%;
-  height: auto;
-  margin: 0 auto 6px;
-  object-fit: contain;
-}
-
-.invoice-preview-paper > p {
-  margin: 5px 0;
-  text-align: center;
-  color: #6b7280;
-  font-size: 10px;
-}
-
-.invoice-preview-paper hr {
-  border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 15px 0;
-}
-
-.invoice-preview-paper > strong {
-  display: block;
-  color: #111111;
-  font-size: 12px;
-}
-
-.preview-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 5px 0;
-  color: #374151;
-  font-size: 10px;
-}
-
-.preview-line span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.preview-line strong {
-  flex-shrink: 0;
-  color: #111111;
-}
-
-.preview-total {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-top: 12px;
-  font-size: 15px;
-  font-weight: 800;
-}
 
 .invoice-preview-footer {
   display: flex;
@@ -1476,13 +2063,6 @@
     width: 85px;
   }
 
-  /*
-    IMPORTANT:
-    Do NOT force the 80mm screen table to 500px.
-    The compact thermal-screen-table rules above
-    control its width.
-  */
-
   .invoice-products-table {
     overflow-x: hidden;
   }
@@ -1491,10 +2071,6 @@
   .invoice-product-row {
     min-width: 0;
   }
-
-  /*
-    Extra protection for very small screens.
-  */
 
   .invoice-products-table.thermal-screen-table
     .invoice-products-head.draft,
@@ -1523,7 +2099,6 @@
       27px
       43px
       48px;
-
     gap: 2px;
     padding-left: 4px;
     padding-right: 4px;
@@ -1560,14 +2135,13 @@
     padding: 12px;
   }
 
-  .invoice-preview-paper {
-    padding: 18px 12px;
+  .invoice-preview-modal.thermal .invoice-preview-body {
+    padding: 12px;
   }
 
   .invoice-preview-modal.thermal .invoice-preview-paper {
     width: 80mm;
     max-width: 80mm;
-    padding: 18px 12px;
   }
 
   .invoice-preview-modal.a4 {
@@ -1582,7 +2156,6 @@
   .invoice-preview-modal.a4 .invoice-preview-paper {
     width: 210mm;
     max-width: 210mm;
-    padding: 15mm;
   }
 }
 
@@ -1591,10 +2164,6 @@
 ============================================================ */
 
 @media print {
-
-  /* ==========================================================
-     PAGE DEFINITIONS
-  ========================================================== */
 
   @page invoiceA4 {
     size: A4 portrait;
@@ -1605,10 +2174,6 @@
     size: 80mm auto;
     margin: 0;
   }
-
-  /* ==========================================================
-     GLOBAL PRINT RESET
-  ========================================================== */
 
   html,
   body {
@@ -1686,11 +2251,6 @@
 
     background: #ffffff !important;
   }
-
-  /*
-    Hide the normal invoice paper and print
-    only the dedicated thermal layout.
-  */
 
   .invoice-page-80mm > *:not(.invoice-thermal-print) {
     display: none !important;

@@ -838,6 +838,13 @@ function Invoice() {
               product.name ||
               "Product",
 
+            /*
+             * Product image is kept in the invoice data
+             * for snapshot/history purposes.
+             *
+             * It is NOT displayed inside the invoice table.
+             */
+
             productImage:
               image,
 
@@ -989,6 +996,7 @@ function Invoice() {
         const items =
           invoice.items.map(
             (item) => ({
+
               product:
                 item.product?._id ||
                 item.product ||
@@ -1010,6 +1018,7 @@ function Invoice() {
                 Number(
                   item.price
                 ),
+
             })
           );
 
@@ -1165,6 +1174,31 @@ function Invoice() {
 
           setInvoice(
             preview
+          );
+
+
+          setDiscountPercent(
+            Number(
+              preview.discountPercent
+            ) || 0
+          );
+
+
+          setNotes(
+            preview.notes ||
+            ""
+          );
+
+
+          setFormat(
+            preview.format ||
+            "80mm"
+          );
+
+
+          setCopyType(
+            preview.copyType ||
+            "Customer"
           );
         }
 
@@ -1574,9 +1608,9 @@ function Invoice() {
   }
 
 
-  /* ==========================================================
+  /* ============================================================
      RENDER
-  ========================================================== */
+  ============================================================ */
 
   return (
 
@@ -1951,13 +1985,23 @@ function Invoice() {
 
           <div className="invoice-brand">
 
-            <h2>
-              BStore
-            </h2>
+            <img
+              src="/logo.png"
+              alt="BStore logo"
+              className="invoice-brand-logo"
+            />
 
-            <span>
-              Invoice
-            </span>
+            <div className="invoice-brand-text">
+
+              <strong>
+                BStore
+              </strong>
+
+              <span>
+                Invoice
+              </span>
+
+            </div>
 
           </div>
 
@@ -2103,6 +2147,10 @@ function Invoice() {
               }
             >
 
+              <span className="invoice-number-column">
+                #
+              </span>
+
               <span>
                 Product
               </span>
@@ -2170,27 +2218,16 @@ function Invoice() {
                       }
                     >
 
+                      {/* COUNT */}
+
+                      <div className="invoice-product-number">
+                        {index + 1}
+                      </div>
+
+
+                      {/* PRODUCT NAME ONLY */}
+
                       <div className="invoice-product-info">
-
-                        {item.productImage ? (
-
-                          <img
-                            src={getImageUrl(
-                              item.productImage
-                            )}
-                            alt={
-                              item.productName
-                            }
-                          />
-
-                        ) : (
-
-                          <div className="invoice-product-placeholder">
-                            —
-                          </div>
-
-                        )}
-
 
                         <strong>
                           {item.productName}
@@ -2198,6 +2235,8 @@ function Invoice() {
 
                       </div>
 
+
+                      {/* QUANTITY */}
 
                       <div>
 
@@ -2232,6 +2271,8 @@ function Invoice() {
 
                       </div>
 
+
+                      {/* PRICE */}
 
                       <div>
 
@@ -2277,12 +2318,16 @@ function Invoice() {
                       </div>
 
 
+                      {/* TOTAL */}
+
                       <strong>
                         {formatPrice(
                           lineTotal
                         )}
                       </strong>
 
+
+                      {/* ACTION */}
 
                       {isDraft && (
 
@@ -2754,9 +2799,15 @@ function Invoice() {
 
               <div className="invoice-preview-paper">
 
-                <h2>
+                <img
+                  src="/logo.png"
+                  alt="BStore logo"
+                  className="invoice-preview-logo"
+                />
+
+                <strong className="invoice-preview-brand">
                   BStore
-                </h2>
+                </strong>
 
                 <p>
                   {invoice.invoiceNumber}
@@ -2764,18 +2815,22 @@ function Invoice() {
 
                 <hr />
 
+
                 <strong>
                   {getCustomerName(
                     invoice.customer
                   )}
                 </strong>
 
+
                 <p>
                   {invoice.customer?.phone ||
                     ""}
                 </p>
 
+
                 <hr />
+
 
                 {invoice.items?.map(
                   (
@@ -2792,6 +2847,10 @@ function Invoice() {
                     >
 
                       <span>
+                        <b>
+                          {index + 1}.
+                        </b>
+                        {" "}
                         {item.productName}
                         {" × "}
                         {item.quantity}
@@ -2813,7 +2872,9 @@ function Invoice() {
                   )
                 )}
 
+
                 <hr />
+
 
                 <div className="preview-line">
 
@@ -2859,6 +2920,33 @@ function Invoice() {
                   </strong>
 
                 </div>
+
+
+                {(
+                  notes ||
+                  invoice.notes
+                ) && (
+
+                  <>
+
+                    <hr />
+
+                    <div className="preview-notes">
+
+                      <strong>
+                        Notes
+                      </strong>
+
+                      <span>
+                        {notes ||
+                          invoice.notes}
+                      </span>
+
+                    </div>
+
+                  </>
+
+                )}
 
               </div>
 

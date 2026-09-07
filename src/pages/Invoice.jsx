@@ -1,3 +1,4 @@
+
 import {
   useCallback,
   useEffect,
@@ -11,6 +12,8 @@ import {
 } from "react-router-dom";
 
 import axios from "axios";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 import "./Invoice.css";
 
@@ -731,6 +734,39 @@ function A4Preview({
 }
 
 /* ============================================================
+   PDF HELPERS
+============================================================ */
+
+const waitForImages = async (element) => {
+  const images =
+    Array.from(
+      element.querySelectorAll("img")
+    );
+
+  await Promise.all(
+    images.map(
+      (image) =>
+        new Promise((resolve) => {
+          if (image.complete) {
+            resolve();
+            return;
+          }
+
+          image.onload = resolve;
+          image.onerror = resolve;
+        })
+    )
+  );
+};
+
+const sanitizeFileName = (value) => {
+  return String(value || "Invoice")
+    .replace(/[<>:"/\\|?*]+/g, "-")
+    .replace(/\s+/g, "-")
+    .trim();
+};
+
+/* ============================================================
    INVOICE PAGE
 ============================================================ */
 
@@ -1366,53 +1402,201 @@ function Invoice() {
      SAVE AS PDF
   ========================================================== */
 
-  const handleSaveAsPdf = () => {
-    clearMessages();
+  const handleSaveAsPdf = async () => {
+    if (!invoice) {
+      return;
+    }
 
-    /*
-     * We use the browser's native PDF printing system.
-     *
-     * The existing Invoice.css already contains the correct
-     * print layouts for both:
-     *
-     * - A4
-     * - 80mm thermal
-     *
-     * Changing document.title gives Chrome a clean suggested
-     * filename when the user selects "Save to PDF".
-     */
+    try {
+      clearMessages();
 
-    const previousTitle =
-      document.title;
+      setActionLoading("pdf");
 
-    const invoiceNumber =
-      invoice?.invoiceNumber ||
-      "Invoice";
+      /*
+       * We generate the PDF directly from the visible invoice.
+       * No browser print dialog is used.
+       */
 
-    const safeInvoiceNumber =
-      String(invoiceNumber)
-        .replace(/[<>:"/\\|?*]+/g, "-")
-        .trim();
+      const invoiceElement =
+        document.querySelector(
+          ".invoice-paper"
+        );
 
-    document.title =
-      `BStore-${safeInvoiceNumber}`;
+      if (!invoiceElement) {
+        throw new Error(
+          "Invoice element could not be found."
+        );
+      }
 
-    const restoreTitle = () => {
-      document.title =
-        previousTitle;
+      /*
+       * Make sure all invoice images are loaded
+       * before creating the canvas.
+       */
 
-      window.removeEventListener(
-        "afterprint",
-        restoreTitle
+      await waitForImages(
+        invoiceElement
       );
-    };
 
-    window.addEventListener(
-      "afterprint",
-      restoreTitle
-    );
+      /*
+       * Small delay gives the browser time to
+       * finish layout calculations.
+       */
 
-    window.print();
+      await new Promise((resolve) =>
+        setTimeout(resolve, 100)
+      );
+
+      const canvas =
+        await html2canvas(
+          invoiceElement,
+          {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#ffffff",
+            logging: false,
+          }
+        );
+
+      const imageData =
+        canvas.toDataURL(
+          "image/png",
+          1
+        );
+
+      const isA4 =
+        format === "A4";
+
+      /*
+       * A4:
+       * 210mm x 297mm
+       *
+       * 80mm:
+       * fixed width 80mm and dynamic height
+       * according to the invoice content.
+       */
+
+      let pdfWidth;
+      let pdfHeight;
+
+      if (isA4) {
+        pdfWidth = 210;
+        pdfHeight = 297;
+      } else {
+        pdfWidth = 80;
+
+        pdfHeight =
+          (canvas.height / canvas.width) *
+          pdfWidth;
+      }
+
+      const pdf =
+        new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: [
+            pdfWidth,
+            pdfHeight,
+          ],
+          compress: true,
+        });
+
+      pdf.addImage(
+        imageData,
+        "PNG",
+        0,
+        0,
+        pdfWidth,
+        pdfHeight,
+        undefined,
+        "FAST"
+      );
+
+      const invoiceNumber =
+        invoice.invoiceNumber ||
+        "Invoice";
+
+      const fileName =
+        `BStore-${sanitizeFileName(
+          invoiceNumber
+        )}.pdf`;
+
+      /*
+       * Chrome / Edge File System Access API.
+       *
+       * This opens a real Save As dialog so the
+       * user can choose the folder/path.
+       */
+
+      if (
+        typeof window !== "undefined" &&
+        "showSaveFilePicker" in window
+      ) {
+        const fileHandle =
+          await window.showSaveFilePicker({
+            suggestedName: fileName,
+
+            types: [
+              {
+                description:
+                  "PDF Document",
+
+                accept: {
+                  "application/pdf":
+                    [".pdf"],
+                },
+              },
+            ],
+          });
+
+        const writable =
+          await fileHandle.createWritable();
+
+        await writable.write(
+          pdf.output("blob")
+        );
+
+        await writable.close();
+      } else {
+        /*
+         * Fallback for browsers that do not
+         * support showSaveFilePicker.
+         *
+         * The browser will download the PDF
+         * using its normal download location.
+         */
+
+        pdf.save(fileName);
+      }
+
+      setSuccess(
+        "PDF saved successfully."
+      );
+    } catch (err) {
+      /*
+       * If the user simply closes the Save As
+       * dialog, do not show an error.
+       */
+
+      if (
+        err?.name ===
+        "AbortError"
+      ) {
+        return;
+      }
+
+      console.error(
+        "Save PDF error:",
+        err
+      );
+
+      setError(
+        err?.message ||
+          "Failed to create PDF."
+      );
+    } finally {
+      setActionLoading("");
+    }
   };
 
   /* ==========================================================
@@ -1733,9 +1917,14 @@ function Invoice() {
           <button
             type="button"
             className="invoice-secondary-button"
+            disabled={
+              actionLoading === "pdf"
+            }
             onClick={handleSaveAsPdf}
           >
-            Save as PDF
+            {actionLoading === "pdf"
+              ? "Creating PDF..."
+              : "Save as PDF"}
           </button>
 
           {/* DUPLICATE */}
@@ -2519,6 +2708,9 @@ function Invoice() {
               <button
                 type="button"
                 className="invoice-secondary-button"
+                disabled={
+                  actionLoading === "pdf"
+                }
                 onClick={() => {
                   setPreviewOpen(false);
 
@@ -2529,7 +2721,9 @@ function Invoice() {
                   );
                 }}
               >
-                Save as PDF
+                {actionLoading === "pdf"
+                  ? "Creating PDF..."
+                  : "Save as PDF"}
               </button>
 
               <button

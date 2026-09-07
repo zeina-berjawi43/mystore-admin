@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import axios from "axios";
 
-const API_URL = "https://mystore-backend-u6ey.onrender.com";
 
-const STATUSES = [
+const API_URL =
+  "https://mystore-backend-u6ey.onrender.com";
+
+
+const ORDER_STATUSES = [
   "Pending",
   "Confirmed",
   "Preparing",
@@ -12,17 +19,281 @@ const STATUSES = [
   "Cancelled",
 ];
 
+
+/* ============================================================
+   AUTH TOKEN
+============================================================ */
+
+const getToken = () => {
+  /*
+   * Admin Login stores the access token as:
+   *
+   * localStorage.setItem("accessToken", accessToken)
+   *
+   * We keep the other keys as fallbacks in case
+   * an older session used them.
+   */
+
+  const storedToken =
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("adminToken") ||
+    localStorage.getItem("token") ||
+    "";
+
+  return storedToken
+    .replace(/^Bearer\s+/i, "")
+    .trim();
+};
+
+
+const getAuthHeaders = () => {
+  const token =
+    getToken();
+
+  if (!token) {
+    throw new Error(
+      "Admin authentication token was not found. Please login again."
+    );
+  }
+
+  return {
+    Authorization:
+      `Bearer ${token}`,
+  };
+};
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+const getInitials = (customer) => {
+
+  if (!customer) {
+    return "?";
+  }
+
+
+  const firstName =
+    customer.firstName ||
+    "";
+
+  const lastName =
+    customer.lastName ||
+    "";
+
+  const name =
+    customer.name ||
+    "";
+
+
+  if (
+    firstName ||
+    lastName
+  ) {
+
+    return (
+      `${firstName.charAt(0)}${lastName.charAt(0)}`
+        .toUpperCase()
+    );
+  }
+
+
+  if (name) {
+
+    const parts =
+      name.trim().split(/\s+/);
+
+
+    if (parts.length >= 2) {
+
+      return (
+        `${parts[0].charAt(0)}${parts[1].charAt(0)}`
+          .toUpperCase()
+      );
+    }
+
+
+    return name
+      .charAt(0)
+      .toUpperCase();
+  }
+
+
+  return "?";
+};
+
+
+const getCustomerName = (customer) => {
+
+  if (!customer) {
+    return "Unknown Customer";
+  }
+
+
+  if (
+    customer.firstName ||
+    customer.lastName
+  ) {
+
+    return (
+      `${customer.firstName || ""} ${
+        customer.lastName || ""
+      }`
+        .trim()
+    );
+  }
+
+
+  return (
+    customer.name ||
+    "Unknown Customer"
+  );
+};
+
+
+const getCustomerEmail = (customer) => {
+
+  return (
+    customer?.email ||
+    "No email"
+  );
+};
+
+
+const getCustomerPhone = (customer) => {
+
+  return (
+    customer?.phone ||
+    "No phone"
+  );
+};
+
+
+const formatDate = (date) => {
+
+  if (!date) {
+    return "—";
+  }
+
+
+  const parsedDate =
+    new Date(date);
+
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
+
+    return "—";
+  }
+
+
+  return parsedDate.toLocaleDateString(
+    "en-US",
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }
+  );
+};
+
+
+const formatDateTime = (date) => {
+
+  if (!date) {
+    return "—";
+  }
+
+
+  const parsedDate =
+    new Date(date);
+
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
+
+    return "—";
+  }
+
+
+  return parsedDate.toLocaleString(
+    "en-US",
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
+};
+
+
+const formatPrice = (price) => {
+
+  const value =
+    Number(price);
+
+
+  if (
+    Number.isNaN(value)
+  ) {
+
+    return "$0.00";
+  }
+
+
+  return `$${value.toFixed(2)}`;
+};
+
+
+const getStatusClass = (status) => {
+
+  return (
+    status ||
+    "Pending"
+  )
+    .toLowerCase()
+    .replace(/\s+/g, "-");
+};
+
+
+/* ============================================================
+   ORDERS
+============================================================ */
+
 function Orders() {
 
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] =
+    useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading] =
+    useState(true);
 
-  const [statusFilter, setStatusFilter] = useState("");
-  const [search, setSearch] = useState("");
+  const [refreshing, setRefreshing] =
+    useState(false);
 
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [error, setError] =
+    useState("");
+
+  const [search, setSearch] =
+    useState("");
+
+  const [statusFilter, setStatusFilter] =
+    useState("All");
+
+  const [selectedOrder, setSelectedOrder] =
+    useState(null);
+
+  const [modalLoading, setModalLoading] =
+    useState(false);
 
   const [updatingStatus, setUpdatingStatus] =
     useState(false);
@@ -30,80 +301,73 @@ function Orders() {
   const [deletingOrder, setDeletingOrder] =
     useState(false);
 
-
-  const getToken = () => {
-    return localStorage.getItem("accessToken");
-  };
+  const [creatingInvoice, setCreatingInvoice] =
+    useState(false);
 
 
-  // ============================================================
-  // GET ALL ORDERS
-  // ============================================================
+/* ============================================================
+   FETCH ALL ORDERS
+============================================================ */
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (
+    showLoading = true
+  ) => {
 
     try {
 
-      setLoading(true);
-      setError("");
-
-      const token = getToken();
-
-      const response = await axios.get(
-        `${API_URL}/orders/admin/all`,
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log(
-        "ORDERS RESPONSE:",
-        response.data
-      );
-
-      setOrders(
-        response.data.orders || []
-      );
-
-    } catch (error) {
-
-      console.log(
-        "ORDERS ERROR:",
-        error
-      );
-
-      if (
-        error.response?.status === 401 ||
-        error.response?.status === 403
-      ) {
-
-        localStorage.clear();
-
-        window.location.href =
-          "/login";
-
-        return;
+      if (showLoading) {
+        setLoading(true);
       }
 
+      setError("");
+
+
+      const response =
+        await axios.get(
+          `${API_URL}/orders/admin/all`,
+          {
+            headers:
+              getAuthHeaders(),
+          }
+        );
+
+
+      const receivedOrders =
+        Array.isArray(
+          response.data
+        )
+          ? response.data
+          : (
+              response.data?.orders ||
+              []
+            );
+
+
+      setOrders(
+        receivedOrders
+      );
+
+    } catch (err) {
+
+      console.error(
+        "Fetch orders error:",
+        err
+      );
+
+
       setError(
-        error.response?.data?.message ||
-          "Cannot load orders"
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to load orders."
       );
 
     } finally {
 
       setLoading(false);
-
+      setRefreshing(false);
     }
   };
 
-
-  // ============================================================
-  // INITIAL LOAD
-  // ============================================================
 
   useEffect(() => {
 
@@ -112,197 +376,291 @@ function Orders() {
   }, []);
 
 
-  // ============================================================
-  // FILTER ORDERS
-  // SEARCH CUSTOMER + PRODUCT
-  // ============================================================
+/* ============================================================
+   FILTER ORDERS
+============================================================ */
 
   const filteredOrders =
-    orders.filter((order) => {
+    orders.filter(
+      (order) => {
 
-      const searchText =
-        search
-          .trim()
-          .toLowerCase();
-
-
-      // ========================================================
-      // CUSTOMER
-      // ========================================================
-
-      const customerName =
-        order.user?.name
-          ?.toLowerCase() || "";
-
-      const customerEmail =
-        order.user?.email
-          ?.toLowerCase() || "";
-
-      const customerPhone =
-        order.user?.phone
-          ?.toLowerCase() || "";
+        const customer =
+          order.user ||
+          order.customer ||
+          {};
 
 
-      // ========================================================
-      // PRODUCT
-      // ========================================================
+        const customerName =
+          getCustomerName(
+            customer
+          );
 
-      const productMatch =
-        (order.items || []).some(
-          (item) => {
 
-            const productName =
-              item.product?.name
-                ?.toLowerCase() || "";
+        const customerEmail =
+          getCustomerEmail(
+            customer
+          );
 
-            return productName.includes(
-              searchText
-            );
 
+        const customerPhone =
+          getCustomerPhone(
+            customer
+          );
+
+
+        const searchableText =
+          [
+            customerName,
+            customerEmail,
+            customerPhone,
+            order._id,
+            order.status,
+          ]
+            .join(" ")
+            .toLowerCase();
+
+
+        const matchesSearch =
+          !search.trim() ||
+          searchableText.includes(
+            search
+              .trim()
+              .toLowerCase()
+          );
+
+
+        const matchesStatus =
+          statusFilter === "All" ||
+          order.status ===
+            statusFilter;
+
+
+        return (
+          matchesSearch &&
+          matchesStatus
+        );
+      }
+    );
+
+
+/* ============================================================
+   REFRESH
+============================================================ */
+
+  const handleRefresh = async () => {
+
+    setRefreshing(true);
+
+    await fetchOrders(false);
+  };
+
+
+/* ============================================================
+   CLEAR FILTERS
+============================================================ */
+
+  const handleClearFilters = () => {
+
+    setSearch("");
+
+    setStatusFilter("All");
+  };
+
+
+/* ============================================================
+   OPEN ORDER
+============================================================ */
+
+  const handleOpenOrder = async (
+    orderId
+  ) => {
+
+    try {
+
+      setModalLoading(true);
+
+      setError("");
+
+
+      const response =
+        await axios.get(
+          `${API_URL}/orders/admin/${orderId}`,
+          {
+            headers:
+              getAuthHeaders(),
           }
         );
 
 
-      // ========================================================
-      // CUSTOMER MATCH
-      // ========================================================
-
-      const customerMatch =
-        customerName.includes(
-          searchText
-        ) ||
-        customerEmail.includes(
-          searchText
-        ) ||
-        customerPhone.includes(
-          searchText
-        );
+      const order =
+        response.data?.order ||
+        response.data;
 
 
-      // ========================================================
-      // SEARCH MATCH
-      // ========================================================
-
-      const matchesSearch =
-        !searchText ||
-        customerMatch ||
-        productMatch;
-
-
-      // ========================================================
-      // STATUS MATCH
-      // ========================================================
-
-      const matchesStatus =
-        !statusFilter ||
-        order.status ===
-          statusFilter;
-
-
-      return (
-        matchesSearch &&
-        matchesStatus
+      setSelectedOrder(
+        order
       );
 
-    });
+    } catch (err) {
+
+      console.error(
+        "Open order error:",
+        err
+      );
 
 
-  // ============================================================
-  // UPDATE STATUS
-  // ============================================================
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to load order details."
+      );
 
-  const updateOrderStatus = async (
+    } finally {
+
+      setModalLoading(false);
+    }
+  };
+
+
+/* ============================================================
+   CLOSE MODAL
+============================================================ */
+
+  const handleCloseModal = () => {
+
+    if (
+      updatingStatus ||
+      deletingOrder ||
+      creatingInvoice
+    ) {
+
+      return;
+    }
+
+
+    setSelectedOrder(null);
+  };
+
+
+/* ============================================================
+   UPDATE ORDER STATUS
+============================================================ */
+
+  const handleStatusChange = async (
     orderId,
     newStatus
   ) => {
+
+    if (
+      !orderId ||
+      !newStatus
+    ) {
+
+      return;
+    }
+
 
     try {
 
       setUpdatingStatus(true);
 
-      const token = getToken();
+      setError("");
+
 
       const response =
         await axios.put(
           `${API_URL}/orders/admin/${orderId}/status`,
           {
-            status: newStatus,
+            status:
+              newStatus,
           },
           {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
+            headers:
+              getAuthHeaders(),
           }
         );
 
 
-      console.log(
-        "STATUS UPDATE RESPONSE:",
-        response.data
-      );
+      const updatedOrder =
+        response.data?.order ||
+        response.data;
 
-
-      // ========================================================
-      // UPDATE SELECTED ORDER
-      // ========================================================
-
-      setSelectedOrder(
-        response.data.order
-      );
-
-
-      // ========================================================
-      // UPDATE ORDER INSIDE TABLE
-      // ========================================================
 
       setOrders(
         (previousOrders) =>
           previousOrders.map(
             (order) =>
-              order._id === orderId
-                ? response.data.order
+              order._id ===
+              orderId
+                ? {
+                    ...order,
+                    status:
+                      newStatus,
+                  }
                 : order
           )
       );
 
 
-      alert(
-        "Order status updated successfully."
+      if (
+        selectedOrder?._id ===
+        orderId
+      ) {
+
+        setSelectedOrder(
+          (previousOrder) =>
+            previousOrder
+              ? {
+                  ...previousOrder,
+                  ...(updatedOrder &&
+                  typeof updatedOrder ===
+                    "object"
+                    ? updatedOrder
+                    : {}),
+                  status:
+                    newStatus,
+                }
+              : previousOrder
+        );
+      }
+
+    } catch (err) {
+
+      console.error(
+        "Update order status error:",
+        err
       );
 
-    } catch (error) {
 
-      console.log(
-        "UPDATE STATUS ERROR:",
-        error
-      );
-
-
-      alert(
-        error.response?.data?.message ||
-          "Error updating order status"
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to update order status."
       );
 
     } finally {
 
       setUpdatingStatus(false);
-
     }
   };
 
 
-  // ============================================================
-  // DELETE ORDER
-  // ============================================================
+/* ============================================================
+   DELETE ORDER
+============================================================ */
 
-  const deleteOrder = async (
+  const handleDeleteOrder = async (
     orderId
   ) => {
 
+    if (!orderId) {
+      return;
+    }
+
+
     const confirmed =
       window.confirm(
-        "Are you sure you want to delete this order? This action cannot be undone."
+        "Are you sure you want to delete this order?"
       );
 
 
@@ -315,212 +673,320 @@ function Orders() {
 
       setDeletingOrder(true);
 
-      const token = getToken();
+      setError("");
 
 
       await axios.delete(
         `${API_URL}/orders/admin/${orderId}`,
         {
-          headers: {
-            Authorization:
-              `Bearer ${token}`,
-          },
+          headers:
+            getAuthHeaders(),
         }
       );
 
-
-      // ========================================================
-      // REMOVE ORDER FROM TABLE
-      // ========================================================
 
       setOrders(
         (previousOrders) =>
           previousOrders.filter(
             (order) =>
-              order._id !== orderId
+              order._id !==
+              orderId
           )
       );
 
 
-      // ========================================================
-      // CLOSE MODAL
-      // ========================================================
-
       if (
-        selectedOrder?._id === orderId
+        selectedOrder?._id ===
+        orderId
       ) {
 
         setSelectedOrder(null);
-
       }
 
+    } catch (err) {
 
-      alert(
-        "Order deleted successfully."
+      console.error(
+        "Delete order error:",
+        err
       );
 
 
-    } catch (error) {
-
-      console.log(
-        "DELETE ORDER ERROR:",
-        error
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to delete order."
       );
-
-
-      if (
-        error.response?.status === 401 ||
-        error.response?.status === 403
-      ) {
-
-        localStorage.clear();
-
-        window.location.href =
-          "/login";
-
-        return;
-
-      }
-
-
-      alert(
-        error.response?.data?.message ||
-          "Error deleting order"
-      );
-
 
     } finally {
 
       setDeletingOrder(false);
-
     }
   };
 
 
-  // ============================================================
-  // OPEN ORDER
-  // ============================================================
+/* ============================================================
+   GET INVOICE ID
+============================================================ */
 
-  const openOrder = async (
+  const getInvoiceId = (
+    order
+  ) => {
+
+    if (!order) {
+      return null;
+    }
+
+
+    if (
+      typeof order.invoice ===
+      "string"
+    ) {
+
+      return order.invoice;
+    }
+
+
+    if (
+      order.invoice &&
+      typeof order.invoice ===
+        "object"
+    ) {
+
+      return (
+        order.invoice._id ||
+        order.invoice.id ||
+        null
+      );
+    }
+
+
+    return null;
+  };
+
+
+/* ============================================================
+   CREATE INVOICE
+============================================================ */
+
+  const handleCreateInvoice = async (
     orderId
   ) => {
 
+    if (!orderId) {
+      return;
+    }
+
+
     try {
 
-      const token = getToken();
+      setCreatingInvoice(true);
+
+      setError("");
+
 
       const response =
-        await axios.get(
-          `${API_URL}/orders/admin/${orderId}`,
+        await axios.post(
+          `${API_URL}/invoices/admin/create/${orderId}`,
+          {},
           {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
+            headers:
+              getAuthHeaders(),
           }
         );
 
 
+      const invoice =
+        response.data?.invoice ||
+        response.data;
+
+
+      const invoiceId =
+        invoice?._id ||
+        invoice?.id;
+
+
+      if (!invoiceId) {
+
+        throw new Error(
+          "Invoice was created but no invoice ID was returned."
+        );
+      }
+
+
+      /*
+       * IMPORTANT:
+       *
+       * We do NOT modify the original Order items,
+       * quantities, prices or total.
+       *
+       * The invoice is an independent snapshot.
+       */
+
+
+      setOrders(
+        (previousOrders) =>
+          previousOrders.map(
+            (order) =>
+              order._id ===
+              orderId
+                ? {
+                    ...order,
+                    invoice:
+                      invoiceId,
+                    invoiceStatus:
+                      invoice?.status ||
+                      "Draft",
+                  }
+                : order
+          )
+      );
+
+
       setSelectedOrder(
-        response.data.order
+        (previousOrder) =>
+          previousOrder &&
+          previousOrder._id ===
+            orderId
+            ? {
+                ...previousOrder,
+                invoice:
+                  invoiceId,
+                invoiceStatus:
+                  invoice?.status ||
+                  "Draft",
+              }
+            : previousOrder
       );
 
-    } catch (error) {
 
-      console.log(
-        "GET ORDER ERROR:",
-        error
+      /*
+       * Open invoice page.
+       */
+
+      window.location.href =
+        `/invoices/${invoiceId}`;
+
+    } catch (err) {
+
+      console.error(
+        "Create invoice error:",
+        err
       );
 
 
-      alert(
-        error.response?.data?.message ||
-          "Cannot load order"
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to create invoice."
       );
 
+    } finally {
+
+      setCreatingInvoice(false);
     }
   };
 
 
-  // ============================================================
-  // CLOSE ORDER
-  // ============================================================
+/* ============================================================
+   OPEN EXISTING INVOICE
+============================================================ */
 
-  const closeOrder = () => {
+  const handleViewInvoice = (
+    invoiceId
+  ) => {
 
-    if (
-      updatingStatus ||
-      deletingOrder
-    ) {
+    if (!invoiceId) {
       return;
     }
 
-    setSelectedOrder(null);
 
+    window.location.href =
+      `/invoices/${invoiceId}`;
   };
 
 
-  // ============================================================
-  // CLEAR FILTERS
-  // ============================================================
+/* ============================================================
+   INVOICE BUTTON
+============================================================ */
 
-  const clearFilters = () => {
-
-    setStatusFilter("");
-    setSearch("");
-
-  };
-
-
-  // ============================================================
-  // STATUS CLASS
-  // ============================================================
-
-  const getStatusClass = (
-    status
+  const renderInvoiceButton = (
+    order
   ) => {
 
-    return `order-status ${
-      String(status || "")
-        .toLowerCase()
-    }`;
-
-  };
+    const invoiceId =
+      getInvoiceId(order);
 
 
-  // ============================================================
-  // LOADING
-  // ============================================================
+    if (invoiceId) {
 
-  if (
-    loading &&
-    orders.length === 0
-  ) {
+      return (
+
+        <button
+          type="button"
+          className="view-invoice-button"
+          onClick={() =>
+            handleViewInvoice(
+              invoiceId
+            )
+          }
+        >
+          Invoice
+        </button>
+
+      );
+    }
+
 
     return (
 
-      <div className="orders-page">
+      <button
+        type="button"
+        className="create-invoice-button"
+        disabled={
+          creatingInvoice
+        }
+        onClick={() =>
+          handleCreateInvoice(
+            order._id
+          )
+        }
+      >
 
-        <div className="orders-loading">
+        {creatingInvoice
+          ? "Creating..."
+          : "Invoice"}
 
-          <div className="loading-spinner"></div>
+      </button>
 
-          <p>
-            Loading orders...
-          </p>
+    );
+  };
 
-        </div>
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+  if (loading) {
+
+    return (
+
+      <div className="orders-loading">
+
+        <div className="loading-spinner" />
+
+        <p>
+          Loading orders...
+        </p>
 
       </div>
 
     );
-
   }
 
 
-  // ============================================================
-  // PAGE
-  // ============================================================
+/* ============================================================
+   RENDER
+============================================================ */
 
   return (
 
@@ -540,7 +1006,8 @@ function Orders() {
           </h1>
 
           <p>
-            View and manage customer orders.
+            Manage customer orders
+            and invoices
           </p>
 
         </div>
@@ -549,9 +1016,18 @@ function Orders() {
         <button
           type="button"
           className="refresh-orders-button"
-          onClick={fetchOrders}
+          onClick={
+            handleRefresh
+          }
+          disabled={
+            refreshing
+          }
         >
-          ↻ Refresh
+
+          {refreshing
+            ? "Refreshing..."
+            : "Refresh"}
+
         </button>
 
       </div>
@@ -563,7 +1039,6 @@ function Orders() {
 
       <div className="orders-filters">
 
-        {/* SEARCH */}
 
         <div className="orders-search">
 
@@ -571,40 +1046,36 @@ function Orders() {
             🔍
           </span>
 
+
           <input
             type="text"
-            placeholder="Search by customer or product..."
             value={search}
-            onChange={(event) => {
-
+            onChange={(event) =>
               setSearch(
                 event.target.value
-              );
-
-            }}
+              )
+            }
+            placeholder="Search customer, phone, email or order..."
           />
 
         </div>
 
 
-        {/* STATUS */}
-
         <select
           value={statusFilter}
-          onChange={(event) => {
-
+          onChange={(event) =>
             setStatusFilter(
               event.target.value
-            );
-
-          }}
+            )
+          }
         >
 
-          <option value="">
+          <option value="All">
             All Statuses
           </option>
 
-          {STATUSES.map(
+
+          {ORDER_STATUSES.map(
             (status) => (
 
               <option
@@ -620,20 +1091,15 @@ function Orders() {
         </select>
 
 
-        {/* CLEAR */}
-
-        {(search ||
-          statusFilter) && (
-
-          <button
-            type="button"
-            className="clear-orders-button"
-            onClick={clearFilters}
-          >
-            Clear
-          </button>
-
-        )}
+        <button
+          type="button"
+          className="clear-orders-button"
+          onClick={
+            handleClearFilters
+          }
+        >
+          Clear
+        </button>
 
       </div>
 
@@ -650,15 +1116,19 @@ function Orders() {
             Error
           </strong>
 
+
           <span>
             {error}
           </span>
 
+
           <button
             type="button"
-            onClick={fetchOrders}
+            onClick={() =>
+              setError("")
+            }
           >
-            Try Again
+            Dismiss
           </button>
 
         </div>
@@ -672,20 +1142,26 @@ function Orders() {
 
       <div className="orders-count">
 
+        Showing{" "}
+
         <span>
-
-          {filteredOrders.length} order
-          {filteredOrders.length !== 1
-            ? "s"
-            : ""}
-
+          {filteredOrders.length}
         </span>
+
+        {" "}of{" "}
+
+        <span>
+          {orders.length}
+        </span>
+
+        {" "}orders
 
       </div>
 
 
       {/* ======================================================
-          ORDERS TABLE
+          TABLE
+          NO PRODUCTS COLUMN
       ====================================================== */}
 
       <div className="orders-table-container">
@@ -698,10 +1174,6 @@ function Orders() {
 
               <th>
                 Customer
-              </th>
-
-              <th>
-                Products
               </th>
 
               <th>
@@ -732,7 +1204,7 @@ function Orders() {
               <tr>
 
                 <td
-                  colSpan="6"
+                  colSpan="5"
                   className="orders-empty"
                 >
 
@@ -742,13 +1214,15 @@ function Orders() {
                       📦
                     </span>
 
+
                     <h3>
                       No orders found
                     </h3>
 
+
                     <p>
-                      There are no orders
-                      matching your filters.
+                      Try changing your
+                      search or filters.
                     </p>
 
                   </div>
@@ -760,172 +1234,161 @@ function Orders() {
             ) : (
 
               filteredOrders.map(
-                (order) => (
+                (order) => {
 
-                  <tr
-                    key={order._id}
-                  >
+                  const customer =
+                    order.user ||
+                    order.customer ||
+                    {};
 
-                    {/* CUSTOMER */}
 
-                    <td>
+                  const customerName =
+                    getCustomerName(
+                      customer
+                    );
 
-                      <div className="order-customer">
 
-                        <div className="order-avatar">
+                  return (
 
-                          {order.user?.name
-                            ?.charAt(0)
-                            ?.toUpperCase() ||
-                            "U"}
+                    <tr
+                      key={
+                        order._id
+                      }
+                    >
+
+
+                      {/* CUSTOMER */}
+
+                      <td>
+
+                        <div className="order-customer">
+
+                          <div className="order-avatar">
+
+                            {getInitials(
+                              customer
+                            )}
+
+                          </div>
+
+
+                          <div>
+
+                            <strong>
+                              {customerName}
+                            </strong>
+
+
+                            <small>
+                              {getCustomerEmail(
+                                customer
+                              )}
+                            </small>
+
+                          </div>
 
                         </div>
 
-                        <div>
+                      </td>
 
-                          <strong>
-                            {order.user?.name ||
-                              "Unknown User"}
-                          </strong>
 
-                          <small>
-                            {order.user?.email ||
-                              ""}
-                          </small>
+                      {/* TOTAL */}
+
+                      <td>
+
+                        <strong>
+                          {formatPrice(
+                            order.totalPrice
+                          )}
+                        </strong>
+
+                      </td>
+
+
+                      {/* STATUS */}
+
+                      <td>
+
+                        <span
+                          className={
+                            `order-status ${getStatusClass(
+                              order.status
+                            )}`
+                          }
+                        >
+
+                          {order.status ||
+                            "Pending"}
+
+                        </span>
+
+                      </td>
+
+
+                      {/* DATE */}
+
+                      <td>
+
+                        <span className="order-date">
+
+                          {formatDate(
+                            order.createdAt
+                          )}
+
+                        </span>
+
+                      </td>
+
+
+                      {/* ACTIONS */}
+
+                      <td>
+
+                        <div className="order-actions">
+
+
+                          <button
+                            type="button"
+                            className="view-order-button"
+                            onClick={() =>
+                              handleOpenOrder(
+                                order._id
+                              )
+                            }
+                          >
+                            View
+                          </button>
+
+
+                          {renderInvoiceButton(
+                            order
+                          )}
+
+
+                          <button
+                            type="button"
+                            className="delete-order-button"
+                            disabled={
+                              deletingOrder
+                            }
+                            onClick={() =>
+                              handleDeleteOrder(
+                                order._id
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+
 
                         </div>
 
-                      </div>
+                      </td>
 
-                    </td>
+                    </tr>
 
-
-                    {/* PRODUCTS */}
-
-                    <td>
-
-                      <div className="order-product-list">
-
-                        {(order.items || []).map(
-                          (item, index) => (
-
-                            <div
-                              key={
-                                item._id ||
-                                index
-                              }
-                              className="order-product-item"
-                            >
-
-                              <span>
-                                {item.product?.name ||
-                                  "Product"}
-                              </span>
-
-                              <small>
-                                × {item.quantity}
-                              </small>
-
-                            </div>
-
-                          )
-                        )}
-
-                      </div>
-
-                    </td>
-
-
-                    {/* TOTAL */}
-
-                    <td>
-
-                      <strong>
-
-                        $
-                        {Number(
-                          order.totalPrice ||
-                            0
-                        ).toFixed(2)}
-
-                      </strong>
-
-                    </td>
-
-
-                    {/* STATUS */}
-
-                    <td>
-
-                      <span
-                        className={getStatusClass(
-                          order.status
-                        )}
-                      >
-                        {order.status}
-                      </span>
-
-                    </td>
-
-
-                    {/* DATE */}
-
-                    <td>
-
-                      <span className="order-date">
-
-                        {order.createdAt
-                          ? new Date(
-                              order.createdAt
-                            ).toLocaleDateString()
-                          : "-"}
-
-                      </span>
-
-                    </td>
-
-
-                    {/* ACTION */}
-
-                    <td>
-
-                      <div className="order-actions">
-
-                        <button
-                          type="button"
-                          className="view-order-button"
-                          onClick={() =>
-                            openOrder(
-                              order._id
-                            )
-                          }
-                        >
-                          View
-                        </button>
-
-
-                        <button
-                          type="button"
-                          className="delete-order-button"
-                          onClick={() =>
-                            deleteOrder(
-                              order._id
-                            )
-                          }
-                          disabled={
-                            deletingOrder
-                          }
-                        >
-                          Delete
-                        </button>
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-
-                )
+                  );
+                }
               )
 
             )}
@@ -938,31 +1401,29 @@ function Orders() {
 
 
       {/* ======================================================
-          ORDER DETAILS MODAL
+          ORDER MODAL
       ====================================================== */}
 
       {selectedOrder && (
 
         <div
           className="order-modal-overlay"
-          onMouseDown={(event) => {
-
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
-
-              closeOrder();
-
-            }
-
-          }}
+          onClick={
+            handleCloseModal
+          }
         >
 
-          <div className="order-modal">
+          <div
+            className="order-modal"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+          >
 
 
-            {/* HEADER */}
+            {/* ==================================================
+                MODAL HEADER
+            ================================================== */}
 
             <div className="order-modal-header">
 
@@ -972,8 +1433,8 @@ function Orders() {
                   Order Details
                 </h2>
 
+
                 <p>
-                  Order #
                   {selectedOrder._id}
                 </p>
 
@@ -983,9 +1444,13 @@ function Orders() {
               <button
                 type="button"
                 className="order-modal-close"
-                onClick={closeOrder}
+                onClick={
+                  handleCloseModal
+                }
                 disabled={
-                  deletingOrder
+                  updatingStatus ||
+                  deletingOrder ||
+                  creatingInvoice
                 }
               >
                 ✕
@@ -994,7 +1459,9 @@ function Orders() {
             </div>
 
 
-            {/* CUSTOMER */}
+            {/* ==================================================
+                CUSTOMER
+            ================================================== */}
 
             <div className="order-detail-section">
 
@@ -1002,36 +1469,49 @@ function Orders() {
                 Customer
               </h3>
 
+
               <div className="order-detail-customer">
 
                 <div className="order-avatar large">
 
-                  {selectedOrder.user?.name
-                    ?.charAt(0)
-                    ?.toUpperCase() ||
-                    "U"}
+                  {getInitials(
+                    selectedOrder.user ||
+                    selectedOrder.customer
+                  )}
 
                 </div>
+
 
                 <div>
 
                   <strong>
-                    {selectedOrder.user?.name ||
-                      "Unknown User"}
+
+                    {getCustomerName(
+                      selectedOrder.user ||
+                      selectedOrder.customer
+                    )}
+
                   </strong>
 
+
                   <span>
-                    {selectedOrder.user?.email ||
-                      ""}
+
+                    {getCustomerEmail(
+                      selectedOrder.user ||
+                      selectedOrder.customer
+                    )}
+
                   </span>
 
-                  {selectedOrder.user?.phone && (
 
-                    <span>
-                      {selectedOrder.user.phone}
-                    </span>
+                  <span>
 
-                  )}
+                    {getCustomerPhone(
+                      selectedOrder.user ||
+                      selectedOrder.customer
+                    )}
+
+                  </span>
 
                 </div>
 
@@ -1050,20 +1530,21 @@ function Orders() {
                 Order Date
               </h3>
 
+
               <p className="order-detail-date">
 
-                {selectedOrder.createdAt
-                  ? new Date(
-                      selectedOrder.createdAt
-                    ).toLocaleString()
-                  : "-"}
+                {formatDateTime(
+                  selectedOrder.createdAt
+                )}
 
               </p>
 
             </div>
 
 
-            {/* SHIPPING */}
+            {/* ==================================================
+                SHIPPING ADDRESS
+            ================================================== */}
 
             <div className="order-detail-section">
 
@@ -1071,17 +1552,21 @@ function Orders() {
                 Shipping Address
               </h3>
 
+
               <p className="shipping-address">
 
                 {selectedOrder.shippingAddress ||
-                  "No address"}
+                  "No shipping address"}
 
               </p>
 
             </div>
 
 
-            {/* PRODUCTS */}
+            {/* ==================================================
+                PRODUCTS
+                PRODUCTS ONLY INSIDE MODAL
+            ================================================== */}
 
             <div className="order-detail-section">
 
@@ -1089,47 +1574,106 @@ function Orders() {
                 Products
               </h3>
 
+
               <div className="order-detail-products">
 
-                {(selectedOrder.items || []).map(
-                  (item, index) => (
+                {modalLoading ? (
 
-                    <div
-                      className="order-detail-product"
-                      key={
-                        item._id ||
-                        index
-                      }
-                    >
+                  <p>
+                    Loading products...
+                  </p>
 
-                      <div>
+                ) : selectedOrder.items &&
+                  selectedOrder.items.length > 0 ? (
 
-                        <strong>
-                          {item.product?.name ||
-                            "Product"}
-                        </strong>
+                  selectedOrder.items.map(
+                    (item, index) => {
 
-                        <span>
-                          Quantity:{" "}
-                          {item.quantity}
-                        </span>
-
-                      </div>
+                      const product =
+                        item.product &&
+                        typeof item.product ===
+                          "object"
+                          ? item.product
+                          : null;
 
 
-                      <strong>
+                      const productName =
+                        product?.name ||
+                        item.productName ||
+                        "Product";
 
-                        $
-                        {Number(
-                          item.price ||
-                            0
-                        ).toFixed(2)}
 
-                      </strong>
+                      const quantity =
+                        Number(
+                          item.quantity
+                        ) || 0;
 
-                    </div>
 
+                      const price =
+                        Number(
+                          item.price
+                        ) || 0;
+
+
+                      const lineTotal =
+                        price *
+                        quantity;
+
+
+                      return (
+
+                        <div
+                          className="order-detail-product"
+                          key={
+                            item._id ||
+                            product?._id ||
+                            index
+                          }
+                        >
+
+                          <div>
+
+                            <strong>
+                              {productName}
+                            </strong>
+
+
+                            <span>
+
+                              Qty:{" "}
+                              {quantity}
+
+                              {" × "}
+
+                              {formatPrice(
+                                price
+                              )}
+
+                            </span>
+
+                          </div>
+
+
+                          <strong>
+
+                            {formatPrice(
+                              lineTotal
+                            )}
+
+                          </strong>
+
+                        </div>
+
+                      );
+                    }
                   )
+
+                ) : (
+
+                  <p>
+                    No products found.
+                  </p>
+
                 )}
 
               </div>
@@ -1137,61 +1681,70 @@ function Orders() {
             </div>
 
 
-            {/* TOTAL */}
+            {/* ==================================================
+                TOTAL
+            ================================================== */}
 
             <div className="order-total-row">
 
               <span>
-                Total
+                Order Total
               </span>
 
+
               <strong>
-
-                $
-                {Number(
-                  selectedOrder.totalPrice ||
-                    0
-                ).toFixed(2)}
-
+                {formatPrice(
+                  selectedOrder.totalPrice
+                )}
               </strong>
 
             </div>
 
 
-            {/* STATUS */}
+            {/* ==================================================
+                STATUS
+            ================================================== */}
 
             <div className="order-detail-section">
 
               <h3>
-                Update Status
+                Order Status
               </h3>
+
 
               <div className="status-buttons">
 
-                {STATUSES.map(
+                {ORDER_STATUSES.map(
                   (status) => (
 
                     <button
-                      type="button"
                       key={status}
+                      type="button"
+                      className={
+                        `status-change-button ${getStatusClass(
+                          status
+                        )} ${
+                          selectedOrder.status ===
+                          status
+                            ? "active"
+                            : ""
+                        }`
+                      }
                       disabled={
                         updatingStatus ||
-                        deletingOrder
-                      }
-                      className={
                         selectedOrder.status ===
-                        status
-                          ? `status-change-button active ${status.toLowerCase()}`
-                          : `status-change-button ${status.toLowerCase()}`
+                          status
                       }
                       onClick={() =>
-                        updateOrderStatus(
+                        handleStatusChange(
                           selectedOrder._id,
                           status
                         )
                       }
                     >
+
                       {status}
+
                     </button>
 
                   )
@@ -1202,21 +1755,80 @@ function Orders() {
             </div>
 
 
-            {/* FOOTER */}
+            {/* ==================================================
+                INVOICE
+            ================================================== */}
+
+            <div className="order-detail-section">
+
+              <h3>
+                Invoice
+              </h3>
+
+
+              {getInvoiceId(
+                selectedOrder
+              ) ? (
+
+                <button
+                  type="button"
+                  className="view-invoice-button"
+                  onClick={() =>
+                    handleViewInvoice(
+                      getInvoiceId(
+                        selectedOrder
+                      )
+                    )
+                  }
+                >
+                  Open Invoice
+                </button>
+
+              ) : (
+
+                <button
+                  type="button"
+                  className="create-invoice-button"
+                  disabled={
+                    creatingInvoice
+                  }
+                  onClick={() =>
+                    handleCreateInvoice(
+                      selectedOrder._id
+                    )
+                  }
+                >
+
+                  {creatingInvoice
+                    ? "Creating Invoice..."
+                    : "Create Invoice"}
+
+                </button>
+
+              )}
+
+            </div>
+
+
+            {/* ==================================================
+                MODAL FOOTER
+            ================================================== */}
 
             <div className="order-modal-footer">
+
 
               <button
                 type="button"
                 className="delete-order-button"
+                disabled={
+                  deletingOrder ||
+                  updatingStatus ||
+                  creatingInvoice
+                }
                 onClick={() =>
-                  deleteOrder(
+                  handleDeleteOrder(
                     selectedOrder._id
                   )
-                }
-                disabled={
-                  updatingStatus ||
-                  deletingOrder
                 }
               >
 
@@ -1230,14 +1842,18 @@ function Orders() {
               <button
                 type="button"
                 className="close-order-button"
-                onClick={closeOrder}
                 disabled={
                   updatingStatus ||
-                  deletingOrder
+                  deletingOrder ||
+                  creatingInvoice
+                }
+                onClick={
+                  handleCloseModal
                 }
               >
                 Close
               </button>
+
 
             </div>
 
@@ -1248,9 +1864,8 @@ function Orders() {
       )}
 
     </div>
-
   );
-
 }
+
 
 export default Orders;

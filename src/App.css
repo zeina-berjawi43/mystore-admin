@@ -3789,1479 +3789,1475 @@ button {
 }
 
 /* ============================================================
-   ORDERS PAGE
+ORDERS PAGE
 ============================================================ */
 
 .orders-page {
-  width: 100%;
-  max-width: 1500px;
-  margin: 0 auto;
-  color: #000;
+width: 100%;
+max-width: 1500px;
+margin: 0 auto;
+color: #000;
 }
 
-
 /* ============================================================
-   HEADER
+HEADER
 ============================================================ */
 
 .orders-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 28px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 20px;
+margin-bottom: 28px;
 }
 
 .orders-header h1 {
-  margin: 0;
+margin: 0;
 
-  font-size: 30px;
-  font-weight: 800;
-  color: #000;
+font-size: 30px;
+font-weight: 800;
+color: #000;
 }
 
 .orders-header p {
-  margin: 8px 0 0;
+margin: 8px 0 0;
 
-  color: #888;
-  font-size: 13px;
+color: #888;
+font-size: 13px;
 }
 
-
 /* ============================================================
-   REFRESH BUTTON
+REFRESH BUTTON
 ============================================================ */
 
 .refresh-orders-button {
-  padding: 10px 16px;
+padding: 10px 16px;
 
-  border: 1px solid #000;
-  border-radius: 8px;
+border: 1px solid #000;
+border-radius: 8px;
 
-  background: #000;
-  color: #fff;
+background: #000;
+color: #fff;
 
-  font-size: 12px;
-  font-weight: 700;
+font-size: 12px;
+font-weight: 700;
 
-  cursor: pointer;
+cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+transition:
+background 0.2s ease,
+color 0.2s ease,
+transform 0.2s ease;
 }
 
 .refresh-orders-button:hover {
-  background: #fff;
-  color: #000;
+background: #fff;
+color: #000;
 
-  transform: translateY(-1px);
+transform: translateY(-1px);
 }
 
-
 /* ============================================================
-   FILTERS
+FILTERS
 ============================================================ */
 
 .orders-filters {
-  display: flex;
-  align-items: center;
+display: flex;
+align-items: center;
 
-  gap: 12px;
+gap: 12px;
 
-  margin-bottom: 20px;
+margin-bottom: 20px;
 
-  width: 100%;
+width: 100%;
 }
 
-
 /* ============================================================
-   SEARCH
+SEARCH
 ============================================================ */
 
 .orders-search {
-  display: flex;
-  align-items: center;
+display: flex;
+align-items: center;
 
-  gap: 9px;
+gap: 9px;
 
-  flex: 1;
+flex: 1;
 
-  min-width: 0;
+min-width: 0;
 
-  height: 42px;
+height: 42px;
 
-  padding: 0 13px;
+padding: 0 13px;
 
-  border: 1px solid #ddd;
-  border-radius: 9px;
+border: 1px solid #ddd;
+border-radius: 9px;
 
-  background: #fff;
+background: #fff;
 
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+transition:
+border-color 0.2s ease,
+box-shadow 0.2s ease;
 }
 
 .orders-search:focus-within {
-  border-color: #999;
+border-color: #999;
 
-  box-shadow:
-    0 0 0 3px rgba(0, 0, 0, 0.04);
+box-shadow:
+0 0 0 3px rgba(0, 0, 0, 0.04);
 }
 
 .orders-search span {
-  font-size: 14px;
+font-size: 14px;
 
-  flex-shrink: 0;
+flex-shrink: 0;
 }
 
 .orders-search input {
-  width: 100%;
+width: 100%;
 
-  border: none;
-  outline: none;
+border: none;
+outline: none;
 
-  background: transparent;
+background: transparent;
 
-  color: #000;
+color: #000;
 
-  font-size: 12px;
+font-size: 12px;
 }
 
 .orders-search input::placeholder {
-  color: #aaa;
+color: #aaa;
 }
 
-
 /* ============================================================
-   STATUS FILTER
+STATUS FILTER
 ============================================================ */
 
 .orders-filters select {
-  height: 42px;
+height: 42px;
 
-  min-width: 150px;
+min-width: 150px;
 
-  padding: 0 12px;
+padding: 0 12px;
 
-  border: 1px solid #ddd;
-  border-radius: 9px;
+border: 1px solid #ddd;
+border-radius: 9px;
 
-  background: #fff;
+background: #fff;
 
-  color: #000;
+color: #000;
 
-  font-size: 12px;
+font-size: 12px;
 
-  outline: none;
+outline: none;
 
-  cursor: pointer;
+cursor: pointer;
 }
 
 .orders-filters select:focus {
-  border-color: #999;
+border-color: #999;
 }
 
-
 /* ============================================================
-   CLEAR FILTERS
+CLEAR FILTERS
 ============================================================ */
 
 .clear-orders-button {
-  height: 42px;
+height: 42px;
 
-  padding: 0 15px;
+padding: 0 15px;
 
-  border: 1px solid #ddd;
-  border-radius: 9px;
+border: 1px solid #ddd;
+border-radius: 9px;
 
-  background: #fff;
+background: #fff;
 
-  color: #555;
+color: #555;
 
-  font-size: 12px;
-  font-weight: 600;
+font-size: 12px;
+font-weight: 600;
 
-  cursor: pointer;
+cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease;
+transition:
+background 0.2s ease,
+border-color 0.2s ease,
+color 0.2s ease;
 }
 
 .clear-orders-button:hover {
-  background: #f5f5f5;
+background: #f5f5f5;
 
-  border-color: #bbb;
+border-color: #bbb;
 
-  color: #000;
+color: #000;
 }
 
-
 /* ============================================================
-   ERROR
+ERROR
 ============================================================ */
 
 .orders-error {
-  display: flex;
-  align-items: center;
+display: flex;
+align-items: center;
 
-  gap: 10px;
+gap: 10px;
 
-  padding: 13px 15px;
+padding: 13px 15px;
 
-  margin-bottom: 20px;
+margin-bottom: 20px;
 
-  border: 1px solid #f0caca;
-  border-radius: 10px;
+border: 1px solid #f0caca;
+border-radius: 10px;
 
-  background: #fff5f5;
+background: #fff5f5;
 
-  color: #a83b3b;
+color: #a83b3b;
 
-  font-size: 12px;
+font-size: 12px;
 }
 
 .orders-error strong {
-  font-weight: 800;
+font-weight: 800;
 }
 
 .orders-error span {
-  flex: 1;
+flex: 1;
 }
 
 .orders-error button {
-  padding: 6px 11px;
+padding: 6px 11px;
 
-  border: 1px solid #a83b3b;
-  border-radius: 6px;
+border: 1px solid #a83b3b;
+border-radius: 6px;
 
-  background: transparent;
+background: transparent;
 
-  color: #a83b3b;
+color: #a83b3b;
 
-  font-size: 10px;
-  font-weight: 700;
+font-size: 10px;
+font-weight: 700;
 
-  cursor: pointer;
+cursor: pointer;
 }
 
 .orders-error button:hover {
-  background: #a83b3b;
+background: #a83b3b;
 
-  color: #fff;
+color: #fff;
 }
 
-
 /* ============================================================
-   ORDERS COUNT
+ORDERS COUNT
 ============================================================ */
 
 .orders-count {
-  margin-bottom: 12px;
+margin-bottom: 12px;
 
-  color: #777;
+color: #777;
 
-  font-size: 12px;
+font-size: 12px;
 }
 
 .orders-count span {
-  font-weight: 600;
+font-weight: 600;
 }
 
-
 /* ============================================================
-   ORDERS TABLE CONTAINER
+ORDERS TABLE CONTAINER
 ============================================================ */
 
 .orders-table-container {
-  width: 100%;
+width: 100%;
 
-  overflow-x: auto;
+overflow-x: auto;
 
-  -webkit-overflow-scrolling: touch;
+-webkit-overflow-scrolling: touch;
 
-  background: #fff;
+background: #fff;
 
-  border: 1px solid #e5e5e5;
+border: 1px solid #e5e5e5;
 
-  border-radius: 14px;
+border-radius: 14px;
 
-  box-shadow:
-    0 4px 18px rgba(0, 0, 0, 0.03);
+box-shadow:
+0 4px 18px rgba(0, 0, 0, 0.03);
 }
 
-
 /* ============================================================
-   ORDERS TABLE
+ORDERS TABLE
 ============================================================ */
 
 .orders-real-table {
-  width: 100%;
+width: 100%;
 
-  min-width: 950px;
+min-width: 850px;
 
-  border-collapse: collapse;
+border-collapse: collapse;
 
-  table-layout: fixed;
+table-layout: fixed;
 }
 
-
 /* ============================================================
-   TABLE HEADER
+TABLE HEADER
 ============================================================ */
 
 .orders-real-table thead {
-  background: #fafafa;
+background: #fafafa;
 }
 
 .orders-real-table th {
-  padding: 13px 14px;
+padding: 13px 14px;
 
-  border-bottom: 1px solid #eee;
+border-bottom: 1px solid #eee;
 
-  color: #888;
+color: #888;
 
-  font-size: 10px;
+font-size: 10px;
 
-  font-weight: 700;
+font-weight: 700;
 
-  text-align: left;
+text-align: left;
 
-  white-space: nowrap;
+white-space: nowrap;
 }
 
-
 /* ============================================================
-   TABLE BODY
+TABLE BODY
 ============================================================ */
 
 .orders-real-table td {
-  padding: 16px 14px;
+padding: 16px 14px;
 
-  border-bottom: 1px solid #eee;
+border-bottom: 1px solid #eee;
 
-  color: #000;
+color: #000;
 
-  font-size: 12px;
+font-size: 12px;
 
-  vertical-align: middle;
+vertical-align: middle;
 }
 
 .orders-real-table tbody tr:last-child td {
-  border-bottom: none;
+border-bottom: none;
 }
 
 .orders-real-table tbody tr:hover {
-  background: #fcfcfc;
+background: #fcfcfc;
 }
 
-
 /* ============================================================
-   CUSTOMER
+CUSTOMER
 ============================================================ */
 
 .order-customer {
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  gap: 10px;
+gap: 10px;
 
-  min-width: 0;
+min-width: 0;
 }
 
 .order-avatar {
-  width: 38px;
-  height: 38px;
+width: 38px;
+height: 38px;
 
-  min-width: 38px;
+min-width: 38px;
 
-  border-radius: 50%;
+border-radius: 50%;
 
-  background: #000;
+background: #000;
 
-  color: #fff;
+color: #fff;
 
-  display: flex;
+display: flex;
 
-  align-items: center;
-  justify-content: center;
+align-items: center;
+justify-content: center;
 
-  font-size: 13px;
+font-size: 13px;
 
-  font-weight: 700;
+font-weight: 700;
 }
 
 .order-customer > div:last-child {
-  min-width: 0;
+min-width: 0;
 }
 
 .order-customer strong {
-  display: block;
+display: block;
 
-  max-width: 160px;
+max-width: 180px;
 
-  overflow: hidden;
+overflow: hidden;
 
-  text-overflow: ellipsis;
+text-overflow: ellipsis;
 
-  white-space: nowrap;
+white-space: nowrap;
 
-  color: #000;
+color: #000;
 
-  font-size: 12px;
+font-size: 12px;
 }
 
 .order-customer small {
-  display: block;
+display: block;
 
-  max-width: 160px;
+max-width: 180px;
 
-  margin-top: 3px;
+margin-top: 3px;
 
-  overflow: hidden;
+overflow: hidden;
 
-  text-overflow: ellipsis;
+text-overflow: ellipsis;
 
-  white-space: nowrap;
+white-space: nowrap;
 
-  color: #999;
+color: #999;
 
-  font-size: 10px;
+font-size: 10px;
 }
-
 
 /* ============================================================
-   ORDER PRODUCTS
-============================================================ */
-
-.order-product-list {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 5px;
-
-  min-width: 0;
-}
-
-.order-product-item {
-  display: flex;
-
-  align-items: center;
-
-  gap: 6px;
-
-  min-width: 0;
-
-  color: #555;
-
-  font-size: 11px;
-}
-
-.order-product-item span {
-  max-width: 180px;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
-}
-
-.order-product-item small {
-  flex-shrink: 0;
-
-  color: #999;
-
-  font-size: 10px;
-}
-
-
-/* ============================================================
-   TOTAL
+TOTAL
 ============================================================ */
 
 .orders-real-table td strong {
-  font-size: 12px;
+font-size: 12px;
 }
 
-
 /* ============================================================
-   ORDER STATUS
+ORDER STATUS
 ============================================================ */
 
 .order-status {
-  display: inline-block;
+display: inline-block;
 
-  width: fit-content;
+width: fit-content;
 
-  padding: 6px 10px;
+padding: 6px 10px;
 
-  border-radius: 20px;
+border-radius: 20px;
 
-  font-size: 10px;
+font-size: 10px;
 
-  font-weight: 700;
+font-weight: 700;
 
-  white-space: nowrap;
+white-space: nowrap;
 }
 
 .order-status.pending {
-  background: #fff4d6;
+background: #fff4d6;
 
-  color: #9a7200;
+color: #9a7200;
 }
 
 .order-status.confirmed {
-  background: #e8f1ff;
+background: #e8f1ff;
 
-  color: #3a6ea5;
+color: #3a6ea5;
 }
 
 .order-status.preparing {
-  background: #f0e8ff;
+background: #f0e8ff;
 
-  color: #7047a8;
+color: #7047a8;
 }
 
 .order-status.shipped {
-  background: #e8f8f1;
+background: #e8f8f1;
 
-  color: #287653;
+color: #287653;
 }
 
 .order-status.delivered {
-  background: #e8f8e8;
+background: #e8f8e8;
 
-  color: #28733b;
+color: #28733b;
 }
 
 .order-status.cancelled {
-  background: #ffeaea;
+background: #ffeaea;
 
-  color: #a83b3b;
+color: #a83b3b;
 }
 
-
 /* ============================================================
-   DATE
+DATE
 ============================================================ */
 
 .order-date {
-  color: #777;
+color: #777;
 
-  font-size: 11px;
+font-size: 11px;
 
-  white-space: nowrap;
+white-space: nowrap;
 }
 
-
 /* ============================================================
-   ORDER ACTIONS
+ORDER ACTIONS
 ============================================================ */
 
 .order-actions {
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  gap: 7px;
+gap: 7px;
 
-  white-space: nowrap;
+white-space: nowrap;
 }
 
-
 /* ============================================================
-   VIEW BUTTON
+VIEW BUTTON
 ============================================================ */
 
 .view-order-button {
-  padding: 7px 12px;
+padding: 7px 12px;
 
-  border: 1px solid #000;
+border: 1px solid #000;
 
-  border-radius: 7px;
+border-radius: 7px;
 
-  background: #000;
+background: #000;
 
-  color: #fff;
+color: #fff;
 
-  font-size: 10px;
+font-size: 10px;
 
-  font-weight: 700;
+font-weight: 700;
 
-  cursor: pointer;
+cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+transition:
+background 0.2s ease,
+color 0.2s ease,
+transform 0.2s ease;
 }
 
 .view-order-button:hover {
-  background: #fff;
+background: #fff;
 
-  color: #000;
+color: #000;
 
-  transform: translateY(-1px);
+transform: translateY(-1px);
 }
 
+/* ============================================================
+INVOICE BUTTON
+============================================================ */
+
+.create-invoice-button,
+.view-invoice-button {
+padding: 7px 12px;
+
+border: 1px solid #000;
+
+border-radius: 7px;
+
+background: #fff;
+
+color: #000;
+
+font-size: 10px;
+
+font-weight: 700;
+
+cursor: pointer;
+
+transition:
+background 0.2s ease,
+color 0.2s ease,
+transform 0.2s ease;
+}
+
+.create-invoice-button:hover,
+.view-invoice-button:hover {
+background: #000;
+
+color: #fff;
+
+transform: translateY(-1px);
+}
+
+.create-invoice-button:disabled,
+.view-invoice-button:disabled {
+opacity: 0.5;
+
+cursor: not-allowed;
+
+transform: none;
+}
 
 /* ============================================================
-   DELETE BUTTON
+DELETE BUTTON
 ============================================================ */
 
 .delete-order-button {
-  padding: 7px 12px;
+padding: 7px 12px;
 
-  border: 1px solid #e5b5b5;
+border: 1px solid #e5b5b5;
 
-  border-radius: 7px;
+border-radius: 7px;
 
-  background: #fff5f5;
+background: #fff5f5;
 
-  color: #a83b3b;
+color: #a83b3b;
 
-  font-size: 10px;
+font-size: 10px;
 
-  font-weight: 700;
+font-weight: 700;
 
-  cursor: pointer;
+cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
+transition:
+background 0.2s ease,
+color 0.2s ease,
+border-color 0.2s ease,
+transform 0.2s ease;
 }
 
 .delete-order-button:hover {
-  background: #a83b3b;
+background: #a83b3b;
 
-  border-color: #a83b3b;
+border-color: #a83b3b;
 
-  color: #fff;
+color: #fff;
 
-  transform: translateY(-1px);
+transform: translateY(-1px);
 }
 
 .delete-order-button:disabled {
-  opacity: 0.55;
+opacity: 0.55;
 
-  cursor: not-allowed;
+cursor: not-allowed;
 
-  transform: none;
+transform: none;
 }
 
-
 /* ============================================================
-   EMPTY STATE
+EMPTY STATE
 ============================================================ */
 
 .orders-empty {
-  height: 280px;
+height: 280px;
 
-  text-align: center;
+text-align: center;
 }
 
 .orders-empty > div {
-  display: flex;
+display: flex;
 
-  flex-direction: column;
+flex-direction: column;
 
-  align-items: center;
+align-items: center;
 
-  justify-content: center;
+justify-content: center;
 
-  height: 100%;
+height: 100%;
 }
 
 .orders-empty span {
-  display: flex;
+display: flex;
 
-  align-items: center;
-  justify-content: center;
+align-items: center;
+justify-content: center;
 
-  width: 52px;
-  height: 52px;
+width: 52px;
+height: 52px;
 
-  margin-bottom: 12px;
+margin-bottom: 12px;
 
-  border-radius: 50%;
+border-radius: 50%;
 
-  background: #f5f5f5;
+background: #f5f5f5;
 
-  font-size: 23px;
+font-size: 23px;
 }
 
 .orders-empty h3 {
-  margin: 0;
+margin: 0;
 
-  font-size: 15px;
+font-size: 15px;
 
-  font-weight: 800;
+font-weight: 800;
 }
 
 .orders-empty p {
-  margin: 6px 0 0;
+margin: 6px 0 0;
 
-  color: #999;
+color: #999;
 
-  font-size: 11px;
+font-size: 11px;
 }
 
-
 /* ============================================================
-   LOADING
+LOADING
 ============================================================ */
 
 .orders-loading {
-  min-height: 70vh;
+min-height: 70vh;
 
-  display: flex;
+display: flex;
 
-  flex-direction: column;
+flex-direction: column;
 
-  align-items: center;
+align-items: center;
 
-  justify-content: center;
+justify-content: center;
 
-  color: #777;
+color: #777;
 }
 
 .loading-spinner {
-  width: 35px;
-  height: 35px;
+width: 35px;
+height: 35px;
 
-  margin-bottom: 12px;
+margin-bottom: 12px;
 
-  border: 3px solid #ddd;
+border: 3px solid #ddd;
 
-  border-top-color: #000;
+border-top-color: #000;
 
-  border-radius: 50%;
+border-radius: 50%;
 
-  animation: orders-spin 0.8s linear infinite;
+animation: orders-spin 0.8s linear infinite;
 }
 
 .orders-loading p {
-  margin: 0;
+margin: 0;
 
-  font-size: 12px;
+font-size: 12px;
 }
 
 @keyframes orders-spin {
-  to {
-    transform: rotate(360deg);
-  }
+to {
+transform: rotate(360deg);
+}
 }
 
-
 /* ============================================================
-   ORDER MODAL OVERLAY
+ORDER MODAL OVERLAY
 ============================================================ */
 
 .order-modal-overlay {
-  position: fixed;
+position: fixed;
 
-  inset: 0;
+inset: 0;
 
-  z-index: 1000;
+z-index: 1000;
 
-  display: flex;
+display: flex;
 
-  align-items: center;
-  justify-content: center;
+align-items: center;
+justify-content: center;
 
-  padding: 20px;
+padding: 20px;
 
-  background: rgba(0, 0, 0, 0.45);
+background: rgba(0, 0, 0, 0.45);
 }
 
-
 /* ============================================================
-   ORDER MODAL
+ORDER MODAL
 ============================================================ */
 
 .order-modal {
-  width: 100%;
+width: 100%;
 
-  max-width: 650px;
+max-width: 650px;
 
-  max-height: 90vh;
+max-height: 90vh;
 
-  overflow-y: auto;
+overflow-y: auto;
 
-  background: #fff;
+background: #fff;
 
-  border-radius: 16px;
+border-radius: 16px;
 
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.18);
+box-shadow:
+0 20px 60px rgba(0, 0, 0, 0.18);
 }
 
-
 /* ============================================================
-   MODAL HEADER
+MODAL HEADER
 ============================================================ */
 
 .order-modal-header {
-  display: flex;
+display: flex;
 
-  align-items: flex-start;
+align-items: flex-start;
 
-  justify-content: space-between;
+justify-content: space-between;
 
-  gap: 20px;
+gap: 20px;
 
-  padding: 22px 24px;
+padding: 22px 24px;
 
-  border-bottom: 1px solid #eee;
+border-bottom: 1px solid #eee;
 }
 
 .order-modal-header h2 {
-  margin: 0;
+margin: 0;
 
-  font-size: 20px;
+font-size: 20px;
 
-  font-weight: 800;
+font-weight: 800;
 }
 
 .order-modal-header p {
-  margin: 5px 0 0;
+margin: 5px 0 0;
 
-  color: #999;
+color: #999;
 
-  font-size: 10px;
+font-size: 10px;
 
-  word-break: break-all;
+word-break: break-all;
 }
 
-
 /* ============================================================
-   MODAL CLOSE
+MODAL CLOSE
 ============================================================ */
 
 .order-modal-close {
-  width: 34px;
-  height: 34px;
+width: 34px;
+height: 34px;
 
-  min-width: 34px;
+min-width: 34px;
 
-  display: flex;
+display: flex;
 
-  align-items: center;
-  justify-content: center;
+align-items: center;
+justify-content: center;
 
-  border: none;
+border: none;
 
-  border-radius: 50%;
+border-radius: 50%;
 
-  background: #f5f5f5;
+background: #f5f5f5;
 
-  color: #000;
+color: #000;
 
-  font-size: 14px;
+font-size: 14px;
 
-  cursor: pointer;
+cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
+transition:
+background 0.2s ease,
+transform 0.2s ease;
 }
 
 .order-modal-close:hover {
-  background: #e9e9e9;
+background: #e9e9e9;
 
-  transform: rotate(90deg);
+transform: rotate(90deg);
 }
 
 .order-modal-close:disabled {
-  opacity: 0.5;
+opacity: 0.5;
 
-  cursor: not-allowed;
+cursor: not-allowed;
 
-  transform: none;
+transform: none;
 }
 
-
 /* ============================================================
-   ORDER DETAIL SECTION
+ORDER DETAIL SECTION
 ============================================================ */
 
 .order-detail-section {
-  padding: 20px 24px;
+padding: 20px 24px;
 
-  border-bottom: 1px solid #eee;
+border-bottom: 1px solid #eee;
 }
 
 .order-detail-section h3 {
-  margin: 0 0 12px;
+margin: 0 0 12px;
 
-  font-size: 13px;
+font-size: 13px;
 
-  font-weight: 800;
+font-weight: 800;
 }
 
-
 /* ============================================================
-   CUSTOMER DETAILS
+CUSTOMER DETAILS
 ============================================================ */
 
 .order-detail-customer {
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  gap: 12px;
+gap: 12px;
 }
 
 .order-avatar.large {
-  width: 46px;
-  height: 46px;
+width: 46px;
+height: 46px;
 
-  min-width: 46px;
+min-width: 46px;
 
-  font-size: 15px;
+font-size: 15px;
 }
 
 .order-detail-customer > div:last-child {
-  display: flex;
+display: flex;
 
-  flex-direction: column;
+flex-direction: column;
 
-  gap: 3px;
+gap: 3px;
 
-  min-width: 0;
+min-width: 0;
 }
 
 .order-detail-customer strong {
-  font-size: 13px;
+font-size: 13px;
 }
 
 .order-detail-customer span {
-  color: #888;
+color: #888;
 
-  font-size: 11px;
+font-size: 11px;
 }
 
-
 /* ============================================================
-   ORDER DATE DETAILS
+ORDER DATE DETAILS
 ============================================================ */
 
 .order-detail-date {
-  margin: 0;
+margin: 0;
 
-  color: #555;
+color: #555;
 
-  font-size: 12px;
+font-size: 12px;
 }
 
-
 /* ============================================================
-   SHIPPING ADDRESS
+SHIPPING ADDRESS
 ============================================================ */
 
 .shipping-address {
-  margin: 0;
+margin: 0;
 
-  color: #555;
+color: #555;
 
-  font-size: 12px;
+font-size: 12px;
 
-  line-height: 1.6;
+line-height: 1.6;
 
-  white-space: pre-wrap;
+white-space: pre-wrap;
 
-  word-break: break-word;
+word-break: break-word;
 }
 
-
 /* ============================================================
-   ORDER DETAIL PRODUCTS
+ORDER DETAIL PRODUCTS
+Products stay INSIDE the order details only.
 ============================================================ */
 
 .order-detail-products {
-  display: flex;
+display: flex;
 
-  flex-direction: column;
+flex-direction: column;
 
-  gap: 0;
+gap: 0;
 }
 
 .order-detail-product {
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  justify-content: space-between;
+justify-content: space-between;
 
-  gap: 20px;
+gap: 20px;
 
-  padding: 12px 0;
+padding: 12px 0;
 
-  border-bottom: 1px solid #f0f0f0;
+border-bottom: 1px solid #f0f0f0;
 }
 
 .order-detail-product:last-child {
-  border-bottom: none;
+border-bottom: none;
 }
 
 .order-detail-product > div {
-  display: flex;
+display: flex;
 
-  flex-direction: column;
+flex-direction: column;
 
-  gap: 4px;
+gap: 4px;
 
-  min-width: 0;
+min-width: 0;
 }
 
 .order-detail-product strong {
-  font-size: 12px;
+font-size: 12px;
 }
 
 .order-detail-product span {
-  color: #999;
+color: #999;
 
-  font-size: 10px;
+font-size: 10px;
 }
 
 .order-detail-product > strong {
-  flex-shrink: 0;
+flex-shrink: 0;
 }
 
-
 /* ============================================================
-   TOTAL
+TOTAL
 ============================================================ */
 
 .order-total-row {
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  justify-content: space-between;
+justify-content: space-between;
 
-  padding: 18px 24px;
+padding: 18px 24px;
 
-  background: #fafafa;
+background: #fafafa;
 
-  border-bottom: 1px solid #eee;
+border-bottom: 1px solid #eee;
 }
 
 .order-total-row span {
-  color: #555;
+color: #555;
 
-  font-size: 13px;
+font-size: 13px;
 
-  font-weight: 600;
+font-weight: 600;
 }
 
 .order-total-row strong {
-  font-size: 17px;
+font-size: 17px;
 
-  font-weight: 800;
+font-weight: 800;
 }
 
-
 /* ============================================================
-   STATUS BUTTONS
+STATUS BUTTONS
 ============================================================ */
 
 .status-buttons {
-  display: flex;
+display: flex;
 
-  flex-wrap: wrap;
+flex-wrap: wrap;
 
-  gap: 8px;
+gap: 8px;
 }
 
 .status-change-button {
-  padding: 8px 12px;
+padding: 8px 12px;
 
-  border: 1px solid #ddd;
+border: 1px solid #ddd;
 
-  border-radius: 8px;
+border-radius: 8px;
 
-  background: #fff;
+background: #fff;
 
-  color: #555;
+color: #555;
 
-  font-size: 10px;
+font-size: 10px;
 
-  font-weight: 700;
+font-weight: 700;
 
-  cursor: pointer;
+cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+transition:
+background 0.2s ease,
+color 0.2s ease,
+border-color 0.2s ease;
 }
 
 .status-change-button:hover {
-  border-color: #aaa;
+border-color: #aaa;
 
-  background: #f7f7f7;
+background: #f7f7f7;
 
-  color: #000;
+color: #000;
 }
 
 .status-change-button.active {
-  border-color: #000;
+border-color: #000;
 
-  background: #000;
+background: #000;
 
-  color: #fff;
+color: #fff;
 }
 
 .status-change-button:disabled {
-  opacity: 0.5;
+opacity: 0.5;
 
-  cursor: not-allowed;
+cursor: not-allowed;
 }
 
-
 /* ============================================================
-   STATUS BUTTON COLORS
+STATUS BUTTON COLORS
 ============================================================ */
 
 .status-change-button.pending.active {
-  background: #9a7200;
-  border-color: #9a7200;
+background: #9a7200;
+border-color: #9a7200;
 }
 
 .status-change-button.confirmed.active {
-  background: #3a6ea5;
-  border-color: #3a6ea5;
+background: #3a6ea5;
+border-color: #3a6ea5;
 }
 
 .status-change-button.preparing.active {
-  background: #7047a8;
-  border-color: #7047a8;
+background: #7047a8;
+border-color: #7047a8;
 }
 
 .status-change-button.shipped.active {
-  background: #287653;
-  border-color: #287653;
+background: #287653;
+border-color: #287653;
 }
 
 .status-change-button.delivered.active {
-  background: #28733b;
-  border-color: #28733b;
+background: #28733b;
+border-color: #28733b;
 }
 
 .status-change-button.cancelled.active {
-  background: #a83b3b;
-  border-color: #a83b3b;
+background: #a83b3b;
+border-color: #a83b3b;
 }
 
-
 /* ============================================================
-   MODAL FOOTER
+MODAL FOOTER
 ============================================================ */
 
 .order-modal-footer {
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  justify-content: flex-end;
+justify-content: flex-end;
 
-  gap: 10px;
+gap: 10px;
 
-  padding: 18px 24px;
+padding: 18px 24px;
 }
 
-
 /* ============================================================
-   CLOSE ORDER BUTTON
+CLOSE ORDER BUTTON
 ============================================================ */
 
 .close-order-button {
-  padding: 9px 18px;
+padding: 9px 18px;
 
-  border: 1px solid #ddd;
+border: 1px solid #ddd;
 
-  border-radius: 8px;
+border-radius: 8px;
 
-  background: #fff;
+background: #fff;
 
-  color: #000;
+color: #000;
 
-  font-size: 11px;
+font-size: 11px;
 
-  font-weight: 700;
+font-weight: 700;
 
-  cursor: pointer;
+cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
+transition:
+background 0.2s ease,
+border-color 0.2s ease;
 }
 
 .close-order-button:hover {
-  background: #f5f5f5;
+background: #f5f5f5;
 
-  border-color: #bbb;
+border-color: #bbb;
 }
 
 .close-order-button:disabled {
-  opacity: 0.5;
+opacity: 0.5;
 
-  cursor: not-allowed;
+cursor: not-allowed;
 }
 
-
 /* ============================================================
-   TABLET
+TABLET
 ============================================================ */
 
 @media (max-width: 1100px) {
 
-  .orders-real-table {
-    min-width: 900px;
-  }
+.orders-real-table {
+min-width: 820px;
+}
 
 }
 
-
 /* ============================================================
-   TABLET / MOBILE
+TABLET / MOBILE
 ============================================================ */
 
 @media (max-width: 768px) {
 
-  .orders-page {
-    width: 100%;
-  }
+.orders-page {
+width: 100%;
+}
 
+/* ----------------------------------------------------------
+HEADER
+---------------------------------------------------------- */
 
-  /* ----------------------------------------------------------
-     HEADER
-  ---------------------------------------------------------- */
+.orders-header {
+align-items: flex-start;
+}
 
-  .orders-header {
-    align-items: flex-start;
-  }
+.orders-header h1 {
+font-size: 25px;
+}
 
-  .orders-header h1 {
-    font-size: 25px;
-  }
+.orders-header p {
+font-size: 12px;
+}
 
-  .orders-header p {
-    font-size: 12px;
-  }
+.refresh-orders-button {
+padding: 9px 12px;
 
-  .refresh-orders-button {
-    padding: 9px 12px;
+font-size: 11px;
+}
 
-    font-size: 11px;
-  }
+/* ----------------------------------------------------------
+FILTERS
+---------------------------------------------------------- */
 
+.orders-filters {
+flex-wrap: wrap;
+}
 
-  /* ----------------------------------------------------------
-     FILTERS
-  ---------------------------------------------------------- */
+.orders-search {
+flex: 1 1 100%;
+}
 
-  .orders-filters {
-    flex-wrap: wrap;
-  }
+.orders-filters select {
+flex: 1;
 
-  .orders-search {
-    flex: 1 1 100%;
-  }
-
-  .orders-filters select {
-    flex: 1;
-
-    min-width: 130px;
-  }
-
-
-  /* ----------------------------------------------------------
-     TABLE
-  ---------------------------------------------------------- */
-
-  .orders-table-container {
-    border-radius: 10px;
-  }
-
-  .orders-real-table {
-    min-width: 900px;
-  }
-
-
-  /* ----------------------------------------------------------
-     MODAL
-  ---------------------------------------------------------- */
-
-  .order-modal-overlay {
-    padding: 12px;
-  }
-
-  .order-modal {
-    max-height: 92vh;
-
-    border-radius: 14px;
-  }
-
-  .order-modal-header {
-    padding: 18px;
-  }
-
-  .order-detail-section {
-    padding: 17px 18px;
-  }
-
-  .order-total-row {
-    padding: 16px 18px;
-  }
-
-  .order-modal-footer {
-    padding: 16px 18px;
-  }
+min-width: 130px;
 
 }
 
+/* ----------------------------------------------------------
+TABLE
+---------------------------------------------------------- */
+
+.orders-table-container {
+border-radius: 10px;
+}
+
+.orders-real-table {
+min-width: 820px;
+}
+
+/* ----------------------------------------------------------
+ACTIONS
+---------------------------------------------------------- */
+
+.order-actions {
+flex-wrap: wrap;
+}
+
+/* ----------------------------------------------------------
+MODAL
+---------------------------------------------------------- */
+
+.order-modal-overlay {
+padding: 12px;
+}
+
+.order-modal {
+max-height: 92vh;
+
+border-radius: 14px;
+}
+
+.order-modal-header {
+padding: 18px;
+}
+
+.order-detail-section {
+padding: 17px 18px;
+}
+
+.order-total-row {
+padding: 16px 18px;
+}
+
+.order-modal-footer {
+padding: 16px 18px;
+}
+
+}
 
 /* ============================================================
-   SMALL PHONES
+SMALL PHONES
 ============================================================ */
 
 @media (max-width: 480px) {
 
-  .orders-header {
-    flex-direction: column;
+.orders-header {
+flex-direction: column;
 
-    gap: 12px;
-  }
-
-  .orders-header h1 {
-    font-size: 22px;
-  }
-
-  .orders-header p {
-    font-size: 11px;
-  }
-
-  .refresh-orders-button {
-    align-self: flex-start;
-  }
-
-
-  /* ----------------------------------------------------------
-     FILTERS
-  ---------------------------------------------------------- */
-
-  .orders-filters {
-    gap: 8px;
-  }
-
-  .orders-search {
-    height: 40px;
-  }
-
-  .orders-filters select {
-    height: 40px;
-
-    min-width: 0;
-
-    font-size: 11px;
-  }
-
-  .clear-orders-button {
-    height: 40px;
-
-    padding: 0 12px;
-  }
-
-
-  /* ----------------------------------------------------------
-     MODAL
-  ---------------------------------------------------------- */
-
-  .order-modal-header {
-    gap: 10px;
-  }
-
-  .order-modal-header h2 {
-    font-size: 18px;
-  }
-
-  .order-detail-customer {
-    gap: 10px;
-  }
-
-  .order-detail-product {
-    gap: 12px;
-  }
-
-  .status-buttons {
-    gap: 6px;
-  }
-
-  .status-change-button {
-    padding: 7px 9px;
-
-    font-size: 9px;
-  }
-
-  .order-modal-footer {
-    flex-wrap: wrap;
-  }
-
-  .order-modal-footer .delete-order-button,
-  .order-modal-footer .close-order-button {
-    flex: 1;
-  }
+gap: 12px;
 
 }
 
+.orders-header h1 {
+font-size: 22px;
+}
+
+.orders-header p {
+font-size: 11px;
+}
+
+.refresh-orders-button {
+align-self: flex-start;
+}
+
+/* ----------------------------------------------------------
+FILTERS
+---------------------------------------------------------- */
+
+.orders-filters {
+gap: 8px;
+}
+
+.orders-search {
+height: 40px;
+}
+
+.orders-filters select {
+height: 40px;
+
+min-width: 0;
+
+font-size: 11px;
+
+}
+
+.clear-orders-button {
+height: 40px;
+
+padding: 0 12px;
+
+}
+
+/* ----------------------------------------------------------
+ACTIONS
+---------------------------------------------------------- */
+
+.order-actions {
+gap: 6px;
+}
+
+.view-order-button,
+.create-invoice-button,
+.view-invoice-button,
+.delete-order-button {
+padding: 7px 9px;
+
+font-size: 9px;
+
+}
+
+/* ----------------------------------------------------------
+MODAL
+---------------------------------------------------------- */
+
+.order-modal-header {
+gap: 10px;
+}
+
+.order-modal-header h2 {
+font-size: 18px;
+}
+
+.order-detail-customer {
+gap: 10px;
+}
+
+.order-detail-product {
+gap: 12px;
+}
+
+.status-buttons {
+gap: 6px;
+}
+
+.status-change-button {
+padding: 7px 9px;
+
+font-size: 9px;
+
+}
+
+.order-modal-footer {
+flex-wrap: wrap;
+}
+
+.order-modal-footer .delete-order-button,
+.order-modal-footer .close-order-button {
+flex: 1;
+}
+
+}
 
 /* ============================================================
-   VERY SMALL PHONES
+VERY SMALL PHONES
 ============================================================ */
 
 @media (max-width: 360px) {
 
-  .orders-header h1 {
-    font-size: 20px;
-  }
+.orders-header h1 {
+font-size: 20px;
+}
 
-  .orders-table-container {
-    border-radius: 8px;
-  }
+.orders-table-container {
+border-radius: 8px;
+}
 
-  .order-modal-overlay {
-    padding: 8px;
-  }
+.order-modal-overlay {
+padding: 8px;
+}
 
-  .order-modal {
-    border-radius: 12px;
-  }
+.order-modal {
+border-radius: 12px;
+}
 
-  .order-modal-header,
-  .order-detail-section,
-  .order-modal-footer {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
+.order-modal-header,
+.order-detail-section,
+.order-modal-footer {
+padding-left: 14px;
+padding-right: 14px;
+}
 
-  .order-total-row {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
+.order-total-row {
+padding-left: 14px;
+padding-right: 14px;
+}
+
+.view-order-button,
+.create-invoice-button,
+.view-invoice-button,
+.delete-order-button {
+padding: 6px 8px;
+
+font-size: 8px;
+
 
 }
 
+}
 
 /* ============================================================
    USERS PAGE

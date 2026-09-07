@@ -1,4 +1,3 @@
-
 import {
   useCallback,
   useEffect,
@@ -17,6 +16,20 @@ import "./Invoice.css";
 
 const API_URL =
   "https://mystore-backend-u6ey.onrender.com";
+
+/* ============================================================
+   INVOICE LOGO
+   ============================================================
+   Keep ONE logo file in:
+
+   Admin Panel/
+   └── public/
+       └── logo.png
+
+   Every invoice layout uses this same logo source.
+============================================================ */
+
+const INVOICE_LOGO = "/logo.png";
 
 /* ============================================================
    AUTH
@@ -166,7 +179,7 @@ function ThermalPrintLayout({
     <div className="invoice-thermal-print">
       <div className="thermal-print-header">
         <img
-          src="/logo.png"
+          src={INVOICE_LOGO}
           alt="BStore logo"
           className="thermal-print-logo"
         />
@@ -362,7 +375,7 @@ function ThermalPreview({
     <div className="thermal-preview-content">
       <div className="thermal-preview-header">
         <img
-          src="/logo.png"
+          src={INVOICE_LOGO}
           alt="BStore logo"
           className="thermal-preview-logo"
         />
@@ -546,7 +559,7 @@ function A4Preview({
       <div className="a4-preview-header">
         <div>
           <img
-            src="/logo.png"
+            src={INVOICE_LOGO}
             alt="BStore logo"
             className="a4-preview-logo"
           />
@@ -1369,82 +1382,6 @@ function Invoice() {
   };
 
   /* ==========================================================
-     REPRINT
-  ========================================================== */
-
-  const handleReprint = async () => {
-    if (!isSaved) {
-      setError(
-        "Only saved invoices can be reprinted."
-      );
-      return;
-    }
-
-    try {
-      setActionLoading("reprint");
-      clearMessages();
-
-      const response =
-        await axios.put(
-          `${API_URL}/invoices/admin/${invoiceId}/reprint`,
-          {},
-          {
-            headers:
-              getAuthHeaders(),
-          }
-        );
-
-      const updatedInvoice =
-        response.data?.invoice;
-
-      if (updatedInvoice) {
-        setInvoice(updatedInvoice);
-
-        setFormat(
-          updatedInvoice.format ||
-            "80mm"
-        );
-
-        setCopyType(
-          updatedInvoice.copyType ||
-            "Customer"
-        );
-
-        setNotes(
-          updatedInvoice.notes || ""
-        );
-
-        setDiscountPercent(
-          Number(
-            updatedInvoice.discountPercent
-          ) || 0
-        );
-      }
-
-      setSuccess(
-        "Invoice ready for reprint."
-      );
-
-      setTimeout(() => {
-        window.print();
-      }, 150);
-    } catch (err) {
-      console.error(
-        "Reprint invoice error:",
-        err
-      );
-
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to reprint invoice."
-      );
-    } finally {
-      setActionLoading("");
-    }
-  };
-
-  /* ==========================================================
      DUPLICATE
   ========================================================== */
 
@@ -1717,7 +1654,6 @@ function Invoice() {
         </div>
 
         <div className="invoice-topbar-actions">
-
           {/* SAVE */}
 
           {canEdit && (
@@ -1755,23 +1691,6 @@ function Invoice() {
               onClick={handlePrint}
             >
               Print
-            </button>
-          )}
-
-          {/* REPRINT */}
-
-          {isSaved && (
-            <button
-              type="button"
-              className="invoice-secondary-button"
-              disabled={
-                actionLoading === "reprint"
-              }
-              onClick={handleReprint}
-            >
-              {actionLoading === "reprint"
-                ? "Preparing..."
-                : "Reprint"}
             </button>
           )}
 
@@ -1943,7 +1862,7 @@ function Invoice() {
         <div className="invoice-paper-header">
           <div className="invoice-brand">
             <img
-              src="/logo.png"
+              src={INVOICE_LOGO}
               alt="BStore logo"
               className="invoice-brand-logo"
             />
@@ -2084,7 +2003,8 @@ function Invoice() {
                     0;
 
                   const lineTotal =
-                    quantity * price;
+                    quantity *
+                    price;
 
                   return (
                     <div

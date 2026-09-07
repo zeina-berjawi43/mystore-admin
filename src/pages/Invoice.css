@@ -1,3 +1,4 @@
+
 /* ============================================================
    INVOICE PAGE
 ============================================================ */
@@ -604,6 +605,195 @@
 }
 
 /* ============================================================
+   80MM SCREEN TABLE
+   IMPORTANT:
+   Compact layout only for the screen invoice.
+   Print layout remains controlled by @media print below.
+============================================================ */
+
+.invoice-products-table.thermal-screen-table {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-products-head.draft,
+.invoice-products-table.thermal-screen-table
+  .invoice-product-row.draft {
+  grid-template-columns:
+    18px
+    minmax(70px, 1fr)
+    28px
+    45px
+    50px
+    42px;
+
+  gap: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-products-head.readonly,
+.invoice-products-table.thermal-screen-table
+  .invoice-product-row.readonly {
+  grid-template-columns:
+    18px
+    minmax(70px, 1fr)
+    28px
+    45px
+    50px;
+
+  gap: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-products-head {
+  min-width: 0;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  font-size: 7px;
+  letter-spacing: 0.02em;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-product-row {
+  min-width: 0;
+  min-height: 42px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-product-row > div,
+.invoice-products-table.thermal-screen-table
+  .invoice-product-row > strong,
+.invoice-products-table.thermal-screen-table
+  .invoice-products-head > span {
+  min-width: 0;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-product-number {
+  font-size: 8px;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-product-info {
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-product-info strong {
+  display: block;
+  width: 100%;
+  min-width: 0;
+
+  color: #111827;
+
+  font-size: 8.5px;
+  line-height: 1.2;
+
+  white-space: normal;
+  overflow: hidden;
+
+  text-overflow: clip;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-product-row > div:not(.invoice-product-info) {
+  min-width: 0;
+  font-size: 8px;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-edit-input {
+  width: 100%;
+  min-width: 0;
+  height: 25px;
+
+  padding: 3px 3px;
+
+  border-radius: 4px;
+
+  font-size: 8px;
+  text-align: center;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-edit-input.quantity {
+  width: 100%;
+  min-width: 0;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-price-input {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 1px;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-price-input span {
+  flex-shrink: 0;
+  font-size: 8px;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-price-input input {
+  width: 100%;
+  min-width: 0;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-product-row > strong {
+  min-width: 0;
+
+  font-size: 8px;
+  text-align: right;
+
+  white-space: nowrap;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-remove-button {
+  width: 100%;
+  min-width: 0;
+
+  justify-self: stretch;
+
+  padding: 4px 2px;
+
+  border-radius: 4px;
+
+  font-size: 7px;
+  line-height: 1;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.invoice-products-table.thermal-screen-table
+  .invoice-empty-products {
+  padding: 25px 8px;
+  font-size: 9px;
+}
+
+/* ============================================================
    SUMMARY
 ============================================================ */
 
@@ -992,9 +1182,57 @@
   box-shadow: 0 20px 70px rgba(0, 0, 0, 0.25);
 }
 
+/* ============================================================
+   80MM PREVIEW
+============================================================ */
+
 .invoice-preview-modal.thermal {
   width: min(100%, 520px);
 }
+
+.invoice-preview-modal.thermal .invoice-preview-body {
+  padding: 25px;
+  background: #f3f4f6;
+}
+
+.invoice-preview-modal.thermal .invoice-preview-paper {
+  width: 80mm;
+  max-width: 80mm;
+  min-height: 100mm;
+  margin: 0 auto;
+  padding: 22px 16px;
+  box-sizing: border-box;
+  background: #ffffff;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================================
+   A4 PREVIEW
+============================================================ */
+
+.invoice-preview-modal.a4 {
+  width: min(100%, 1000px);
+}
+
+.invoice-preview-modal.a4 .invoice-preview-body {
+  padding: 30px;
+  background: #e5e7eb;
+}
+
+.invoice-preview-modal.a4 .invoice-preview-paper {
+  width: 210mm;
+  max-width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 18mm 16mm;
+  box-sizing: border-box;
+  background: #ffffff;
+  box-shadow: 0 3px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================================
+   PREVIEW HEADER
+============================================================ */
 
 .invoice-preview-header {
   display: flex;
@@ -1003,6 +1241,7 @@
   gap: 20px;
   padding: 16px 20px;
   border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
 }
 
 .invoice-preview-header h2 {
@@ -1016,11 +1255,19 @@
   font-size: 11px;
 }
 
+/* ============================================================
+   PREVIEW BODY
+============================================================ */
+
 .invoice-preview-body {
   overflow-y: auto;
   padding: 25px;
   background: #f3f4f6;
 }
+
+/* ============================================================
+   PREVIEW PAPER DEFAULT
+============================================================ */
 
 .invoice-preview-paper {
   width: 100%;
@@ -1030,11 +1277,6 @@
   box-sizing: border-box;
   background: #ffffff;
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
-}
-
-.invoice-preview-modal.thermal .invoice-preview-paper {
-  max-width: 320px;
-  padding: 22px 16px;
 }
 
 .invoice-preview-logo {
@@ -1105,6 +1347,7 @@
   padding: 14px 20px;
   border-top: 1px solid #e5e7eb;
   background: #ffffff;
+  flex-shrink: 0;
 }
 
 /* ============================================================
@@ -1126,6 +1369,14 @@
 
   .invoice-topbar-actions {
     justify-content: flex-start;
+  }
+
+  .invoice-preview-modal.a4 {
+    width: min(100%, 96vw);
+  }
+
+  .invoice-preview-modal.a4 .invoice-preview-body {
+    overflow-x: auto;
   }
 }
 
@@ -1178,6 +1429,10 @@
   .invoice-product-info strong {
     font-size: 10px;
   }
+
+  .invoice-preview-modal.a4 .invoice-preview-body {
+    padding: 15px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -1221,13 +1476,75 @@
     width: 85px;
   }
 
+  /*
+    IMPORTANT:
+    Do NOT force the 80mm screen table to 500px.
+    The compact thermal-screen-table rules above
+    control its width.
+  */
+
   .invoice-products-table {
-    overflow-x: auto;
+    overflow-x: hidden;
   }
 
   .invoice-products-head,
   .invoice-product-row {
-    min-width: 500px;
+    min-width: 0;
+  }
+
+  /*
+    Extra protection for very small screens.
+  */
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-products-head.draft,
+  .invoice-products-table.thermal-screen-table
+    .invoice-product-row.draft {
+    grid-template-columns:
+      17px
+      minmax(62px, 1fr)
+      27px
+      43px
+      48px
+      40px;
+
+    gap: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-products-head.readonly,
+  .invoice-products-table.thermal-screen-table
+    .invoice-product-row.readonly {
+    grid-template-columns:
+      17px
+      minmax(62px, 1fr)
+      27px
+      43px
+      48px;
+
+    gap: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-product-info strong {
+    font-size: 8px;
+  }
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-edit-input {
+    height: 24px;
+    padding: 3px 2px;
+    font-size: 8px;
+  }
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-remove-button {
+    padding: 4px 1px;
+    font-size: 6.5px;
   }
 
   .invoice-summary {
@@ -1246,6 +1563,27 @@
   .invoice-preview-paper {
     padding: 18px 12px;
   }
+
+  .invoice-preview-modal.thermal .invoice-preview-paper {
+    width: 80mm;
+    max-width: 80mm;
+    padding: 18px 12px;
+  }
+
+  .invoice-preview-modal.a4 {
+    width: 100%;
+  }
+
+  .invoice-preview-modal.a4 .invoice-preview-body {
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  .invoice-preview-modal.a4 .invoice-preview-paper {
+    width: 210mm;
+    max-width: 210mm;
+    padding: 15mm;
+  }
 }
 
 /* ============================================================
@@ -1255,12 +1593,8 @@
 @media print {
 
   /* ==========================================================
-     GLOBAL PRINT RESET
+     PAGE DEFINITIONS
   ========================================================== */
-
-  @page {
-    margin: 0;
-  }
 
   @page invoiceA4 {
     size: A4 portrait;
@@ -1271,6 +1605,10 @@
     size: 80mm auto;
     margin: 0;
   }
+
+  /* ==========================================================
+     GLOBAL PRINT RESET
+  ========================================================== */
 
   html,
   body {
@@ -1289,7 +1627,7 @@
   }
 
   /* ==========================================================
-     A4
+     A4 PRINT
   ========================================================== */
 
   .invoice-page-a4 {
@@ -1331,7 +1669,7 @@
   }
 
   /* ==========================================================
-     80MM
+     80MM PRINT
   ========================================================== */
 
   .invoice-page-80mm {
@@ -1350,8 +1688,8 @@
   }
 
   /*
-    Hide normal invoice paper.
-    Only the dedicated thermal layout is printed.
+    Hide the normal invoice paper and print
+    only the dedicated thermal layout.
   */
 
   .invoice-page-80mm > *:not(.invoice-thermal-print) {
@@ -1869,5 +2207,13 @@
   .invoice-product-row {
     page-break-inside: avoid;
     break-inside: avoid;
+  }
+
+  /* ==========================================================
+     NEVER PRINT PREVIEW MODAL
+  ========================================================== */
+
+  .invoice-preview-overlay {
+    display: none !important;
   }
 }

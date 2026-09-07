@@ -1,3 +1,4 @@
+
 import {
   useCallback,
   useEffect,
@@ -146,7 +147,7 @@ const getProductPrice = (product) => {
 };
 
 /* ============================================================
-   THERMAL 80MM PRINT LAYOUT
+   THERMAL 80MM LAYOUT
 ============================================================ */
 
 function ThermalPrintLayout({
@@ -176,7 +177,9 @@ function ThermalPrintLayout({
         </div>
 
         <div className="thermal-print-number">
-          <strong>{invoice.invoiceNumber}</strong>
+          <strong>
+            {invoice.invoiceNumber}
+          </strong>
 
           <span>
             {formatDate(invoice.createdAt)}
@@ -330,6 +333,389 @@ function ThermalPrintLayout({
 
       <div className="thermal-print-footer">
         <strong>{copyType} Copy</strong>
+
+        <span>
+          Thank you for your business
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   80MM SCREEN PREVIEW
+============================================================ */
+
+function ThermalPreview({
+  invoice,
+  totals,
+  notes,
+  copyType,
+}) {
+  if (!invoice) {
+    return null;
+  }
+
+  const items = invoice.items || [];
+
+  return (
+    <div className="thermal-preview-content">
+      <div className="thermal-preview-header">
+        <img
+          src="/logo.png"
+          alt="BStore logo"
+          className="thermal-preview-logo"
+        />
+
+        <strong>BStore</strong>
+
+        <span>Invoice</span>
+
+        <small>
+          {invoice.invoiceNumber}
+        </small>
+
+        <small>
+          {formatDate(invoice.createdAt)}
+        </small>
+      </div>
+
+      <div className="thermal-preview-divider" />
+
+      <div className="thermal-preview-customer">
+        <strong className="thermal-preview-title">
+          CUSTOMER
+        </strong>
+
+        <div className="thermal-preview-customer-row">
+          <span>Name</span>
+
+          <strong>
+            {getCustomerName(invoice.customer)}
+          </strong>
+        </div>
+
+        {invoice.customer?.phone && (
+          <div className="thermal-preview-customer-row">
+            <span>Phone</span>
+
+            <strong>
+              {invoice.customer.phone}
+            </strong>
+          </div>
+        )}
+
+        {invoice.customer?.address && (
+          <div className="thermal-preview-customer-row">
+            <span>Address</span>
+
+            <strong>
+              {invoice.customer.address}
+            </strong>
+          </div>
+        )}
+      </div>
+
+      <div className="thermal-preview-divider" />
+
+      <div className="thermal-preview-products">
+        <div className="thermal-preview-products-head">
+          <span>Product</span>
+          <span>Qty</span>
+          <span>Price</span>
+          <span>Total</span>
+        </div>
+
+        {items.length > 0 ? (
+          items.map((item, index) => {
+            const quantity =
+              Number(item.quantity) || 0;
+
+            const price =
+              Number(item.price) || 0;
+
+            const lineTotal =
+              quantity * price;
+
+            return (
+              <div
+                className="thermal-preview-product-row"
+                key={
+                  item._id ||
+                  `${item.product?._id || item.product || "product"}-${index}`
+                }
+              >
+                <span className="thermal-preview-product-name">
+                  {item.productName || "Product"}
+                </span>
+
+                <span className="thermal-preview-qty">
+                  {quantity}
+                </span>
+
+                <span className="thermal-preview-price">
+                  {formatPrice(price)}
+                </span>
+
+                <strong className="thermal-preview-total">
+                  {formatPrice(lineTotal)}
+                </strong>
+              </div>
+            );
+          })
+        ) : (
+          <div className="thermal-preview-empty">
+            No products
+          </div>
+        )}
+      </div>
+
+      <div className="thermal-preview-divider" />
+
+      <div className="thermal-preview-summary">
+        <div>
+          <span>Subtotal</span>
+
+          <strong>
+            {formatPrice(totals.subtotal)}
+          </strong>
+        </div>
+
+        <div>
+          <span>
+            Discount ({totals.discount}%)
+          </span>
+
+          <strong>
+            -{formatPrice(totals.discountAmount)}
+          </strong>
+        </div>
+
+        <div className="thermal-preview-grand-total">
+          <span>Total</span>
+
+          <strong>
+            {formatPrice(totals.total)}
+          </strong>
+        </div>
+      </div>
+
+      {notes && (
+        <>
+          <div className="thermal-preview-divider" />
+
+          <div className="thermal-preview-notes">
+            <strong>Notes</strong>
+
+            <span>{notes}</span>
+          </div>
+        </>
+      )}
+
+      <div className="thermal-preview-divider" />
+
+      <div className="thermal-preview-footer">
+        <strong>
+          {copyType} Copy
+        </strong>
+
+        <span>
+          Thank you for your business
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   A4 PREVIEW
+============================================================ */
+
+function A4Preview({
+  invoice,
+  totals,
+  notes,
+  copyType,
+}) {
+  if (!invoice) {
+    return null;
+  }
+
+  return (
+    <div className="a4-preview-content">
+      <div className="a4-preview-header">
+        <div>
+          <img
+            src="/logo.png"
+            alt="BStore logo"
+            className="a4-preview-logo"
+          />
+
+          <strong>BStore</strong>
+
+          <span>Invoice</span>
+        </div>
+
+        <div className="a4-preview-number">
+          <strong>
+            {invoice.invoiceNumber}
+          </strong>
+
+          <span>
+            {formatDate(invoice.createdAt)}
+          </span>
+        </div>
+      </div>
+
+      <div className="a4-preview-divider" />
+
+      <div className="a4-preview-customer">
+        <strong className="a4-preview-title">
+          CUSTOMER
+        </strong>
+
+        <div className="a4-preview-customer-grid">
+          <div>
+            <span>Name</span>
+
+            <strong>
+              {getCustomerName(
+                invoice.customer
+              )}
+            </strong>
+          </div>
+
+          <div>
+            <span>Email</span>
+
+            <strong>
+              {invoice.customer?.email ||
+                "—"}
+            </strong>
+          </div>
+
+          <div>
+            <span>Phone</span>
+
+            <strong>
+              {invoice.customer?.phone ||
+                "—"}
+            </strong>
+          </div>
+
+          <div>
+            <span>Address</span>
+
+            <strong>
+              {invoice.customer?.address ||
+                "—"}
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="a4-preview-divider" />
+
+      <div className="a4-preview-products">
+        <div className="a4-preview-products-head">
+          <span>#</span>
+          <span>Product</span>
+          <span>Qty</span>
+          <span>Price</span>
+          <span>Total</span>
+        </div>
+
+        {invoice.items?.map(
+          (item, index) => {
+            const quantity =
+              Number(item.quantity) || 0;
+
+            const price =
+              Number(item.price) || 0;
+
+            const lineTotal =
+              quantity * price;
+
+            return (
+              <div
+                className="a4-preview-product-row"
+                key={
+                  item._id ||
+                  `${item.product?._id || item.product || "product"}-${index}`
+                }
+              >
+                <span>
+                  {index + 1}
+                </span>
+
+                <span>
+                  {item.productName ||
+                    "Product"}
+                </span>
+
+                <span>
+                  {quantity}
+                </span>
+
+                <span>
+                  {formatPrice(price)}
+                </span>
+
+                <strong>
+                  {formatPrice(lineTotal)}
+                </strong>
+              </div>
+            );
+          }
+        )}
+      </div>
+
+      <div className="a4-preview-summary">
+        <div>
+          <span>Subtotal</span>
+
+          <strong>
+            {formatPrice(
+              totals.subtotal
+            )}
+          </strong>
+        </div>
+
+        <div>
+          <span>
+            Discount ({totals.discount}%)
+          </span>
+
+          <strong>
+            -{formatPrice(
+              totals.discountAmount
+            )}
+          </strong>
+        </div>
+
+        <div className="a4-preview-grand-total">
+          <span>Total</span>
+
+          <strong>
+            {formatPrice(
+              totals.total
+            )}
+          </strong>
+        </div>
+      </div>
+
+      {notes && (
+        <div className="a4-preview-notes">
+          <strong>Notes</strong>
+
+          <span>{notes}</span>
+        </div>
+      )}
+
+      <div className="a4-preview-footer">
+        <span>
+          {copyType} Copy
+        </span>
 
         <span>
           Thank you for your business
@@ -959,61 +1345,17 @@ function Invoice() {
      PREVIEW
   ========================================================== */
 
-  const handlePreview = async () => {
-    try {
-      setActionLoading("preview");
-      clearMessages();
+  const handlePreview = () => {
+    clearMessages();
 
-      const response =
-        await axios.get(
-          `${API_URL}/invoices/admin/${invoiceId}/preview`,
-          {
-            headers:
-              getAuthHeaders(),
-          }
-        );
-
-      const preview =
-        response.data?.preview;
-
-      if (preview) {
-        setInvoice(preview);
-
-        setDiscountPercent(
-          Number(
-            preview.discountPercent
-          ) || 0
-        );
-
-        setNotes(
-          preview.notes || ""
-        );
-
-        setFormat(
-          preview.format || "80mm"
-        );
-
-        setCopyType(
-          preview.copyType ||
-            "Customer"
-        );
-      }
-
-      setPreviewOpen(true);
-    } catch (err) {
-      console.error(
-        "Preview invoice error:",
-        err
-      );
-
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to load invoice preview."
-      );
-    } finally {
-      setActionLoading("");
-    }
+    /*
+     * Preview uses the CURRENT invoice state directly.
+     *
+     * This is important because the invoice can be edited
+     * before saving. We must not fetch the old database
+     * version and overwrite the selected format/items/price.
+     */
+    setPreviewOpen(true);
   };
 
   /* ==========================================================
@@ -1057,6 +1399,26 @@ function Invoice() {
 
       if (updatedInvoice) {
         setInvoice(updatedInvoice);
+
+        setFormat(
+          updatedInvoice.format ||
+            "80mm"
+        );
+
+        setCopyType(
+          updatedInvoice.copyType ||
+            "Customer"
+        );
+
+        setNotes(
+          updatedInvoice.notes || ""
+        );
+
+        setDiscountPercent(
+          Number(
+            updatedInvoice.discountPercent
+          ) || 0
+        );
       }
 
       setSuccess(
@@ -1200,6 +1562,26 @@ function Invoice() {
           setInvoice(
             cancelledInvoice
           );
+
+          setFormat(
+            cancelledInvoice.format ||
+              "80mm"
+          );
+
+          setCopyType(
+            cancelledInvoice.copyType ||
+              "Customer"
+          );
+
+          setNotes(
+            cancelledInvoice.notes || ""
+          );
+
+          setDiscountPercent(
+            Number(
+              cancelledInvoice.discountPercent
+            ) || 0
+          );
         }
 
         setSuccess(
@@ -1336,7 +1718,7 @@ function Invoice() {
 
         <div className="invoice-topbar-actions">
 
-          {/* SAVE FOR DRAFT + CANCELLED */}
+          {/* SAVE */}
 
           {canEdit && (
             <button
@@ -1351,6 +1733,8 @@ function Invoice() {
             </button>
           )}
 
+          {/* PREVIEW */}
+
           <button
             type="button"
             className="invoice-secondary-button"
@@ -1359,9 +1743,7 @@ function Invoice() {
             }
             onClick={handlePreview}
           >
-            {actionLoading === "preview"
-              ? "Loading..."
-              : "Preview"}
+            Preview
           </button>
 
           {/* PRINT */}
@@ -1546,7 +1928,7 @@ function Invoice() {
       </div>
 
       {/* ======================================================
-          DESKTOP / SCREEN INVOICE PAPER
+          SCREEN INVOICE
       ====================================================== */}
 
       <div
@@ -1658,6 +2040,10 @@ function Invoice() {
               canEdit
                 ? "draft"
                 : "readonly"
+            } ${
+              format === "80mm"
+                ? "thermal-screen-table"
+                : "a4-screen-table"
             }`}
           >
             <div
@@ -1672,8 +2058,11 @@ function Invoice() {
               </span>
 
               <span>Product</span>
+
               <span>Qty</span>
+
               <span>Price</span>
+
               <span>Total</span>
 
               {canEdit && (
@@ -2107,6 +2496,8 @@ function Invoice() {
 
                 <span>
                   {invoice.invoiceNumber}
+                  {" · "}
+                  {format}
                 </span>
               </div>
 
@@ -2121,119 +2512,33 @@ function Invoice() {
             </div>
 
             <div className="invoice-preview-body">
-              <div className="invoice-preview-paper">
-                <img
-                  src="/logo.png"
-                  alt="BStore logo"
-                  className="invoice-preview-logo"
-                />
-
-                <strong className="invoice-preview-brand">
-                  BStore
-                </strong>
-
-                <p>
-                  {invoice.invoiceNumber}
-                </p>
-
-                <hr />
-
-                <strong>
-                  {getCustomerName(
-                    invoice.customer
-                  )}
-                </strong>
-
-                <p>
-                  {invoice.customer?.phone ||
-                    ""}
-                </p>
-
-                <hr />
-
-                {invoice.items?.map(
-                  (item, index) => (
-                    <div
-                      className="preview-line"
-                      key={
-                        item._id ||
-                        index
-                      }
-                    >
-                      <span>
-                        <b>
-                          {index + 1}.
-                        </b>{" "}
-                        {item.productName}
-                        {" × "}
-                        {item.quantity}
-                      </span>
-
-                      <strong>
-                        {formatPrice(
-                          Number(
-                            item.price
-                          ) *
-                            Number(
-                              item.quantity
-                            )
-                        )}
-                      </strong>
-                    </div>
-                  )
-                )}
-
-                <hr />
-
-                <div className="preview-line">
-                  <span>Subtotal</span>
-
-                  <strong>
-                    {formatPrice(
-                      calculatedTotals.subtotal
-                    )}
-                  </strong>
+              {format === "80mm" ? (
+                <div className="invoice-preview-paper thermal-preview-paper">
+                  <ThermalPreview
+                    invoice={invoice}
+                    totals={calculatedTotals}
+                    notes={
+                      notes ||
+                      invoice.notes ||
+                      ""
+                    }
+                    copyType={copyType}
+                  />
                 </div>
-
-                <div className="preview-line">
-                  <span>Discount</span>
-
-                  <strong>
-                    -
-                    {formatPrice(
-                      calculatedTotals.discountAmount
-                    )}
-                  </strong>
+              ) : (
+                <div className="invoice-preview-paper a4-preview-paper">
+                  <A4Preview
+                    invoice={invoice}
+                    totals={calculatedTotals}
+                    notes={
+                      notes ||
+                      invoice.notes ||
+                      ""
+                    }
+                    copyType={copyType}
+                  />
                 </div>
-
-                <div className="preview-total">
-                  <span>Total</span>
-
-                  <strong>
-                    {formatPrice(
-                      calculatedTotals.total
-                    )}
-                  </strong>
-                </div>
-
-                {(notes ||
-                  invoice.notes) && (
-                  <>
-                    <hr />
-
-                    <div className="preview-notes">
-                      <strong>
-                        Notes
-                      </strong>
-
-                      <span>
-                        {notes ||
-                          invoice.notes}
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
+              )}
             </div>
 
             <div className="invoice-preview-footer">

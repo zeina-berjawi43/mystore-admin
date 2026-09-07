@@ -19,15 +19,7 @@ const API_URL =
 
 /* ============================================================
    INVOICE LOGO
-   ============================================================
-   Keep ONE logo file in:
-
-   Admin Panel/
-   └── public/
-       └── logo.png
-
-   Every invoice layout uses this same logo source.
-============================================================ */
+   ============================================================ */
 
 const INVOICE_LOGO = "/logo.png";
 
@@ -811,10 +803,6 @@ function Invoice() {
   const isCancelled =
     status === "Cancelled";
 
-  /*
-   * Draft AND Cancelled invoices can be edited.
-   * Saved invoices remain locked.
-   */
   const canEdit =
     isDraft || isCancelled;
 
@@ -1361,13 +1349,6 @@ function Invoice() {
   const handlePreview = () => {
     clearMessages();
 
-    /*
-     * Preview uses the CURRENT invoice state directly.
-     *
-     * This is important because the invoice can be edited
-     * before saving. We must not fetch the old database
-     * version and overwrite the selected format/items/price.
-     */
     setPreviewOpen(true);
   };
 
@@ -1377,6 +1358,59 @@ function Invoice() {
 
   const handlePrint = () => {
     clearMessages();
+
+    window.print();
+  };
+
+  /* ==========================================================
+     SAVE AS PDF
+  ========================================================== */
+
+  const handleSaveAsPdf = () => {
+    clearMessages();
+
+    /*
+     * We use the browser's native PDF printing system.
+     *
+     * The existing Invoice.css already contains the correct
+     * print layouts for both:
+     *
+     * - A4
+     * - 80mm thermal
+     *
+     * Changing document.title gives Chrome a clean suggested
+     * filename when the user selects "Save to PDF".
+     */
+
+    const previousTitle =
+      document.title;
+
+    const invoiceNumber =
+      invoice?.invoiceNumber ||
+      "Invoice";
+
+    const safeInvoiceNumber =
+      String(invoiceNumber)
+        .replace(/[<>:"/\\|?*]+/g, "-")
+        .trim();
+
+    document.title =
+      `BStore-${safeInvoiceNumber}`;
+
+    const restoreTitle = () => {
+      document.title =
+        previousTitle;
+
+      window.removeEventListener(
+        "afterprint",
+        restoreTitle
+      );
+    };
+
+    window.addEventListener(
+      "afterprint",
+      restoreTitle
+    );
 
     window.print();
   };
@@ -1693,6 +1727,16 @@ function Invoice() {
               Print
             </button>
           )}
+
+          {/* SAVE AS PDF */}
+
+          <button
+            type="button"
+            className="invoice-secondary-button"
+            onClick={handleSaveAsPdf}
+          >
+            Save as PDF
+          </button>
 
           {/* DUPLICATE */}
 
@@ -2470,6 +2514,22 @@ function Invoice() {
                 }
               >
                 Close
+              </button>
+
+              <button
+                type="button"
+                className="invoice-secondary-button"
+                onClick={() => {
+                  setPreviewOpen(false);
+
+                  setTimeout(
+                    () =>
+                      handleSaveAsPdf(),
+                    100
+                  );
+                }}
+              >
+                Save as PDF
               </button>
 
               <button

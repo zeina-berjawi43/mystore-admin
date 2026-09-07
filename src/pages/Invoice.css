@@ -1,3 +1,4 @@
+
 /* ============================================================
    INVOICE PAGE
 ============================================================ */
@@ -208,6 +209,9 @@
 
 .invoice-error-message span {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .invoice-error-message button,
@@ -366,6 +370,16 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
+  min-width: 0;
+  max-width: 45%;
+}
+
+.invoice-number-block strong,
+.invoice-number-block span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-align: right;
 }
 
 .invoice-number-block strong {
@@ -417,9 +431,11 @@
 }
 
 .invoice-customer-grid strong {
+  min-width: 0;
   color: #111827;
   font-size: 12px;
   font-weight: 600;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
@@ -429,6 +445,7 @@
 
 .invoice-products-section {
   padding: 20px 0;
+  min-width: 0;
 }
 
 .invoice-section-heading-row {
@@ -436,10 +453,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-width: 0;
 }
 
 .invoice-section-heading-row .invoice-section-title {
   margin-bottom: 12px;
+  min-width: 0;
 }
 
 .invoice-add-product-button {
@@ -450,6 +469,7 @@
   color: #ffffff;
   font-size: 11px;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .invoice-add-product-button:hover {
@@ -458,9 +478,11 @@
 
 .invoice-products-table {
   width: 100%;
+  min-width: 0;
   overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
+  box-sizing: border-box;
 }
 
 /* ============================================================
@@ -481,6 +503,7 @@
   gap: 10px;
   padding: 11px 12px;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .invoice-products-head.readonly,
@@ -503,6 +526,14 @@
   letter-spacing: 0.05em;
 }
 
+.invoice-products-head > span,
+.invoice-product-row > div,
+.invoice-product-row > strong {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .invoice-number-column,
 .invoice-product-number {
   text-align: center;
@@ -519,17 +550,27 @@
 
 .invoice-product-info {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   min-width: 0;
+  width: 100%;
 }
 
 .invoice-product-info strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: block;
+  width: 100%;
+  min-width: 0;
   color: #111827;
   font-size: 12px;
   font-weight: 600;
+
+  /* IMPORTANT:
+     Do not cut long product names. */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.25;
 }
 
 .invoice-product-number {
@@ -539,12 +580,15 @@
 }
 
 .invoice-product-row > div:not(.invoice-product-info) {
+  min-width: 0;
   font-size: 12px;
   color: #374151;
 }
 
 .invoice-edit-input {
   width: 70px;
+  max-width: 100%;
+  min-width: 0;
   height: 34px;
   box-sizing: border-box;
   padding: 6px 8px;
@@ -564,32 +608,48 @@
 
 .invoice-edit-input.quantity {
   width: 56px;
+  max-width: 100%;
 }
 
 .invoice-price-input {
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .invoice-price-input span {
   color: #6b7280;
   font-size: 12px;
+  flex-shrink: 0;
+}
+
+.invoice-price-input input {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .invoice-product-row > strong {
   font-size: 12px;
   font-weight: 700;
+  text-align: right;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .invoice-remove-button {
   justify-self: start;
+  max-width: 100%;
   padding: 6px 8px;
   border-radius: 6px;
   background: #fff1f2;
   color: #be123c;
   font-size: 10px;
   font-weight: 700;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .invoice-remove-button:hover {
@@ -607,43 +667,62 @@
    80MM SCREEN TABLE
 ============================================================ */
 
+/*
+  IMPORTANT:
+  The screen editor is NOT the same as the thermal printer.
+
+  The 80mm paper is narrow, so the editable table uses compact
+  flexible columns. Product is the only column allowed to grow/shrink.
+
+  minmax(0, 1fr) is important here because it prevents the
+  Product column from forcing the whole grid wider than the paper.
+*/
+
 .invoice-products-table.thermal-screen-table {
   width: 100%;
   min-width: 0;
-  overflow: hidden;
+  max-width: 100%;
+  overflow: visible;
+  box-sizing: border-box;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-products-head.draft,
 .invoice-products-table.thermal-screen-table
   .invoice-product-row.draft {
-  grid-template-columns:
-    18px
-    minmax(70px, 1fr)
-    28px
-    45px
-    50px
-    42px;
+  width: 100%;
+  min-width: 0;
 
-  gap: 3px;
-  padding-left: 5px;
-  padding-right: 5px;
+  grid-template-columns:
+    16px
+    minmax(0, 1fr)
+    24px
+    39px
+    45px
+    38px;
+
+  gap: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-products-head.readonly,
 .invoice-products-table.thermal-screen-table
   .invoice-product-row.readonly {
-  grid-template-columns:
-    18px
-    minmax(70px, 1fr)
-    28px
-    45px
-    50px;
+  width: 100%;
+  min-width: 0;
 
-  gap: 3px;
-  padding-left: 5px;
-  padding-right: 5px;
+  grid-template-columns:
+    16px
+    minmax(0, 1fr)
+    24px
+    39px
+    45px;
+
+  gap: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .invoice-products-table.thermal-screen-table
@@ -651,8 +730,8 @@
   min-width: 0;
   padding-top: 7px;
   padding-bottom: 7px;
-  font-size: 7px;
-  letter-spacing: 0.02em;
+  font-size: 6.5px;
+  letter-spacing: 0.01em;
 }
 
 .invoice-products-table.thermal-screen-table
@@ -661,6 +740,7 @@
   min-height: 42px;
   padding-top: 6px;
   padding-bottom: 6px;
+  align-items: center;
 }
 
 .invoice-products-table.thermal-screen-table
@@ -670,18 +750,23 @@
 .invoice-products-table.thermal-screen-table
   .invoice-products-head > span {
   min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-product-number {
-  font-size: 8px;
+  font-size: 7.5px;
+  text-align: center;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-product-info {
   min-width: 0;
   width: 100%;
-  overflow: hidden;
+  max-width: 100%;
+  overflow: visible;
+  align-items: flex-start;
 }
 
 .invoice-products-table.thermal-screen-table
@@ -689,11 +774,15 @@
   display: block;
   width: 100%;
   min-width: 0;
+  max-width: 100%;
+
   color: #111827;
-  font-size: 8.5px;
-  line-height: 1.2;
+  font-size: 7.5px;
+  line-height: 1.25;
+
+  /* Never cut the product name */
   white-space: normal;
-  overflow: hidden;
+  overflow: visible;
   text-overflow: clip;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -702,23 +791,26 @@
 .invoice-products-table.thermal-screen-table
   .invoice-product-row > div:not(.invoice-product-info) {
   min-width: 0;
-  font-size: 8px;
+  max-width: 100%;
+  font-size: 7.5px;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-edit-input {
   width: 100%;
+  max-width: 100%;
   min-width: 0;
-  height: 25px;
-  padding: 3px 3px;
+  height: 24px;
+  padding: 2px 2px;
   border-radius: 4px;
-  font-size: 8px;
+  font-size: 7.5px;
   text-align: center;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-edit-input.quantity {
   width: 100%;
+  max-width: 100%;
   min-width: 0;
 }
 
@@ -726,6 +818,7 @@
   .invoice-price-input {
   width: 100%;
   min-width: 0;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -735,41 +828,96 @@
 .invoice-products-table.thermal-screen-table
   .invoice-price-input span {
   flex-shrink: 0;
-  font-size: 8px;
+  font-size: 7px;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-price-input input {
   width: 100%;
   min-width: 0;
+  max-width: 100%;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-product-row > strong {
   min-width: 0;
-  font-size: 8px;
+  max-width: 100%;
+  font-size: 7.5px;
   text-align: right;
   white-space: nowrap;
+  overflow: visible;
 }
 
 .invoice-products-table.thermal-screen-table
   .invoice-remove-button {
   width: 100%;
   min-width: 0;
+  max-width: 100%;
   justify-self: stretch;
-  padding: 4px 2px;
+  padding: 4px 1px;
   border-radius: 4px;
-  font-size: 7px;
-  line-height: 1;
-  white-space: nowrap;
-  overflow: hidden;
+  font-size: 6.5px;
+  line-height: 1.1;
+  white-space: normal;
+  overflow: visible;
   text-overflow: clip;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.invoice-products-table.thermal-screen-table
-  .invoice-empty-products {
-  padding: 25px 8px;
-  font-size: 9px;
+/* ============================================================
+   80MM EXTRA SMALL WIDTH
+============================================================ */
+
+@media (max-width: 350px) {
+  .invoice-products-table.thermal-screen-table
+    .invoice-products-head.draft,
+  .invoice-products-table.thermal-screen-table
+    .invoice-product-row.draft {
+    grid-template-columns:
+      15px
+      minmax(0, 1fr)
+      22px
+      36px
+      42px
+      35px;
+
+    gap: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-products-head.readonly,
+  .invoice-products-table.thermal-screen-table
+    .invoice-product-row.readonly {
+    grid-template-columns:
+      15px
+      minmax(0, 1fr)
+      22px
+      36px
+      42px;
+
+    gap: 1px;
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-product-info strong {
+    font-size: 7px;
+  }
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-edit-input {
+    height: 23px;
+    font-size: 7px;
+  }
+
+  .invoice-products-table.thermal-screen-table
+    .invoice-remove-button {
+    font-size: 6px;
+  }
 }
 
 /* ============================================================
@@ -780,6 +928,7 @@
   width: min(100%, 440px);
   margin-left: auto;
   padding-top: 10px;
+  min-width: 0;
 }
 
 .invoice-summary-row {
@@ -790,27 +939,45 @@
   padding: 8px 0;
   color: #4b5563;
   font-size: 12px;
+  min-width: 0;
+}
+
+.invoice-summary-row > span,
+.invoice-summary-row > strong,
+.invoice-summary-row > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.invoice-summary-row span,
+.invoice-summary-row strong {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .invoice-summary-row strong {
   color: #111827;
   font-weight: 700;
+  text-align: right;
 }
 
 .invoice-discount-row > div {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .invoice-discount-input {
   display: flex;
   align-items: center;
   gap: 3px;
+  min-width: 0;
 }
 
 .invoice-discount-input input {
   width: 58px;
+  max-width: 100%;
   height: 30px;
   box-sizing: border-box;
   padding: 5px 7px;
@@ -842,6 +1009,19 @@
   color: #111827;
   font-size: 16px;
   font-weight: 800;
+  min-width: 0;
+}
+
+.invoice-summary-total span,
+.invoice-summary-total strong {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.invoice-summary-total strong {
+  text-align: right;
 }
 
 /* ============================================================
@@ -852,6 +1032,7 @@
   margin-top: 18px;
   padding-top: 12px;
   border-top: 1px solid #e5e7eb;
+  min-width: 0;
 }
 
 .invoice-notes-section .invoice-section-title {
@@ -892,6 +1073,8 @@
   font-size: 10px;
   line-height: 1.35;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   border: 1px solid #eeeeee;
   border-radius: 5px;
   background: #fafafa;
@@ -915,6 +1098,14 @@
   border-top: 1px solid #e5e7eb;
   color: #9ca3af;
   font-size: 9px;
+  min-width: 0;
+}
+
+.invoice-paper-footer > * {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ============================================================
@@ -1455,6 +1646,8 @@
 
 .thermal-preview-summary > div > span {
   min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .thermal-preview-summary > div > strong {
@@ -2063,8 +2256,12 @@
     width: 85px;
   }
 
+  /*
+    Do NOT hide the right side of the 80mm table.
+    The grid itself is now sized to fit the available width.
+  */
   .invoice-products-table {
-    overflow-x: hidden;
+    overflow: visible;
   }
 
   .invoice-products-head,
@@ -2077,12 +2274,12 @@
   .invoice-products-table.thermal-screen-table
     .invoice-product-row.draft {
     grid-template-columns:
-      17px
-      minmax(62px, 1fr)
-      27px
-      43px
-      48px
-      40px;
+      16px
+      minmax(0, 1fr)
+      24px
+      39px
+      45px
+      38px;
 
     gap: 2px;
     padding-left: 4px;
@@ -2094,11 +2291,12 @@
   .invoice-products-table.thermal-screen-table
     .invoice-product-row.readonly {
     grid-template-columns:
-      17px
-      minmax(62px, 1fr)
-      27px
-      43px
-      48px;
+      16px
+      minmax(0, 1fr)
+      24px
+      39px
+      45px;
+
     gap: 2px;
     padding-left: 4px;
     padding-right: 4px;
@@ -2106,14 +2304,14 @@
 
   .invoice-products-table.thermal-screen-table
     .invoice-product-info strong {
-    font-size: 8px;
+    font-size: 7.5px;
   }
 
   .invoice-products-table.thermal-screen-table
     .invoice-edit-input {
     height: 24px;
     padding: 3px 2px;
-    font-size: 8px;
+    font-size: 7.5px;
   }
 
   .invoice-products-table.thermal-screen-table
@@ -2124,6 +2322,15 @@
 
   .invoice-summary {
     width: 100%;
+  }
+
+  .invoice-summary-row {
+    gap: 10px;
+  }
+
+  .invoice-summary-total {
+    gap: 10px;
+    font-size: 14px;
   }
 
   .invoice-paper-footer {
@@ -2617,6 +2824,8 @@
 
   .thermal-print-summary-row span {
     min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .thermal-print-summary-row strong {

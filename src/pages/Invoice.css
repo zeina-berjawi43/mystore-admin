@@ -10,7 +10,6 @@
   box-sizing: border-box;
 }
 
-
 /* ============================================================
    TOP BAR
 ============================================================ */
@@ -19,55 +18,40 @@
   width: 100%;
   max-width: 1500px;
   margin: 0 auto 20px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
-
   padding: 16px 18px;
-
   box-sizing: border-box;
-
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
-
 
 .invoice-topbar-title {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-
   flex: 1;
 }
 
-
 .invoice-topbar-title h1 {
   margin: 0;
-
   font-size: 24px;
   font-weight: 700;
-
   color: #111827;
 }
-
 
 .invoice-topbar-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
   gap: 8px;
-
   flex-wrap: wrap;
 }
-
 
 /* ============================================================
    BUTTONS
@@ -81,11 +65,8 @@
 .invoice-remove-button {
   border: none;
   outline: none;
-
   font-family: inherit;
-
   cursor: pointer;
-
   transition:
     background 0.18s ease,
     color 0.18s ease,
@@ -94,92 +75,63 @@
     opacity 0.18s ease;
 }
 
-
 .invoice-back-button {
   background: transparent;
-
   color: #374151;
-
   font-size: 14px;
   font-weight: 600;
-
   padding: 8px 4px;
 }
-
 
 .invoice-back-button:hover {
   color: #111827;
 }
 
-
 .invoice-primary-button {
   min-height: 38px;
-
   padding: 9px 16px;
-
   border-radius: 8px;
-
   background: #111827;
-
   color: #ffffff;
-
   font-size: 13px;
   font-weight: 700;
 }
-
 
 .invoice-primary-button:hover {
   background: #000000;
 }
 
-
 .invoice-secondary-button {
   min-height: 38px;
-
   padding: 8px 14px;
-
   border-radius: 8px;
-
   background: #ffffff;
-
   color: #374151;
-
   border: 1px solid #d1d5db;
-
   font-size: 13px;
   font-weight: 600;
 }
-
 
 .invoice-secondary-button:hover {
   background: #f9fafb;
   border-color: #9ca3af;
 }
 
-
 .invoice-danger-button {
   min-height: 38px;
-
   padding: 8px 14px;
-
   border-radius: 8px;
-
   background: #ffffff;
-
   color: #b91c1c;
-
   border: 1px solid #fecaca;
-
   font-size: 13px;
   font-weight: 600;
 }
-
 
 .invoice-danger-button:hover {
   background: #fef2f2;
   border-color: #fca5a5;
 }
-
 
 .invoice-primary-button:disabled,
 .invoice-secondary-button:disabled,
@@ -190,7 +142,6 @@
   opacity: 0.55;
 }
 
-
 /* ============================================================
    STATUS BADGE
 ============================================================ */
@@ -199,38 +150,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   min-height: 26px;
-
   padding: 4px 10px;
-
   border-radius: 999px;
-
   font-size: 11px;
   font-weight: 700;
-
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
-
 
 .invoice-status-badge.draft {
   background: #fff7ed;
   color: #c2410c;
 }
 
-
 .invoice-status-badge.saved {
   background: #ecfdf5;
   color: #047857;
 }
 
-
 .invoice-status-badge.cancelled {
   background: #fef2f2;
   color: #b91c1c;
 }
-
 
 /* ============================================================
    MESSAGES
@@ -239,72 +181,50 @@
 .invoice-messages {
   width: 100%;
   max-width: 1500px;
-
   margin: 0 auto 16px;
 }
-
 
 .invoice-error-message,
 .invoice-success-message {
   display: flex;
   align-items: center;
-
   gap: 10px;
-
   min-height: 46px;
-
   padding: 10px 14px;
-
   box-sizing: border-box;
-
   border-radius: 10px;
-
   font-size: 13px;
 }
 
-
 .invoice-error-message {
   background: #fef2f2;
-
   border: 1px solid #fecaca;
-
   color: #991b1b;
 }
-
 
 .invoice-error-message strong {
   font-weight: 700;
 }
 
-
 .invoice-error-message span {
   flex: 1;
 }
 
-
 .invoice-error-message button,
 .invoice-success-message button {
   margin-left: auto;
-
   border: none;
   background: transparent;
-
   cursor: pointer;
-
   color: inherit;
-
   font-size: 15px;
 }
 
-
 .invoice-success-message {
   background: #ecfdf5;
-
   border: 1px solid #a7f3d0;
-
   color: #047857;
 }
-
 
 /* ============================================================
    SETTINGS
@@ -313,95 +233,63 @@
 .invoice-settings {
   width: 100%;
   max-width: 1500px;
-
   margin: 0 auto 18px;
-
   display: flex;
   align-items: center;
-
   gap: 28px;
-
   padding: 14px 16px;
-
   box-sizing: border-box;
-
   background: #ffffff;
-
   border: 1px solid #e5e7eb;
-
   border-radius: 12px;
 }
-
 
 .invoice-setting-group {
   display: flex;
   align-items: center;
-
   gap: 10px;
 }
 
-
 .invoice-setting-group > label {
   color: #6b7280;
-
   font-size: 12px;
   font-weight: 700;
-
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-
 .invoice-toggle-group {
   display: flex;
-
   padding: 3px;
-
   background: #f3f4f6;
-
   border-radius: 8px;
 }
 
-
 .invoice-toggle-group button {
   border: none;
-
   background: transparent;
-
   color: #6b7280;
-
   padding: 7px 11px;
-
   border-radius: 6px;
-
   cursor: pointer;
-
   font-family: inherit;
-
   font-size: 12px;
   font-weight: 600;
 }
-
 
 .invoice-toggle-group button:hover {
   color: #111827;
 }
 
-
 .invoice-toggle-group button.active {
   background: #ffffff;
-
   color: #111827;
-
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
-
 
 .invoice-toggle-group button:disabled {
   cursor: not-allowed;
 }
-
 
 /* ============================================================
    INVOICE PAPER
@@ -409,37 +297,33 @@
 
 .invoice-paper {
   background: #ffffff;
-
   margin: 0 auto;
-
   box-sizing: border-box;
-
   color: #111111;
-
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.08);
-
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border-radius: 4px;
 }
 
-
 .invoice-paper-a4 {
   width: 210mm;
-
   min-height: 297mm;
-
   padding: 18mm 16mm;
 }
 
-
 .invoice-paper-80mm {
   width: 80mm;
-
   min-height: 100mm;
-
   padding: 8mm 5mm;
 }
 
+/* ============================================================
+   DEDICATED THERMAL PRINT LAYOUT
+   Hidden on screen.
+============================================================ */
+
+.invoice-thermal-print {
+  display: none;
+}
 
 /* ============================================================
    PAPER HEADER
@@ -447,81 +331,53 @@
 
 .invoice-paper-header {
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
-
   gap: 20px;
-
   padding-bottom: 18px;
-
   border-bottom: 1px solid #e5e7eb;
 }
 
-
 .invoice-brand {
   display: flex;
-
   flex-direction: column;
-
   align-items: flex-start;
-
   gap: 5px;
-
   min-width: 0;
 }
 
-
 .invoice-brand-logo {
   display: block;
-
   width: 105px;
-
   max-width: 100%;
-
   height: auto;
-
   object-fit: contain;
 }
 
-
 .invoice-brand span {
   color: #6b7280;
-
   font-size: 12px;
-
   font-weight: 600;
-
   text-transform: uppercase;
-
   letter-spacing: 0.08em;
 }
 
-
 .invoice-number-block {
   display: flex;
-
   flex-direction: column;
-
   align-items: flex-end;
-
   gap: 4px;
 }
 
-
 .invoice-number-block strong {
   font-size: 15px;
-
   font-weight: 800;
 }
 
-
 .invoice-number-block span {
   color: #6b7280;
-
   font-size: 11px;
 }
-
 
 /* ============================================================
    CUSTOMER SECTION
@@ -529,68 +385,44 @@
 
 .invoice-customer-section {
   padding: 20px 0;
-
   border-bottom: 1px solid #e5e7eb;
 }
 
-
 .invoice-section-title {
   margin-bottom: 12px;
-
   color: #374151;
-
   font-size: 11px;
-
   font-weight: 800;
-
   text-transform: uppercase;
-
   letter-spacing: 0.08em;
 }
 
-
 .invoice-customer-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 13px 28px;
 }
 
-
 .invoice-customer-grid > div {
   display: flex;
-
   flex-direction: column;
-
   gap: 3px;
-
   min-width: 0;
 }
 
-
 .invoice-customer-grid span {
   color: #9ca3af;
-
   font-size: 10px;
-
   font-weight: 600;
-
   text-transform: uppercase;
 }
 
-
 .invoice-customer-grid strong {
   color: #111827;
-
   font-size: 12px;
-
   font-weight: 600;
-
   word-break: break-word;
 }
-
 
 /* ============================================================
    PRODUCTS SECTION
@@ -600,65 +432,45 @@
   padding: 20px 0;
 }
 
-
 .invoice-section-heading-row {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 12px;
 }
 
-
-.invoice-section-heading-row
-.invoice-section-title {
+.invoice-section-heading-row .invoice-section-title {
   margin-bottom: 12px;
 }
-
 
 .invoice-add-product-button {
   margin-bottom: 12px;
-
   padding: 7px 11px;
-
   border-radius: 7px;
-
   background: #111827;
-
   color: #ffffff;
-
   font-size: 11px;
-
   font-weight: 700;
 }
-
 
 .invoice-add-product-button:hover {
   background: #000000;
 }
 
-
 .invoice-products-table {
   width: 100%;
-
   overflow: hidden;
-
   border: 1px solid #e5e7eb;
-
   border-radius: 8px;
 }
 
-
 /* ============================================================
    PRODUCT TABLE
-   # | PRODUCT | QTY | PRICE | TOTAL | ACTION
 ============================================================ */
 
 .invoice-products-head,
 .invoice-product-row {
   display: grid;
-
   grid-template-columns:
     30px
     minmax(0, 1.8fr)
@@ -666,16 +478,11 @@
     100px
     110px
     85px;
-
   align-items: center;
-
   gap: 10px;
-
   padding: 11px 12px;
-
   box-sizing: border-box;
 }
-
 
 .invoice-products-head.readonly,
 .invoice-product-row.readonly {
@@ -687,177 +494,115 @@
     110px;
 }
 
-
 .invoice-products-head {
   background: #f9fafb;
-
   border-bottom: 1px solid #e5e7eb;
-
   color: #6b7280;
-
   font-size: 10px;
-
   font-weight: 800;
-
   text-transform: uppercase;
-
   letter-spacing: 0.05em;
 }
-
 
 .invoice-number-column,
 .invoice-product-number {
   text-align: center;
 }
 
-
 .invoice-product-row {
   min-height: 52px;
-
   border-bottom: 1px solid #f0f0f0;
 }
-
 
 .invoice-product-row:last-child {
   border-bottom: none;
 }
 
-
 .invoice-product-info {
   display: flex;
-
   align-items: center;
-
   min-width: 0;
 }
 
-
 .invoice-product-info strong {
   overflow: hidden;
-
   text-overflow: ellipsis;
-
   white-space: nowrap;
-
   color: #111827;
-
   font-size: 12px;
-
   font-weight: 600;
 }
 
-
 .invoice-product-number {
   color: #6b7280;
-
   font-size: 11px;
-
   font-weight: 700;
 }
 
-
-.invoice-product-row > div:not(
-  .invoice-product-info
-) {
+.invoice-product-row > div:not(.invoice-product-info) {
   font-size: 12px;
-
   color: #374151;
 }
 
-
 .invoice-edit-input {
   width: 70px;
-
   height: 34px;
-
   box-sizing: border-box;
-
   padding: 6px 8px;
-
   border: 1px solid #d1d5db;
-
   border-radius: 6px;
-
   outline: none;
-
   background: #ffffff;
-
   color: #111827;
-
   font-family: inherit;
-
   font-size: 12px;
 }
 
-
 .invoice-edit-input:focus {
   border-color: #6b7280;
-
-  box-shadow:
-    0 0 0 2px rgba(17, 24, 39, 0.06);
+  box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.06);
 }
-
 
 .invoice-edit-input.quantity {
   width: 56px;
 }
 
-
 .invoice-price-input {
   display: flex;
-
   align-items: center;
-
   gap: 4px;
 }
 
-
 .invoice-price-input span {
   color: #6b7280;
-
   font-size: 12px;
 }
-
 
 .invoice-product-row > strong {
   font-size: 12px;
-
   font-weight: 700;
 }
-
 
 .invoice-remove-button {
   justify-self: start;
-
   padding: 6px 8px;
-
   border-radius: 6px;
-
   background: #fff1f2;
-
   color: #be123c;
-
   font-size: 10px;
-
   font-weight: 700;
 }
-
 
 .invoice-remove-button:hover {
   background: #ffe4e6;
 }
 
-
 .invoice-empty-products {
   padding: 35px 20px;
-
   text-align: center;
-
   color: #9ca3af;
-
   font-size: 12px;
 }
-
 
 /* ============================================================
    SUMMARY
@@ -865,110 +610,71 @@
 
 .invoice-summary {
   width: min(100%, 440px);
-
   margin-left: auto;
-
   padding-top: 10px;
 }
 
-
 .invoice-summary-row {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 20px;
-
   padding: 8px 0;
-
   color: #4b5563;
-
   font-size: 12px;
 }
 
-
 .invoice-summary-row strong {
   color: #111827;
-
   font-weight: 700;
 }
 
-
 .invoice-discount-row > div {
   display: flex;
-
   align-items: center;
-
   gap: 10px;
 }
 
-
 .invoice-discount-input {
   display: flex;
-
   align-items: center;
-
   gap: 3px;
 }
 
-
 .invoice-discount-input input {
   width: 58px;
-
   height: 30px;
-
   box-sizing: border-box;
-
   padding: 5px 7px;
-
   border: 1px solid #d1d5db;
-
   border-radius: 6px;
-
   outline: none;
-
   font-family: inherit;
-
   font-size: 11px;
-
   text-align: right;
 }
-
 
 .invoice-discount-input input:focus {
   border-color: #6b7280;
 }
 
-
 .invoice-discount-input span {
   color: #6b7280;
-
   font-size: 11px;
 }
 
-
 .invoice-summary-total {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 20px;
-
   margin-top: 8px;
-
   padding-top: 14px;
-
   border-top: 2px solid #111827;
-
   color: #111827;
-
   font-size: 16px;
-
   font-weight: 800;
 }
-
 
 /* ============================================================
    NOTES
@@ -976,98 +682,56 @@
 
 .invoice-notes-section {
   margin-top: 18px;
-
   padding-top: 12px;
-
   border-top: 1px solid #e5e7eb;
 }
-
 
 .invoice-notes-section .invoice-section-title {
   margin-bottom: 6px;
 }
 
-
-/*
-   IMPORTANT:
-   Notes area is intentionally fixed and compact.
-   Typing a long note will NOT make the invoice grow.
-*/
-
 .invoice-notes-input {
   display: block;
-
   width: 100%;
-
   height: 42px;
-
   min-height: 42px;
-
   max-height: 42px;
-
   resize: none;
-
   overflow-y: auto;
-
   box-sizing: border-box;
-
   padding: 7px 9px;
-
   border: 1px solid #d1d5db;
-
   border-radius: 6px;
-
   outline: none;
-
   font-family: inherit;
-
   font-size: 11px;
-
   line-height: 1.35;
 }
-
 
 .invoice-notes-input:focus {
   border-color: #6b7280;
-
-  box-shadow:
-    0 0 0 2px rgba(17, 24, 39, 0.06);
+  box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.06);
 }
-
 
 .invoice-notes-display {
   width: 100%;
-
   height: 32px;
-
   max-height: 32px;
-
   overflow-y: auto;
-
   box-sizing: border-box;
-
   padding: 5px 7px;
-
   color: #4b5563;
-
   font-size: 10px;
-
   line-height: 1.35;
-
   white-space: pre-wrap;
-
   border: 1px solid #eeeeee;
-
   border-radius: 5px;
-
   background: #fafafa;
 }
-
 
 .invoice-notes-print {
   display: none;
 }
-
 
 /* ============================================================
    FOOTER
@@ -1075,23 +739,15 @@
 
 .invoice-paper-footer {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 12px;
-
   margin-top: 25px;
-
   padding-top: 12px;
-
   border-top: 1px solid #e5e7eb;
-
   color: #9ca3af;
-
   font-size: 9px;
 }
-
 
 /* ============================================================
    LOADING
@@ -1100,110 +756,65 @@
 .invoice-loading-page,
 .invoice-error-page {
   min-height: 100vh;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   flex-direction: column;
-
   gap: 12px;
-
   background: #f5f6f8;
-
   color: #374151;
 }
 
-
 .invoice-loading-spinner {
   width: 28px;
-
   height: 28px;
-
   border: 3px solid #e5e7eb;
-
   border-top-color: #111827;
-
   border-radius: 50%;
-
-  animation:
-    invoiceSpin
-    0.8s
-    linear
-    infinite;
+  animation: invoiceSpin 0.8s linear infinite;
 }
-
 
 .invoice-loading-spinner.small {
   width: 20px;
-
   height: 20px;
-
   border-width: 2px;
 }
 
-
 @keyframes invoiceSpin {
-
   to {
     transform: rotate(360deg);
   }
-
 }
-
 
 .invoice-loading-page p {
   margin: 0;
-
   color: #6b7280;
-
   font-size: 13px;
 }
 
-
 .invoice-error-card {
-  width: min(
-    calc(100% - 40px),
-    450px
-  );
-
+  width: min(calc(100% - 40px), 450px);
   padding: 30px;
-
   box-sizing: border-box;
-
   background: #ffffff;
-
   border: 1px solid #e5e7eb;
-
   border-radius: 12px;
-
   text-align: center;
-
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
-
 
 .invoice-error-card h2 {
   margin: 0 0 8px;
-
   color: #111827;
-
   font-size: 20px;
 }
 
-
 .invoice-error-card p {
   margin: 0 0 20px;
-
   color: #6b7280;
-
   font-size: 13px;
-
   line-height: 1.5;
 }
-
 
 /* ============================================================
    ADD PRODUCT MODAL
@@ -1212,540 +823,334 @@
 .invoice-modal-overlay,
 .invoice-preview-overlay {
   position: fixed;
-
   inset: 0;
-
   z-index: 1000;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   padding: 20px;
-
   box-sizing: border-box;
-
-  background:
-    rgba(17, 24, 39, 0.48);
-
-  backdrop-filter:
-    blur(3px);
+  background: rgba(17, 24, 39, 0.48);
+  backdrop-filter: blur(3px);
 }
-
 
 .invoice-product-modal {
-  width: min(
-    100%,
-    560px
-  );
-
-  max-height: min(
-    720px,
-    calc(100vh - 40px)
-  );
-
+  width: min(100%, 560px);
+  max-height: min(720px, calc(100vh - 40px));
   display: flex;
-
   flex-direction: column;
-
   overflow: hidden;
-
   background: #ffffff;
-
   border-radius: 14px;
-
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
-
 
 .invoice-modal-header {
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
-
   gap: 20px;
-
   padding: 18px 20px;
-
   border-bottom: 1px solid #e5e7eb;
 }
 
-
 .invoice-modal-header h2 {
   margin: 0 0 4px;
-
   color: #111827;
-
   font-size: 18px;
 }
 
-
 .invoice-modal-header p {
   margin: 0;
-
   color: #6b7280;
-
   font-size: 11px;
 }
-
 
 .invoice-modal-header > button,
 .invoice-preview-header > button {
   width: 32px;
-
   height: 32px;
-
   flex-shrink: 0;
-
   border: none;
-
   border-radius: 7px;
-
   background: #f3f4f6;
-
   color: #374151;
-
   cursor: pointer;
-
   font-size: 14px;
 }
-
 
 .invoice-modal-header > button:hover,
 .invoice-preview-header > button:hover {
   background: #e5e7eb;
 }
 
-
 .invoice-product-search {
   margin: 15px 20px 10px;
-
   height: 40px;
-
   padding: 8px 12px;
-
   box-sizing: border-box;
-
   border: 1px solid #d1d5db;
-
   border-radius: 8px;
-
   outline: none;
-
   font-family: inherit;
-
   font-size: 12px;
 }
-
 
 .invoice-product-search:focus {
   border-color: #6b7280;
 }
 
-
 .invoice-product-list {
   overflow-y: auto;
-
   padding: 5px 10px 15px;
 }
 
-
 .invoice-product-option {
   width: 100%;
-
   display: flex;
-
   align-items: center;
-
   gap: 12px;
-
   padding: 10px;
-
   border: none;
-
   border-radius: 8px;
-
   background: transparent;
-
   text-align: left;
-
   cursor: pointer;
-
   font-family: inherit;
 }
-
 
 .invoice-product-option:hover {
   background: #f9fafb;
 }
 
-
 .invoice-product-option img,
 .invoice-product-option-placeholder {
   width: 45px;
-
   height: 45px;
-
   flex-shrink: 0;
-
   object-fit: cover;
-
   border-radius: 7px;
-
   background: #f3f4f6;
 }
 
-
 .invoice-product-option-placeholder {
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   color: #9ca3af;
-
   font-size: 12px;
 }
-
 
 .invoice-product-option > div:last-child {
   display: flex;
-
   flex-direction: column;
-
   gap: 4px;
-
   min-width: 0;
 }
 
-
 .invoice-product-option strong {
   overflow: hidden;
-
   text-overflow: ellipsis;
-
   white-space: nowrap;
-
   color: #111827;
-
   font-size: 12px;
 }
 
-
 .invoice-product-option span {
   color: #6b7280;
-
   font-size: 11px;
 }
 
-
 .invoice-product-option small {
   color: #9ca3af;
-
   font-size: 9px;
 }
-
 
 .invoice-product-loading,
 .invoice-product-empty {
   min-height: 150px;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   flex-direction: column;
-
   gap: 10px;
-
   color: #9ca3af;
-
   font-size: 12px;
 }
-
 
 /* ============================================================
    PREVIEW MODAL
 ============================================================ */
 
 .invoice-preview-modal {
-  width: min(
-    100%,
-    900px
-  );
-
-  max-height: calc(
-    100vh - 40px
-  );
-
+  width: min(100%, 900px);
+  max-height: calc(100vh - 40px);
   display: flex;
-
   flex-direction: column;
-
   overflow: hidden;
-
   background: #ffffff;
-
   border-radius: 14px;
-
-  box-shadow:
-    0 20px 70px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.25);
 }
-
 
 .invoice-preview-modal.thermal {
-  width: min(
-    100%,
-    520px
-  );
+  width: min(100%, 520px);
 }
-
 
 .invoice-preview-header {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 20px;
-
   padding: 16px 20px;
-
   border-bottom: 1px solid #e5e7eb;
 }
 
-
 .invoice-preview-header h2 {
   margin: 0 0 3px;
-
   color: #111827;
-
   font-size: 17px;
 }
 
-
 .invoice-preview-header span {
   color: #6b7280;
-
   font-size: 11px;
 }
 
-
 .invoice-preview-body {
   overflow-y: auto;
-
   padding: 25px;
-
   background: #f3f4f6;
 }
 
-
 .invoice-preview-paper {
   width: 100%;
-
   max-width: 500px;
-
   margin: 0 auto;
-
   padding: 28px;
-
   box-sizing: border-box;
-
   background: #ffffff;
-
-  box-shadow:
-    0 3px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
 }
 
-
-.invoice-preview-modal.thermal
-.invoice-preview-paper {
+.invoice-preview-modal.thermal .invoice-preview-paper {
   max-width: 320px;
-
   padding: 22px 16px;
 }
 
-
 .invoice-preview-logo {
   display: block;
-
   width: 100px;
-
   max-width: 100%;
-
   height: auto;
-
   margin: 0 auto 6px;
-
   object-fit: contain;
 }
 
-
 .invoice-preview-paper > p {
   margin: 5px 0;
-
   text-align: center;
-
   color: #6b7280;
-
   font-size: 10px;
 }
-
 
 .invoice-preview-paper hr {
   border: none;
-
   border-top: 1px solid #e5e7eb;
-
   margin: 15px 0;
 }
 
-
 .invoice-preview-paper > strong {
   display: block;
-
   color: #111111;
-
   font-size: 12px;
 }
 
-
 .preview-line {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 10px;
-
   padding: 5px 0;
-
   color: #374151;
-
   font-size: 10px;
 }
 
-
 .preview-line span {
   min-width: 0;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
-
   white-space: nowrap;
 }
 
-
 .preview-line strong {
   flex-shrink: 0;
-
   color: #111111;
 }
 
-
 .preview-total {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 10px;
-
   padding-top: 12px;
-
   font-size: 15px;
-
   font-weight: 800;
 }
 
-
 .invoice-preview-footer {
   display: flex;
-
   align-items: center;
   justify-content: flex-end;
-
   gap: 8px;
-
   padding: 14px 20px;
-
   border-top: 1px solid #e5e7eb;
-
   background: #ffffff;
 }
-
 
 /* ============================================================
    RESPONSIVE
 ============================================================ */
 
-@media (
-  max-width: 1100px
-) {
-
+@media (max-width: 1100px) {
   .invoice-topbar {
     align-items: flex-start;
-
     flex-wrap: wrap;
   }
 
-
   .invoice-topbar-title {
     order: -1;
-
     width: 100%;
-
     flex: none;
-
     justify-content: flex-start;
   }
-
 
   .invoice-topbar-actions {
     justify-content: flex-start;
   }
-
 }
 
-
-@media (
-  max-width: 800px
-) {
-
+@media (max-width: 800px) {
   .invoice-page {
     padding: 12px;
   }
 
-
   .invoice-settings {
     align-items: flex-start;
-
     flex-direction: column;
-
     gap: 12px;
   }
 
-
   .invoice-paper-a4 {
     width: 100%;
-
     min-height: auto;
-
     padding: 30px 20px;
   }
 
-
   .invoice-paper-80mm {
     width: 100%;
-
     max-width: 400px;
   }
-
 
   .invoice-products-head,
   .invoice-product-row {
@@ -1756,13 +1161,10 @@
       85px
       90px
       65px;
-
     gap: 6px;
-
     padding-left: 8px;
     padding-right: 8px;
   }
-
 
   .invoice-products-head.readonly,
   .invoice-product-row.readonly {
@@ -1774,474 +1176,526 @@
       90px;
   }
 
-
   .invoice-product-info strong {
     font-size: 10px;
   }
-
 }
 
-
-@media (
-  max-width: 600px
-) {
-
+@media (max-width: 600px) {
   .invoice-page {
     padding: 8px;
   }
 
-
   .invoice-topbar {
     padding: 12px;
-
     border-radius: 10px;
   }
-
 
   .invoice-topbar-title h1 {
     font-size: 20px;
   }
 
-
   .invoice-topbar-actions {
     width: 100%;
   }
 
-
   .invoice-topbar-actions button {
     flex: 1;
-
     min-width: 90px;
   }
-
 
   .invoice-customer-grid {
     grid-template-columns: 1fr;
   }
 
-
   .invoice-paper-80mm {
     width: 100%;
-
     max-width: 100%;
-
     padding: 20px 10px;
   }
-
 
   .invoice-paper-header {
     gap: 10px;
   }
 
-
   .invoice-brand-logo {
     width: 85px;
   }
 
-
   .invoice-products-table {
     overflow-x: auto;
   }
-
 
   .invoice-products-head,
   .invoice-product-row {
     min-width: 500px;
   }
 
-
   .invoice-summary {
     width: 100%;
   }
 
-
   .invoice-paper-footer {
     flex-direction: column;
-
     align-items: flex-start;
   }
-
 
   .invoice-preview-body {
     padding: 12px;
   }
 
-
   .invoice-preview-paper {
     padding: 18px 12px;
   }
-
 }
-
 
 /* ============================================================
    PRINT
 ============================================================ */
 
 @media print {
-
   @page {
     margin: 0;
   }
 
+  @page invoiceA4 {
+    size: A4;
+    margin: 0;
+  }
+
+  @page invoice80 {
+    size: 80mm auto;
+    margin: 0;
+  }
 
   html,
   body {
     margin: 0 !important;
-
     padding: 0 !important;
-
     background: #ffffff !important;
   }
 
-
   body {
     -webkit-print-color-adjust: exact;
-
     print-color-adjust: exact;
   }
-
 
   .no-print {
     display: none !important;
   }
 
-
   .invoice-page {
     width: 100% !important;
-
     min-height: 0 !important;
-
     margin: 0 !important;
-
     padding: 0 !important;
-
     background: #ffffff !important;
   }
 
+  /* ==========================================================
+     A4
+  ========================================================== */
 
-  .invoice-paper {
+  .invoice-page-a4 {
+    page: invoiceA4;
+  }
+
+  .invoice-page-a4 .invoice-paper {
+    display: block !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
     margin: 0 !important;
-
+    padding: 15mm !important;
     box-shadow: none !important;
-
     border-radius: 0 !important;
   }
 
-
-  .invoice-paper-a4 {
-    width: 210mm !important;
-
-    min-height: 297mm !important;
-
-    padding: 15mm !important;
-  }
-
-
-  .invoice-paper-80mm {
-    width: 80mm !important;
-
-    min-height: auto !important;
-
-    padding: 5mm !important;
-  }
-
-
-  .invoice-notes-input {
+  .invoice-page-a4 .invoice-thermal-print {
     display: none !important;
   }
 
+  /* ==========================================================
+     80MM THERMAL
+  ========================================================== */
 
+  .invoice-page-80mm {
+    page: invoice80;
+  }
+
+  /*
+     Completely hide the normal invoice paper.
+     This prevents the desktop/table layout from being
+     squeezed into the thermal printer width.
+  */
+
+  .invoice-page-80mm .invoice-paper {
+    display: none !important;
+  }
+
+  /*
+     Show ONLY the dedicated thermal layout.
+  */
+
+  .invoice-page-80mm .invoice-thermal-print {
+    display: block !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    min-width: 80mm !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 4mm !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 9px !important;
+    line-height: 1.25 !important;
+  }
+
+  /* ==========================================================
+     THERMAL HEADER
+  ========================================================== */
+
+  .thermal-print-header {
+    display: grid !important;
+    grid-template-columns: 22mm minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2mm;
+    width: 100%;
+    padding-bottom: 3mm;
+    box-sizing: border-box;
+  }
+
+  .thermal-print-logo {
+    display: block !important;
+    width: 20mm !important;
+    max-width: 20mm !important;
+    height: auto !important;
+    max-height: 14mm !important;
+    object-fit: contain !important;
+  }
+
+  .thermal-print-brand {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .thermal-print-brand strong {
+    color: #111111;
+    font-size: 14px;
+    line-height: 1.1;
+    font-weight: 800;
+  }
+
+  .thermal-print-brand span {
+    margin-top: 1mm;
+    color: #555555;
+    font-size: 7px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .thermal-print-number {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    min-width: 0;
+    text-align: right;
+  }
+
+  .thermal-print-number strong {
+    color: #111111;
+    font-size: 8px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .thermal-print-number span {
+    margin-top: 1mm;
+    color: #555555;
+    font-size: 7px;
+    white-space: nowrap;
+  }
+
+  .thermal-print-divider {
+    width: 100%;
+    height: 0;
+    margin: 0;
+    border-top: 1px dashed #111111;
+  }
+
+  /* ==========================================================
+     THERMAL CUSTOMER
+  ========================================================== */
+
+  .thermal-print-customer {
+    padding: 3mm 0;
+    box-sizing: border-box;
+  }
+
+  .thermal-print-section-title {
+    margin-bottom: 1.5mm;
+    color: #111111;
+    font-size: 7px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .thermal-print-customer-row {
+    display: grid;
+    grid-template-columns: 13mm minmax(0, 1fr);
+    gap: 2mm;
+    align-items: start;
+    margin-bottom: 1mm;
+    width: 100%;
+  }
+
+  .thermal-print-customer-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .thermal-print-customer-row span {
+    color: #666666;
+    font-size: 7px;
+    font-weight: 700;
+  }
+
+  .thermal-print-customer-row strong {
+    min-width: 0;
+    color: #111111;
+    font-size: 8px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* ==========================================================
+     THERMAL PRODUCTS
+  ========================================================== */
+
+  .thermal-print-products {
+    padding: 3mm 0;
+    box-sizing: border-box;
+  }
+
+  .thermal-print-products-head,
+  .thermal-print-product-row {
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1fr)
+      8mm
+      16mm
+      18mm;
+    gap: 1mm;
+    align-items: start;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .thermal-print-products-head {
+    padding-bottom: 1.5mm;
+    border-bottom: 1px solid #111111;
+    color: #111111;
+    font-size: 7px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .thermal-print-products-head span:nth-child(2) {
+    text-align: center;
+  }
+
+  .thermal-print-products-head span:nth-child(3),
+  .thermal-print-products-head span:nth-child(4) {
+    text-align: right;
+  }
+
+  .thermal-print-product-row {
+    padding: 1.8mm 0;
+    border-bottom: 1px dotted #cccccc;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .thermal-print-product-row:last-child {
+    border-bottom: none;
+  }
+
+  .thermal-print-product-name {
+    min-width: 0;
+    color: #111111;
+    font-size: 8px;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .thermal-print-product-qty,
+  .thermal-print-product-price,
+  .thermal-print-product-total {
+    min-width: 0;
+    color: #111111;
+    font-size: 8px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .thermal-print-product-qty {
+    text-align: center;
+  }
+
+  .thermal-print-product-price,
+  .thermal-print-product-total {
+    text-align: right;
+  }
+
+  .thermal-print-product-total {
+    font-weight: 700;
+  }
+
+  .thermal-print-empty {
+    padding: 4mm 0;
+    text-align: center;
+    color: #666666;
+    font-size: 8px;
+  }
+
+  /* ==========================================================
+     THERMAL SUMMARY
+  ========================================================== */
+
+  .thermal-print-summary {
+    padding: 3mm 0;
+    box-sizing: border-box;
+  }
+
+  .thermal-print-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4mm;
+    padding: 1mm 0;
+    color: #333333;
+    font-size: 8px;
+  }
+
+  .thermal-print-summary-row strong {
+    color: #111111;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .thermal-print-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4mm;
+    margin-top: 2mm;
+    padding-top: 2mm;
+    border-top: 1px solid #111111;
+    color: #111111;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .thermal-print-total strong {
+    font-weight: 800;
+  }
+
+  /* ==========================================================
+     THERMAL NOTES
+  ========================================================== */
+
+  .thermal-print-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5mm;
+    padding: 3mm 0;
+    box-sizing: border-box;
+  }
+
+  .thermal-print-notes strong {
+    color: #111111;
+    font-size: 7px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .thermal-print-notes span {
+    color: #333333;
+    font-size: 8px;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* ==========================================================
+     THERMAL FOOTER
+  ========================================================== */
+
+  .thermal-print-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1mm;
+    padding-top: 3mm;
+    text-align: center;
+    color: #555555;
+    font-size: 7px;
+  }
+
+  .thermal-print-footer strong {
+    color: #111111;
+    font-size: 8px;
+    font-weight: 800;
+  }
+
+  .thermal-print-footer span {
+    color: #555555;
+    font-size: 7px;
+  }
+
+  /* ==========================================================
+     HIDE SCREEN-ONLY ELEMENTS DURING PRINT
+  ========================================================== */
+
+  .invoice-notes-input,
   .invoice-notes-display {
     display: none !important;
   }
 
-
   .invoice-notes-print {
     display: block !important;
-
-    max-height: 28px !important;
-
-    overflow: hidden !important;
-
     color: #111111 !important;
-
-    font-size: 9px !important;
-
-    line-height: 1.35 !important;
-
     white-space: pre-wrap !important;
   }
 
-
-  .invoice-product-row {
-    page-break-inside: avoid;
-  }
-
-
-  .invoice-products-table {
-    overflow: visible !important;
-
-    border: 1px solid #111111 !important;
-  }
-
-
-  .invoice-products-head {
-    background: #ffffff !important;
-
-    color: #111111 !important;
-
-    border-bottom: 1px solid #111111 !important;
-  }
-
-
-  .invoice-product-row {
-    border-bottom: 1px solid #dddddd !important;
-  }
-
-
-  .invoice-summary-total {
-    border-top: 2px solid #111111 !important;
-  }
-
-
-  .invoice-paper-footer {
-    border-top: 1px solid #dddddd !important;
-  }
-
-
   .invoice-brand-logo {
     display: block !important;
-
-    width: 105px !important;
-
-    height: auto !important;
   }
-
 
   .invoice-preview-logo {
     display: block !important;
   }
 
-}
-
-
-/* ============================================================
-   80MM THERMAL PRINT
-============================================================ */
-
-@media print {
-
-  .invoice-page-80mm .invoice-paper {
-    width: 80mm !important;
-
-    padding: 4mm !important;
-
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-paper-header {
-    padding-bottom: 10px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-brand-logo {
-    width: 72px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-brand span {
-    font-size: 8px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-number-block strong {
-    font-size: 9px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-number-block span {
-    font-size: 8px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-customer-section {
-    padding: 10px 0 !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-customer-grid {
-    grid-template-columns: 1fr !important;
-
-    gap: 6px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-customer-grid span {
-    font-size: 7px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-customer-grid strong {
-    font-size: 9px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-products-section {
-    padding: 10px 0 !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-products-head,
-  .invoice-page-80mm
-  .invoice-product-row {
-    min-width: 0 !important;
-
-    grid-template-columns:
-      18px
-      minmax(0, 1fr)
-      28px
-      45px
-      52px !important;
-
-    gap: 3px !important;
-
-    padding: 6px 2px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-products-head.draft,
-  .invoice-page-80mm
-  .invoice-product-row.draft {
-    grid-template-columns:
-      18px
-      minmax(0, 1fr)
-      28px
-      45px
-      52px
-      42px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-products-head {
-    font-size: 7px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-product-row {
-    min-height: 32px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-product-info {
-    gap: 0 !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-product-info strong {
-    font-size: 8px !important;
-
-    white-space: normal !important;
-
-    overflow: visible !important;
-
-    text-overflow: clip !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-product-number {
-    font-size: 7px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-product-row > div:not(
-    .invoice-product-info
-  ),
-  .invoice-page-80mm
-  .invoice-product-row > strong {
-    font-size: 8px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-summary {
-    width: 100% !important;
-
-    margin-top: 5px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-summary-row {
-    padding: 4px 0 !important;
-
-    font-size: 8px !important;
-  }
-
-
-  .invoice-page-80mm
   .invoice-summary-total {
-    padding-top: 8px !important;
-
-    font-size: 12px !important;
+    border-top: 2px solid #111111 !important;
   }
 
-
-  .invoice-page-80mm
-  .invoice-notes-section {
-    margin-top: 8px !important;
-
-    padding-top: 6px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-section-title {
-    margin-bottom: 4px !important;
-
-    font-size: 7px !important;
-  }
-
-
-  .invoice-page-80mm
-  .invoice-notes-print {
-    max-height: 24px !important;
-
-    font-size: 7px !important;
-
-    line-height: 1.3 !important;
-  }
-
-
-  .invoice-page-80mm
   .invoice-paper-footer {
-    margin-top: 14px !important;
-
-    padding-top: 7px !important;
-
-    font-size: 7px !important;
+    border-top: 1px solid #dddddd !important;
   }
 
+  .invoice-product-row {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
 }

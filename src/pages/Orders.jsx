@@ -1,3 +1,4 @@
+
 import {
   useEffect,
   useState,
@@ -25,6 +26,7 @@ const ORDER_STATUSES = [
 ============================================================ */
 
 const getToken = () => {
+
   /*
    * Admin Login stores the access token as:
    *
@@ -47,10 +49,12 @@ const getToken = () => {
 
 
 const getAuthHeaders = () => {
+
   const token =
     getToken();
 
   if (!token) {
+
     throw new Error(
       "Admin authentication token was not found. Please login again."
     );
@@ -266,6 +270,51 @@ const getStatusClass = (status) => {
 
 
 /* ============================================================
+   DATE FILTER HELPER
+============================================================ */
+
+const getLocalDateValue = (date) => {
+
+  if (!date) {
+    return "";
+  }
+
+
+  const parsedDate =
+    new Date(date);
+
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
+
+    return "";
+  }
+
+
+  const year =
+    parsedDate.getFullYear();
+
+
+  const month =
+    String(
+      parsedDate.getMonth() + 1
+    ).padStart(2, "0");
+
+
+  const day =
+    String(
+      parsedDate.getDate()
+    ).padStart(2, "0");
+
+
+  return `${year}-${month}-${day}`;
+};
+
+
+/* ============================================================
    ORDERS
 ============================================================ */
 
@@ -284,6 +333,9 @@ function Orders() {
     useState("");
 
   const [search, setSearch] =
+    useState("");
+
+  const [invoiceDate, setInvoiceDate] =
     useState("");
 
   const [statusFilter, setStatusFilter] =
@@ -377,6 +429,109 @@ function Orders() {
 
 
 /* ============================================================
+   GET INVOICE ID
+============================================================ */
+
+  const getInvoiceId = (
+    order
+  ) => {
+
+    if (!order) {
+      return null;
+    }
+
+
+    if (
+      typeof order.invoice ===
+      "string"
+    ) {
+
+      return order.invoice;
+    }
+
+
+    if (
+      order.invoice &&
+      typeof order.invoice ===
+        "object"
+    ) {
+
+      return (
+        order.invoice._id ||
+        order.invoice.id ||
+        null
+      );
+    }
+
+
+    return null;
+  };
+
+
+/* ============================================================
+   GET INVOICE NUMBER
+============================================================ */
+
+  const getInvoiceNumber = (
+    order
+  ) => {
+
+    if (!order) {
+      return "";
+    }
+
+
+    if (
+      order.invoice &&
+      typeof order.invoice ===
+        "object"
+    ) {
+
+      return (
+        order.invoice.invoiceNumber ||
+        order.invoice.number ||
+        ""
+      );
+    }
+
+
+    return "";
+  };
+
+
+/* ============================================================
+   GET INVOICE DATE
+============================================================ */
+
+  const getInvoiceDate = (
+    order
+  ) => {
+
+    if (!order) {
+      return "";
+    }
+
+
+    if (
+      order.invoice &&
+      typeof order.invoice ===
+        "object"
+    ) {
+
+      return (
+        order.invoice.createdAt ||
+        order.invoice.invoiceDate ||
+        order.invoice.date ||
+        ""
+      );
+    }
+
+
+    return "";
+  };
+
+
+/* ============================================================
    FILTER ORDERS
 ============================================================ */
 
@@ -408,25 +563,67 @@ function Orders() {
           );
 
 
+        const invoiceNumber =
+          getInvoiceNumber(
+            order
+          );
+
+
+        const invoiceId =
+          getInvoiceId(
+            order
+          );
+
+
+        const productNames =
+          Array.isArray(
+            order.items
+          )
+            ? order.items
+                .map(
+                  (item) =>
+                    item?.product?.name ||
+                    item?.productName ||
+                    ""
+                )
+                .join(" ")
+            : "";
+
+
         const searchableText =
           [
             customerName,
             customerEmail,
             customerPhone,
             order._id,
+            invoiceId,
+            invoiceNumber,
+            productNames,
             order.status,
           ]
             .join(" ")
             .toLowerCase();
 
 
+        const searchText =
+          search
+            .trim()
+            .toLowerCase();
+
+
         const matchesSearch =
-          !search.trim() ||
+          !searchText ||
           searchableText.includes(
-            search
-              .trim()
-              .toLowerCase()
+            searchText
           );
+
+
+        const matchesInvoiceDate =
+          !invoiceDate ||
+          getLocalDateValue(
+            getInvoiceDate(order)
+          ) ===
+            invoiceDate;
 
 
         const matchesStatus =
@@ -437,6 +634,7 @@ function Orders() {
 
         return (
           matchesSearch &&
+          matchesInvoiceDate &&
           matchesStatus
         );
       }
@@ -462,6 +660,8 @@ function Orders() {
   const handleClearFilters = () => {
 
     setSearch("");
+
+    setInvoiceDate("");
 
     setStatusFilter("All");
   };
@@ -596,7 +796,7 @@ function Orders() {
                     ...order,
                     status:
                       newStatus,
-                  }
+                }
                 : order
           )
       );
@@ -725,46 +925,6 @@ function Orders() {
 
 
 /* ============================================================
-   GET INVOICE ID
-============================================================ */
-
-  const getInvoiceId = (
-    order
-  ) => {
-
-    if (!order) {
-      return null;
-    }
-
-
-    if (
-      typeof order.invoice ===
-      "string"
-    ) {
-
-      return order.invoice;
-    }
-
-
-    if (
-      order.invoice &&
-      typeof order.invoice ===
-        "object"
-    ) {
-
-      return (
-        order.invoice._id ||
-        order.invoice.id ||
-        null
-      );
-    }
-
-
-    return null;
-  };
-
-
-/* ============================================================
    CREATE INVOICE
 ============================================================ */
 
@@ -832,7 +992,7 @@ function Orders() {
                 ? {
                     ...order,
                     invoice:
-                      invoiceId,
+                      invoice,
                     invoiceStatus:
                       invoice?.status ||
                       "Draft",
@@ -850,7 +1010,7 @@ function Orders() {
             ? {
                 ...previousOrder,
                 invoice:
-                  invoiceId,
+                  invoice,
                 invoiceStatus:
                   invoice?.status ||
                   "Draft",
@@ -957,7 +1117,6 @@ function Orders() {
           : "Invoice"}
 
       </button>
-
     );
   };
 
@@ -1055,10 +1214,24 @@ function Orders() {
                 event.target.value
               )
             }
-            placeholder="Search customer, phone, email or order..."
+            placeholder="Search customer, invoice number, phone, email or order..."
           />
 
         </div>
+
+
+        <input
+          type="date"
+          className="orders-date-filter"
+          value={invoiceDate}
+          onChange={(event) =>
+            setInvoiceDate(
+              event.target.value
+            )
+          }
+          title="Filter by invoice date"
+          aria-label="Filter by invoice date"
+        />
 
 
         <select

@@ -1,6 +1,4 @@
-import React, {
-  useEffect,
-} from "react";
+import React, { useEffect } from "react";
 
 import {
   BrowserRouter,
@@ -12,9 +10,7 @@ import {
 import "./App.css";
 
 // WEB PUSH
-import {
-  subscribeToWebPush,
-} from "./utils/webPush";
+import { subscribeToWebPush } from "./utils/webPush";
 
 // PAGES
 import Login from "./pages/Login";
@@ -33,220 +29,140 @@ import Invoice from "./pages/Invoice";
 // LAYOUT
 import AdminLayout from "./layouts/AdminLayout";
 
-
 // ============================================================
 // AUTO SYNC WEB PUSH
 // ============================================================
 
 function AutoSyncWebPush() {
   useEffect(() => {
+    const syncNotifications = async () => {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
 
-    const syncNotifications =
-      async () => {
+        if (!accessToken) {
+          console.log(
+            "WEB PUSH AUTO SYNC: No admin token."
+          );
+          return;
+        }
+
+        let user = null;
 
         try {
-
-          const accessToken =
-            localStorage.getItem(
-              "accessToken"
-            );
-
-          if (!accessToken) {
-
-            console.log(
-              "WEB PUSH AUTO SYNC: No admin token."
-            );
-
-            return;
-          }
-
-
-          let user = null;
-
-
-          try {
-
-            user = JSON.parse(
-              localStorage.getItem(
-                "user"
-              ) || "null"
-            );
-
-          } catch (error) {
-
-            console.log(
-              "WEB PUSH AUTO SYNC: User parse error:",
-              error
-            );
-
-            return;
-          }
-
-
-          if (
-            !user ||
-            user.role !== "admin"
-          ) {
-
-            console.log(
-              "WEB PUSH AUTO SYNC: Current user is not admin."
-            );
-
-            return;
-          }
-
-
-          if (
-            !("Notification" in window) ||
-            !("serviceWorker" in navigator) ||
-            !("PushManager" in window)
-          ) {
-
-            console.log(
-              "WEB PUSH AUTO SYNC: Browser does not support Web Push."
-            );
-
-            return;
-          }
-
-
-          const permission =
-            Notification.permission;
-
-
-          console.log(
-            "WEB PUSH AUTO SYNC: Permission:",
-            permission
+          user = JSON.parse(
+            localStorage.getItem("user") || "null"
           );
-
-
-          if (
-            permission ===
-            "denied"
-          ) {
-
-            console.log(
-              "WEB PUSH AUTO SYNC: Notifications are blocked."
-            );
-
-            return;
-          }
-
-
-          if (
-            permission ===
-            "default"
-          ) {
-
-            console.log(
-              "WEB PUSH AUTO SYNC: Permission not granted yet. Waiting for user action."
-            );
-
-            return;
-          }
-
-
-          if (
-            permission ===
-            "granted"
-          ) {
-
-            console.log(
-              "WEB PUSH AUTO SYNC: Permission already granted."
-            );
-
-
-            console.log(
-              "WEB PUSH AUTO SYNC: Starting automatic sync..."
-            );
-
-
-            const subscription =
-              await subscribeToWebPush(
-                accessToken
-              );
-
-
-            if (
-              subscription &&
-              subscription.endpoint
-            ) {
-
-              console.log(
-                "✅ WEB PUSH AUTO SYNC: Subscription synced successfully."
-              );
-
-
-              console.log(
-                "WEB PUSH AUTO SYNC: Endpoint:",
-                subscription.endpoint
-              );
-
-            } else {
-
-              console.log(
-                "⚠️ WEB PUSH AUTO SYNC: No valid subscription returned."
-              );
-            }
-          }
-
         } catch (error) {
-
-          console.error(
-            "❌ WEB PUSH AUTO SYNC ERROR:",
+          console.log(
+            "WEB PUSH AUTO SYNC: User parse error:",
             error
           );
+          return;
         }
-      };
 
+        if (!user || user.role !== "admin") {
+          console.log(
+            "WEB PUSH AUTO SYNC: Current user is not admin."
+          );
+          return;
+        }
+
+        if (
+          !("Notification" in window) ||
+          !("serviceWorker" in navigator) ||
+          !("PushManager" in window)
+        ) {
+          console.log(
+            "WEB PUSH AUTO SYNC: Browser does not support Web Push."
+          );
+          return;
+        }
+
+        const permission = Notification.permission;
+
+        console.log(
+          "WEB PUSH AUTO SYNC: Permission:",
+          permission
+        );
+
+        if (permission === "denied") {
+          console.log(
+            "WEB PUSH AUTO SYNC: Notifications are blocked."
+          );
+          return;
+        }
+
+        if (permission === "default") {
+          console.log(
+            "WEB PUSH AUTO SYNC: Permission not granted yet. Waiting for user action."
+          );
+          return;
+        }
+
+        if (permission === "granted") {
+          console.log(
+            "WEB PUSH AUTO SYNC: Permission already granted."
+          );
+
+          console.log(
+            "WEB PUSH AUTO SYNC: Starting automatic sync..."
+          );
+
+          const subscription = await subscribeToWebPush(
+            accessToken
+          );
+
+          if (
+            subscription &&
+            subscription.endpoint
+          ) {
+            console.log(
+              "WEB PUSH AUTO SYNC: Subscription synced successfully."
+            );
+
+            console.log(
+              "WEB PUSH AUTO SYNC: Endpoint:",
+              subscription.endpoint
+            );
+          } else {
+            console.log(
+              "WEB PUSH AUTO SYNC: No valid subscription returned."
+            );
+          }
+        }
+      } catch (error) {
+        console.error(
+          "WEB PUSH AUTO SYNC ERROR:",
+          error
+        );
+      }
+    };
 
     syncNotifications();
-
   }, []);
-
 
   return null;
 }
-
 
 // ============================================================
 // PROTECTED ADMIN ROUTE
 // ============================================================
 
-function ProtectedRoute({
-  children,
-}) {
-
-  const token =
-    localStorage.getItem(
-      "accessToken"
-    );
-
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("accessToken");
 
   let user = null;
 
-
   try {
-
     user = JSON.parse(
-      localStorage.getItem(
-        "user"
-      ) || "null"
+      localStorage.getItem("user") || "null"
     );
-
   } catch (error) {
-
-    console.log(
-      "USER PARSE ERROR:",
-      error
-    );
-
+    console.log("USER PARSE ERROR:", error);
     user = null;
   }
 
-
   if (!token) {
-
     return (
       <Navigate
         to="/login"
@@ -255,12 +171,7 @@ function ProtectedRoute({
     );
   }
 
-
-  if (
-    !user ||
-    user.role !== "admin"
-  ) {
-
+  if (!user || user.role !== "admin") {
     return (
       <Navigate
         to="/login"
@@ -268,24 +179,18 @@ function ProtectedRoute({
       />
     );
   }
-
 
   return children;
 }
-
 
 // ============================================================
 // APP
 // ============================================================
 
 function App() {
-
   return (
-
     <BrowserRouter>
-
       <AutoSyncWebPush />
-
 
       <Routes>
 
@@ -295,11 +200,8 @@ function App() {
 
         <Route
           path="/login"
-          element={
-            <Login />
-          }
+          element={<Login />}
         />
-
 
         {/* ====================================================
             PROTECTED ADMIN AREA
@@ -314,116 +216,72 @@ function App() {
         >
 
           {/* DASHBOARD */}
-
           <Route
             path="/dashboard"
-            element={
-              <Dashboard />
-            }
+            element={<Dashboard />}
           />
-
 
           {/* ORDERS */}
-
           <Route
             path="/orders"
-            element={
-              <Orders />
-            }
+            element={<Orders />}
           />
-
 
           {/* INVOICE */}
-
           <Route
             path="/invoices/:invoiceId"
-            element={
-              <Invoice />
-            }
+            element={<Invoice />}
           />
-
 
           {/* PRODUCTS */}
-
           <Route
             path="/products"
-            element={
-              <Products />
-            }
+            element={<Products />}
           />
-
 
           {/* USERS */}
-
           <Route
             path="/users"
-            element={
-              <Users />
-            }
+            element={<Users />}
           />
-
 
           {/* PHONE VERIFICATION */}
-
           <Route
             path="/phone-verification"
-            element={
-              <PhoneVerification />
-            }
+            element={<PhoneVerification />}
           />
-
 
           {/* ADD ADMIN */}
-
           <Route
             path="/add-admin"
-            element={
-              <AddAdmin />
-            }
+            element={<AddAdmin />}
           />
-
 
           {/* CATEGORIES */}
-
           <Route
             path="/categories"
-            element={
-              <Categories />
-            }
+            element={<Categories />}
           />
-
 
           {/* BRANDS */}
-
           <Route
             path="/brands"
-            element={
-              <Brands />
-            }
+            element={<Brands />}
           />
-
 
           {/* SLIDESHOW */}
-
           <Route
             path="/slideshow"
-            element={
-              <Slideshow />
-            }
+            element={<Slideshow />}
           />
 
-
           {/* NOTIFICATIONS */}
-
           <Route
             path="/notifications"
-            element={
-              <Notifications />
-            }
+            element={<Notifications />}
           />
 
         </Route>
-
 
         {/* ====================================================
             DEFAULT
@@ -439,9 +297,8 @@ function App() {
           }
         />
 
-
         {/* ====================================================
-            UNKNOWN
+            UNKNOWN ROUTES
         ==================================================== */}
 
         <Route
@@ -455,10 +312,8 @@ function App() {
         />
 
       </Routes>
-
     </BrowserRouter>
   );
 }
-
 
 export default App;

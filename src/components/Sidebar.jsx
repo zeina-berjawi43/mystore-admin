@@ -1,4 +1,3 @@
-
 import { NavLink, useNavigate } from "react-router-dom";
 
 function Sidebar({ isOpen, setIsOpen }) {
@@ -25,21 +24,10 @@ function Sidebar({ isOpen, setIsOpen }) {
       path: "/users",
       icon: "👥",
     },
-
-    // ============================================================
-    // PHONE VERIFICATION / OTP
-    // ============================================================
-
     {
       name: "Phone Verification",
       path: "/phone-verification",
       icon: "📱",
-    },
-
-    {
-      name: "Add Admin",
-      path: "/add-admin",
-      icon: "👤➕",
     },
     {
       name: "Categories",
@@ -63,11 +51,15 @@ function Sidebar({ isOpen, setIsOpen }) {
     },
   ];
 
-  // ============================================================
-  // LOGOUT
-  // ============================================================
-
   const handleLogout = () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to logout?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
@@ -75,73 +67,51 @@ function Sidebar({ isOpen, setIsOpen }) {
 
     setIsOpen(false);
 
-    navigate("/login");
+    navigate("/login", {
+      replace: true,
+    });
   };
 
-  // ============================================================
-  // MOBILE NAVIGATION
-  // ============================================================
-
-  const handleNavigation = () => {
+  const closeMobileSidebar = () => {
     if (window.innerWidth <= 768) {
       setIsOpen(false);
     }
   };
 
+  const handleAddAdmin = () => {
+    closeMobileSidebar();
+    navigate("/add-admin");
+  };
+
+  const sidebarClassName = isOpen
+    ? "sidebar sidebar-open"
+    : "sidebar";
+
   return (
-    <aside
-      className={`sidebar ${
-        isOpen ? "sidebar-open" : ""
-      }`}
-    >
-
-      {/* ======================================================
-          LOGO
-      ====================================================== */}
-
+    <aside className={sidebarClassName}>
       <div className="sidebar-logo">
-
-        <div className="sidebar-logo-icon">
-          🛍️
-        </div>
+        <div className="sidebar-logo-icon">🛍️</div>
 
         <div className="sidebar-logo-text">
-
-          <h2>
-            BStore
-          </h2>
-
-          <span>
-            Admin Panel
-          </span>
-
+          <h2>BStore</h2>
+          <span>Admin Panel</span>
         </div>
-
       </div>
 
-
-      {/* ======================================================
-          MENU
-      ====================================================== */}
-
       <nav className="sidebar-menu">
-
-        <p className="sidebar-section-title">
-          MAIN MENU
-        </p>
+        <p className="sidebar-section-title">MAIN MENU</p>
 
         {menuItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
-            onClick={handleNavigation}
+            onClick={closeMobileSidebar}
             className={({ isActive }) =>
-              `sidebar-link ${
-                isActive ? "active" : ""
-              }`
+              isActive
+                ? "sidebar-link active"
+                : "sidebar-link"
             }
           >
-
             <span className="sidebar-icon">
               {item.icon}
             </span>
@@ -149,37 +119,35 @@ function Sidebar({ isOpen, setIsOpen }) {
             <span className="sidebar-link-text">
               {item.name}
             </span>
-
           </NavLink>
         ))}
-
       </nav>
 
-
-      {/* ======================================================
-          LOGOUT
-      ====================================================== */}
-
       <div className="sidebar-bottom">
+        <button
+          type="button"
+          className="sidebar-link sidebar-add-admin"
+          onClick={handleAddAdmin}
+        >
+          <span className="sidebar-icon">👤➕</span>
+
+          <span className="sidebar-link-text">
+            Add Admin
+          </span>
+        </button>
 
         <button
           type="button"
           className="sidebar-logout"
           onClick={handleLogout}
         >
-
-          <span className="sidebar-icon">
-            🚪
-          </span>
+          <span className="sidebar-icon">🚪</span>
 
           <span className="sidebar-link-text">
             Logout
           </span>
-
         </button>
-
       </div>
-
     </aside>
   );
 }

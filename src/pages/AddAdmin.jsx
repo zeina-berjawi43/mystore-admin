@@ -1,38 +1,22 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const API_URL =
- "https://mystore-backend-u6ey.onrender.com";
+  "https://mystore-backend-u6ey.onrender.com";
 
 function AddAdmin() {
   const navigate = useNavigate();
 
-  const [name, setName] =
-    useState("");
-
-  const [email, setEmail] =
-    useState("");
-
-  const [password, setPassword] =
-    useState("");
-
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] =
     useState("");
 
-  const [loading, setLoading] =
-    useState(false);
-
-  const [message, setMessage] =
-    useState("");
-
-  const [error, setError] =
-    useState("");
-
-  // ============================================================
-  // ADD ADMIN
-  // ============================================================
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,20 +24,13 @@ function AddAdmin() {
     setMessage("");
     setError("");
 
-    // ==========================================================
-    // VALIDATION
-    // ==========================================================
-
     if (
       !name.trim() ||
       !email.trim() ||
       !password ||
       !confirmPassword
     ) {
-      setError(
-        "Please fill in all fields"
-      );
-
+      setError("Please fill in all fields");
       return;
     }
 
@@ -61,283 +38,160 @@ function AddAdmin() {
       setError(
         "Password must be at least 6 characters"
       );
-
       return;
     }
 
-    if (
-      password !==
-      confirmPassword
-    ) {
-      setError(
-        "Passwords do not match"
-      );
-
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
-
-    // ==========================================================
-    // TOKEN
-    // ==========================================================
 
     const accessToken =
-      localStorage.getItem(
-        "accessToken"
-      );
+      localStorage.getItem("accessToken");
 
     if (!accessToken) {
       setError(
         "You are not logged in as an admin"
       );
-
       return;
     }
 
     try {
       setLoading(true);
 
-      // ========================================================
-      // API REQUEST
-      // ========================================================
-
-      const response =
-        await axios.post(
-          `${API_URL}/auth/admin/add`,
-          {
-            name: name.trim(),
-            email:
-              email.trim().toLowerCase(),
-            password,
+      const response = await axios.post(
+        `${API_URL}/auth/admin/add`,
+        {
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          password,
+        },
+        {
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`,
           },
-          {
-            headers: {
-              Authorization:
-                `Bearer ${accessToken}`,
-            },
-          }
-        );
+        }
+      );
 
       console.log(
         "ADD ADMIN RESPONSE:",
         response.data
       );
 
-      // ========================================================
-      // SUCCESS
-      // ========================================================
-
       setMessage(
         response.data?.message ||
           "Admin added successfully"
       );
 
-      // Clear form
       setName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-
     } catch (error) {
       console.log(
         "ADD ADMIN ERROR:",
         error
       );
 
-      // ========================================================
-      // TOKEN / AUTH ERROR
-      // ========================================================
-
       if (
-        error.response?.status ===
-          401 ||
-        error.response?.status ===
-          403
+        error.response?.status === 401 ||
+        error.response?.status === 403
       ) {
         setError(
           error.response?.data?.message ||
             "You are not authorized to add an admin."
         );
-
         return;
       }
-
-      // ========================================================
-      // BACKEND ERROR
-      // ========================================================
 
       setError(
         error.response?.data?.message ||
           "Error adding admin"
       );
-
     } finally {
       setLoading(false);
     }
   };
 
-  // ============================================================
-  // UI
-  // ============================================================
-
   return (
-    <div
-      style={{
-        padding: "30px",
-        maxWidth: "600px",
-        margin: "0 auto",
-      }}
-    >
-
-      {/* ======================================================
-          HEADER
-      ====================================================== */}
-
-      <div
-        style={{
-          marginBottom: "25px",
-        }}
-      >
-
-        <h1
-          style={{
-            margin: 0,
-            fontSize: "28px",
-          }}
-        >
-          Add Admin
-        </h1>
-
-        <p
-          style={{
-            marginTop: "8px",
-            color: "#777",
-          }}
-        >
-          Create a new administrator
-          account.
-        </p>
-
+    <div className="add-admin-page">
+      <div className="add-admin-header">
+        <div>
+          <h1>Add Admin</h1>
+          <p>
+            Create a new administrator account.
+          </p>
+        </div>
       </div>
 
-
-      {/* ======================================================
-          CARD
-      ====================================================== */}
-
-      <div
-        style={{
-          background: "#fff",
-          padding: "30px",
-          borderRadius: "12px",
-          boxShadow:
-            "0 4px 20px rgba(0,0,0,0.08)",
-        }}
-      >
-
+      <div className="add-admin-card">
         <form
+          className="add-admin-form"
           onSubmit={handleSubmit}
         >
-
-          {/* ==================================================
-              NAME
-          ================================================== */}
-
-          <div
-            className="input-group"
-          >
-
-            <label>
+          <div className="add-admin-form-group">
+            <label htmlFor="admin-name">
               Name
             </label>
 
             <input
+              id="admin-name"
               type="text"
               placeholder="Enter admin name"
               value={name}
               onChange={(e) =>
-                setName(
-                  e.target.value
-                )
+                setName(e.target.value)
               }
               autoComplete="name"
             />
-
           </div>
 
-
-          {/* ==================================================
-              EMAIL
-          ================================================== */}
-
-          <div
-            className="input-group"
-          >
-
-            <label>
+          <div className="add-admin-form-group">
+            <label htmlFor="admin-email">
               Email
             </label>
 
             <input
+              id="admin-email"
               type="email"
               placeholder="Enter admin email"
               value={email}
               onChange={(e) =>
-                setEmail(
-                  e.target.value
-                )
+                setEmail(e.target.value)
               }
               autoCapitalize="none"
               autoComplete="email"
             />
-
           </div>
 
-
-          {/* ==================================================
-              PASSWORD
-          ================================================== */}
-
-          <div
-            className="input-group"
-          >
-
-            <label>
+          <div className="add-admin-form-group">
+            <label htmlFor="admin-password">
               Password
             </label>
 
             <input
+              id="admin-password"
               type="password"
               placeholder="Enter password"
               value={password}
               onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
+                setPassword(e.target.value)
               }
               autoComplete="new-password"
             />
-
           </div>
 
-
-          {/* ==================================================
-              CONFIRM PASSWORD
-          ================================================== */}
-
-          <div
-            className="input-group"
-          >
-
-            <label>
+          <div className="add-admin-form-group">
+            <label htmlFor="admin-confirm-password">
               Confirm Password
             </label>
 
             <input
+              id="admin-confirm-password"
               type="password"
               placeholder="Confirm password"
-              value={
-                confirmPassword
-              }
+              value={confirmPassword}
               onChange={(e) =>
                 setConfirmPassword(
                   e.target.value
@@ -345,89 +199,41 @@ function AddAdmin() {
               }
               autoComplete="new-password"
             />
-
           </div>
 
-
-          {/* ==================================================
-              ERROR
-          ================================================== */}
-
           {error && (
-            <div
-              className="error-message"
-              style={{
-                marginBottom: "15px",
-              }}
-            >
+            <div className="add-admin-error">
               {error}
             </div>
           )}
 
-
-          {/* ==================================================
-              SUCCESS
-          ================================================== */}
-
           {message && (
-            <div
-              style={{
-                padding: "12px",
-                marginBottom: "15px",
-                borderRadius: "6px",
-                background: "#e8f7e8",
-                color: "#246b24",
-                fontSize: "14px",
-              }}
-            >
+            <div className="add-admin-success">
               {message}
             </div>
           )}
 
-
-          {/* ==================================================
-              BUTTON
-          ================================================== */}
-
           <button
             type="submit"
+            className="add-admin-submit"
             disabled={loading}
-            style={{
-              width: "100%",
-              marginTop: "5px",
-            }}
           >
             {loading
               ? "Adding Admin..."
               : "Add Admin"}
           </button>
-
         </form>
-
-
-        {/* ====================================================
-            BACK
-        ==================================================== */}
 
         <button
           type="button"
+          className="add-admin-back"
           onClick={() =>
             navigate("/dashboard")
           }
-          style={{
-            width: "100%",
-            marginTop: "15px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
         >
-          Back to Dashboard
+          ← Back to Dashboard
         </button>
-
       </div>
-
     </div>
   );
 }

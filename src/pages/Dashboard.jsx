@@ -7,6 +7,7 @@ function Dashboard() {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   // ============================================================
   // FETCH DASHBOARD DATA
@@ -31,6 +32,7 @@ function Dashboard() {
       console.log("DASHBOARD RESPONSE:", response.data);
 
       setStatistics(response.data.statistics);
+      setSelectedOrderId(null);
     } catch (error) {
       console.log("DASHBOARD ERROR:", error);
 
@@ -59,6 +61,16 @@ function Dashboard() {
   useEffect(() => {
     fetchDashboard();
   }, []);
+
+  // ============================================================
+  // TOGGLE ORDER DETAILS
+  // ============================================================
+
+  const toggleOrderDetails = (orderId) => {
+    setSelectedOrderId((currentId) =>
+      currentId === orderId ? null : orderId
+    );
+  };
 
   // ============================================================
   // LOADING
@@ -460,7 +472,7 @@ function Dashboard() {
             </h2>
 
             <p>
-              Latest orders from customers
+              Select an order to view its products and details
             </p>
           </div>
 
@@ -475,143 +487,422 @@ function Dashboard() {
 
         ) : (
 
-          <div className="orders-table">
+          <div className="recent-orders-container">
 
-            {/* TABLE HEADER */}
+            {/* ==================================================
+                COMPACT ORDER LIST
+            ================================================== */}
 
-            <div className="orders-table-header">
+            <div className="orders-table">
 
-              <span>
-                Customer
-              </span>
+              {/* TABLE HEADER */}
 
-              <span>
-                Products
-              </span>
+              <div className="orders-table-header">
 
-              <span>
-                Total
-              </span>
+                <span>
+                  Customer
+                </span>
 
-              <span>
-                Status
-              </span>
+                <span>
+                  Order
+                </span>
 
-              <span>
-                Date
-              </span>
+                <span>
+                  Total
+                </span>
+
+                <span>
+                  Status
+                </span>
+
+                <span>
+                  Date
+                </span>
+
+              </div>
+
+
+              {/* ORDERS */}
+
+              {recentOrders.map(
+                (order, index) => {
+
+                  const orderId =
+                    order._id || `order-${index}`;
+
+                  const isSelected =
+                    selectedOrderId === orderId;
+
+                  return (
+                    <div
+                      className={`orders-table-row ${
+                        isSelected
+                          ? "selected"
+                          : ""
+                      }`}
+                      key={orderId}
+                      onClick={() =>
+                        toggleOrderDetails(orderId)
+                      }
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (
+                          event.key === "Enter" ||
+                          event.key === " "
+                        ) {
+                          event.preventDefault();
+                          toggleOrderDetails(orderId);
+                        }
+                      }}
+                    >
+
+                      {/* CUSTOMER */}
+
+                      <div className="customer-info">
+
+                        <div className="customer-avatar">
+
+                          {order.user?.name
+                            ?.charAt(0)
+                            ?.toUpperCase() || "U"}
+
+                        </div>
+
+                        <div>
+
+                          <strong>
+                            {order.user?.name ||
+                              "Unknown User"}
+                          </strong>
+
+                          <small>
+                            {order.user?.email || ""}
+                          </small>
+
+                        </div>
+
+                      </div>
+
+
+                      {/* ORDER */}
+
+                      <div className="order-number">
+
+                        <strong>
+                          #
+                          {String(
+                            order._id || index + 1
+                          ).slice(-8)}
+                        </strong>
+
+                        <small>
+                          {Array.isArray(order.items)
+                            ? `${order.items.length} ${
+                                order.items.length === 1
+                                  ? "item"
+                                  : "items"
+                              }`
+                            : "0 items"}
+                        </small>
+
+                      </div>
+
+
+                      {/* TOTAL */}
+
+                      <strong className="order-total">
+
+                        $
+                        {Number(
+                          order.totalPrice || 0
+                        ).toFixed(2)}
+
+                      </strong>
+
+
+                      {/* STATUS */}
+
+                      <span
+                        className={`order-status ${
+                          String(
+                            order.status || ""
+                          ).toLowerCase()
+                        }`}
+                      >
+                        {order.status || "Unknown"}
+                      </span>
+
+
+                      {/* DATE */}
+
+                      <span className="order-date">
+
+                        {order.createdAt
+                          ? new Date(
+                              order.createdAt
+                            ).toLocaleDateString()
+                          : "-"}
+
+                      </span>
+
+                    </div>
+                  );
+                }
+              )}
 
             </div>
 
 
-            {/* ORDERS */}
+            {/* ==================================================
+                SELECTED ORDER DETAILS
+            ================================================== */}
 
-            {recentOrders.map(
-              (order, index) => (
+            {selectedOrderId && (
+              <div className="selected-order-details">
 
-                <div
-                  className="orders-table-row"
-                  key={
-                    order._id || index
+                {(() => {
+                  const selectedOrder =
+                    recentOrders.find(
+                      (order, index) =>
+                        (order._id ||
+                          `order-${index}`) ===
+                        selectedOrderId
+                    );
+
+                  if (!selectedOrder) {
+                    return null;
                   }
-                >
 
-                  {/* CUSTOMER */}
+                  return (
+                    <>
+                      {/* DETAILS HEADER */}
 
-                  <div className="customer-info">
+                      <div className="selected-order-header">
 
-                    <div className="customer-avatar">
+                        <div>
+                          <h3>
+                            Order Details
+                          </h3>
 
-                      {order.user?.name
-                        ?.charAt(0)
-                        ?.toUpperCase() || "U"}
+                          <p>
+                            Order #
+                            {String(
+                              selectedOrder._id || ""
+                            ).slice(-8)}
+                          </p>
+                        </div>
 
-                    </div>
-
-                    <div>
-
-                      <strong>
-                        {order.user?.name ||
-                          "Unknown User"}
-                      </strong>
-
-                      <small>
-                        {order.user?.email || ""}
-                      </small>
-
-                    </div>
-
-                  </div>
-
-
-                  {/* PRODUCTS */}
-
-                  <div className="order-products">
-
-                    {(order.items || []).map(
-                      (item, itemIndex) => (
-
-                        <div
-                          key={
-                            item._id ||
-                            itemIndex
-                          }
+                        <button
+                          type="button"
+                          className="close-order-details"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setSelectedOrderId(null);
+                          }}
                         >
+                          Hide Details
+                        </button>
 
-                          {item.product?.name ||
-                            item.productName ||
-                            "Product"}
+                      </div>
 
-                          {" × "}
 
-                          {item.quantity || 0}
+                      {/* CUSTOMER DETAILS */}
+
+                      <div className="selected-order-customer">
+
+                        <div className="customer-avatar large">
+
+                          {selectedOrder.user?.name
+                            ?.charAt(0)
+                            ?.toUpperCase() || "U"}
 
                         </div>
 
-                      )
-                    )}
+                        <div>
 
-                  </div>
+                          <strong>
+                            {selectedOrder.user?.name ||
+                              "Unknown User"}
+                          </strong>
 
+                          {selectedOrder.user?.email && (
+                            <small>
+                              {selectedOrder.user.email}
+                            </small>
+                          )}
 
-                  {/* TOTAL */}
+                          {selectedOrder.user?.phone && (
+                            <small>
+                              {selectedOrder.user.phone}
+                            </small>
+                          )}
 
-                  <strong>
-                    $
-                    {Number(
-                      order.totalPrice || 0
-                    ).toFixed(2)}
-                  </strong>
+                        </div>
 
-
-                  {/* STATUS */}
-
-                  <span
-                    className={`order-status ${
-                      String(
-                        order.status || ""
-                      ).toLowerCase()
-                    }`}
-                  >
-                    {order.status || "Unknown"}
-                  </span>
+                      </div>
 
 
-                  {/* DATE */}
+                      {/* ORDER SUMMARY */}
 
-                  <span className="order-date">
+                      <div className="selected-order-summary">
 
-                    {order.createdAt
-                      ? new Date(
-                          order.createdAt
-                        ).toLocaleDateString()
-                      : "-"}
+                        <div>
+                          <span>
+                            Status
+                          </span>
 
-                  </span>
+                          <strong
+                            className={`order-status ${
+                              String(
+                                selectedOrder.status || ""
+                              ).toLowerCase()
+                            }`}
+                          >
+                            {selectedOrder.status ||
+                              "Unknown"}
+                          </strong>
+                        </div>
 
-                </div>
+                        <div>
+                          <span>
+                            Date
+                          </span>
 
-              )
+                          <strong>
+                            {selectedOrder.createdAt
+                              ? new Date(
+                                  selectedOrder.createdAt
+                                ).toLocaleDateString()
+                              : "-"}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>
+                            Total
+                          </span>
+
+                          <strong>
+                            $
+                            {Number(
+                              selectedOrder.totalPrice || 0
+                            ).toFixed(2)}
+                          </strong>
+                        </div>
+
+                      </div>
+
+
+                      {/* PRODUCTS */}
+
+                      <div className="selected-order-products">
+
+                        <div className="selected-products-title">
+                          <h4>
+                            Products
+                          </h4>
+
+                          <span>
+                            {Array.isArray(
+                              selectedOrder.items
+                            )
+                              ? selectedOrder.items.length
+                              : 0}{" "}
+                            {Array.isArray(
+                              selectedOrder.items
+                            ) &&
+                            selectedOrder.items.length === 1
+                              ? "item"
+                              : "items"}
+                          </span>
+                        </div>
+
+
+                        {!selectedOrder.items ||
+                        selectedOrder.items.length === 0 ? (
+
+                          <div className="empty-order-products">
+                            No products found for this order.
+                          </div>
+
+                        ) : (
+
+                          <div className="order-products-list">
+
+                            {selectedOrder.items.map(
+                              (item, itemIndex) => {
+
+                                const productName =
+                                  item.product?.name ||
+                                  item.productName ||
+                                  "Product";
+
+                                const quantity =
+                                  Number(
+                                    item.quantity || 0
+                                  );
+
+                                const price =
+                                  Number(
+                                    item.price ||
+                                      item.product?.price ||
+                                      0
+                                  );
+
+                                const itemTotal =
+                                  price * quantity;
+
+                                return (
+                                  <div
+                                    className="order-product-row"
+                                    key={
+                                      item._id ||
+                                      item.product?._id ||
+                                      itemIndex
+                                    }
+                                  >
+
+                                    <div className="order-product-info">
+
+                                      <div className="order-product-image">
+                                        🛍️
+                                      </div>
+
+                                      <div>
+                                        <strong>
+                                          {productName}
+                                        </strong>
+
+                                        <small>
+                                          ${price.toFixed(2)} ×{" "}
+                                          {quantity}
+                                        </small>
+                                      </div>
+
+                                    </div>
+
+                                    <strong>
+                                      $
+                                      {itemTotal.toFixed(2)}
+                                    </strong>
+
+                                  </div>
+                                );
+                              }
+                            )}
+
+                          </div>
+
+                        )}
+
+                      </div>
+
+                    </>
+                  );
+                })()}
+
+              </div>
             )}
 
           </div>

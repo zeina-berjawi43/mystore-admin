@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   subscribeToWebPush,
@@ -8,7 +7,6 @@ const API_URL =
   import.meta.env.VITE_API_URL;
 
 function Notifications() {
-
   // ============================================================
   // SEND NOTIFICATION
   // ============================================================
@@ -16,8 +14,7 @@ function Notifications() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [successMessage, setSuccessMessage] =
     useState("");
@@ -58,113 +55,96 @@ function Notifications() {
   // CHECK BROWSER PUSH SUBSCRIPTION
   // ============================================================
 
-  const checkPushSubscription =
-    async () => {
+  const checkPushSubscription = async () => {
+    try {
+      setCheckingPush(true);
 
-      try {
+      // --------------------------------------------------------
+      // CHECK SUPPORT
+      // --------------------------------------------------------
 
-        setCheckingPush(true);
+      if (
+        !("Notification" in window) ||
+        !("serviceWorker" in navigator) ||
+        !("PushManager" in window)
+      ) {
+        setPushSubscribed(false);
+        setNotificationPermission("unsupported");
+        return;
+      }
 
-        // ------------------------------------------------------
-        // CHECK SUPPORT
-        // ------------------------------------------------------
+      // --------------------------------------------------------
+      // CHECK PERMISSION
+      // --------------------------------------------------------
 
-        if (
-          !("Notification" in window) ||
-          !("serviceWorker" in navigator) ||
-          !("PushManager" in window)
-        ) {
+      setNotificationPermission(
+        Notification.permission
+      );
 
-          setPushSubscribed(false);
+      // --------------------------------------------------------
+      // WAIT FOR SERVICE WORKER
+      // --------------------------------------------------------
 
-          setNotificationPermission(
-            "unsupported"
-          );
+      const registration =
+        await navigator.serviceWorker.ready;
 
-          return;
-        }
+      console.log(
+        "WEB PUSH CHECK - Service Worker:",
+        registration
+      );
 
-        // ------------------------------------------------------
-        // PERMISSION
-        // ------------------------------------------------------
+      // --------------------------------------------------------
+      // GET CURRENT SUBSCRIPTION
+      // --------------------------------------------------------
 
-        setNotificationPermission(
-          Notification.permission
-        );
+      const subscription =
+        await registration.pushManager.getSubscription();
 
-        // ------------------------------------------------------
-        // WAIT FOR SERVICE WORKER
-        // ------------------------------------------------------
+      console.log(
+        "WEB PUSH CHECK - Subscription:",
+        subscription
+      );
 
-        const registration =
-          await navigator.serviceWorker.ready;
+      console.log(
+        "WEB PUSH CHECK - Endpoint:",
+        subscription?.endpoint
+      );
+
+      // --------------------------------------------------------
+      // UPDATE STATE
+      // --------------------------------------------------------
+
+      if (subscription) {
+        setPushSubscribed(true);
 
         console.log(
-          "WEB PUSH CHECK - Service Worker:",
-          registration
+          "WEB PUSH CHECK: Browser push subscription exists."
         );
-
-        // ------------------------------------------------------
-        // GET SUBSCRIPTION
-        // ------------------------------------------------------
-
-        const subscription =
-          await registration.pushManager.getSubscription();
-
-        console.log(
-          "WEB PUSH CHECK - Subscription:",
-          subscription
-        );
-
-        console.log(
-          "WEB PUSH CHECK - Endpoint:",
-          subscription?.endpoint
-        );
-
-        // ------------------------------------------------------
-        // SUBSCRIPTION EXISTS
-        // ------------------------------------------------------
-
-        if (subscription) {
-
-          setPushSubscribed(true);
-
-          console.log(
-            "WEB PUSH CHECK: Browser push subscription exists."
-          );
-
-        } else {
-
-          setPushSubscribed(false);
-
-          console.log(
-            "WEB PUSH CHECK: Browser has NO push subscription."
-          );
-        }
-
-      } catch (error) {
-
-        console.error(
-          "WEB PUSH CHECK ERROR:",
-          error
-        );
-
+      } else {
         setPushSubscribed(false);
 
-      } finally {
-
-        setCheckingPush(false);
+        console.log(
+          "WEB PUSH CHECK: Browser has NO push subscription."
+        );
       }
-    };
+    } catch (error) {
+      console.error(
+        "WEB PUSH CHECK ERROR:",
+        error
+      );
+
+      setPushSubscribed(false);
+    } finally {
+      setCheckingPush(false);
+    }
+  };
 
   // ============================================================
   // INITIAL CHECK
   // ============================================================
 
   useEffect(() => {
-
     checkPushSubscription();
-
   }, []);
 
   // ============================================================
@@ -173,27 +153,21 @@ function Notifications() {
 
   const handleEnableNotifications =
     async () => {
-
       setNotificationEnabledMessage("");
       setErrorMessage("");
       setSuccessMessage("");
 
       const accessToken =
-        localStorage.getItem(
-          "accessToken"
-        );
+        localStorage.getItem("accessToken");
 
       if (!accessToken) {
-
         setErrorMessage(
           "You are not authenticated. Please login again."
         );
-
         return;
       }
 
       try {
-
         setEnablingNotifications(true);
 
         console.log(
@@ -227,7 +201,6 @@ function Notifications() {
           !subscription ||
           !subscription.endpoint
         ) {
-
           throw new Error(
             "Browser push subscription was not created."
           );
@@ -240,7 +213,9 @@ function Notifications() {
         setPushSubscribed(true);
 
         setNotificationPermission(
-          Notification.permission
+          "Notification" in window
+            ? Notification.permission
+            : "unsupported"
         );
 
         setNotificationEnabledMessage(
@@ -250,9 +225,7 @@ function Notifications() {
         console.log(
           "WEB PUSH: Notifications enabled successfully."
         );
-
       } catch (error) {
-
         console.error(
           "ENABLE NOTIFICATIONS ERROR:",
           error
@@ -266,11 +239,9 @@ function Notifications() {
 
         setErrorMessage(
           error.message ||
-          "Failed to enable notifications."
+            "Failed to enable notifications."
         );
-
       } finally {
-
         setEnablingNotifications(false);
       }
     };
@@ -281,7 +252,6 @@ function Notifications() {
 
   const handleSendNotification =
     async () => {
-
       setSuccessMessage("");
       setErrorMessage("");
 
@@ -289,27 +259,20 @@ function Notifications() {
       // VALIDATION
       // --------------------------------------------------------
 
-      const cleanTitle =
-        title.trim();
-
-      const cleanBody =
-        body.trim();
+      const cleanTitle = title.trim();
+      const cleanBody = body.trim();
 
       if (!cleanTitle) {
-
         setErrorMessage(
           "Please enter a notification title."
         );
-
         return;
       }
 
       if (!cleanBody) {
-
         setErrorMessage(
           "Please enter a notification message."
         );
-
         return;
       }
 
@@ -318,50 +281,41 @@ function Notifications() {
       // --------------------------------------------------------
 
       const accessToken =
-        localStorage.getItem(
-          "accessToken"
-        );
+        localStorage.getItem("accessToken");
 
       if (!accessToken) {
-
         setErrorMessage(
           "You are not authenticated. Please login again."
         );
-
         return;
       }
 
       try {
-
         setLoading(true);
 
         // ------------------------------------------------------
-        // SEND
+        // SEND NOTIFICATION
         // ------------------------------------------------------
 
-        const response =
-          await fetch(
-            `${API_URL}/admin/send-offer-notification`,
-            {
-              method: "POST",
+        const response = await fetch(
+          `${API_URL}/admin/send-offer-notification`,
+          {
+            method: "POST",
 
-              headers: {
-                "Content-Type":
-                  "application/json",
+            headers: {
+              "Content-Type":
+                "application/json",
 
-                Authorization:
-                  `Bearer ${accessToken}`,
-              },
+              Authorization:
+                `Bearer ${accessToken}`,
+            },
 
-              body: JSON.stringify({
-                title:
-                  cleanTitle,
-
-                body:
-                  cleanBody,
-              }),
-            }
-          );
+            body: JSON.stringify({
+              title: cleanTitle,
+              body: cleanBody,
+            }),
+          }
+        );
 
         const data =
           await response.json();
@@ -371,10 +325,9 @@ function Notifications() {
         // ------------------------------------------------------
 
         if (!response.ok) {
-
           throw new Error(
             data.message ||
-            "Failed to send notification."
+              "Failed to send notification."
           );
         }
 
@@ -395,9 +348,7 @@ function Notifications() {
           "NOTIFICATION RESPONSE:",
           data
         );
-
       } catch (error) {
-
         console.error(
           "SEND NOTIFICATION ERROR:",
           error
@@ -405,11 +356,9 @@ function Notifications() {
 
         setErrorMessage(
           error.message ||
-          "Failed to send notification. Please try again."
+            "Failed to send notification. Please try again."
         );
-
       } finally {
-
         setLoading(false);
       }
     };
@@ -420,15 +369,12 @@ function Notifications() {
 
   return (
     <div className="notifications-page">
-
       {/* ======================================================
           HEADER
       ====================================================== */}
 
       <div className="notifications-header">
-
         <div>
-
           <h1>
             Send Offer Notification
           </h1>
@@ -436,45 +382,35 @@ function Notifications() {
           <p>
             Send an offer notification to all users.
           </p>
-
         </div>
-
       </div>
-
 
       {/* ======================================================
           ADMIN BROWSER NOTIFICATIONS
       ====================================================== */}
 
       <div className="notifications-card">
-
         <div className="notification-field">
-
           <label>
             Admin Browser Notifications
           </label>
 
           <p>
             Enable browser notifications to receive
-            new notifications even when the Admin Website
-            is not open.
+            new notifications even when the Admin
+            Website is not open.
           </p>
-
         </div>
-
 
         {/* ====================================================
             CHECKING
         ==================================================== */}
 
         {checkingPush && (
-
           <div className="notification-success">
             Checking browser notifications...
           </div>
-
         )}
-
 
         {/* ====================================================
             ENABLED
@@ -483,15 +419,10 @@ function Notifications() {
         {!checkingPush &&
           notificationPermission === "granted" &&
           pushSubscribed && (
-
-          <div className="notification-success">
-
-            Browser notifications are enabled.
-
-          </div>
-
-        )}
-
+            <div className="notification-success">
+              Browser notifications are enabled.
+            </div>
+          )}
 
         {/* ====================================================
             GRANTED BUT NOT CONNECTED
@@ -500,16 +431,11 @@ function Notifications() {
         {!checkingPush &&
           notificationPermission === "granted" &&
           !pushSubscribed && (
-
-          <div className="notification-error">
-
-            Browser permission is allowed, but push
-            notifications are not connected yet.
-
-          </div>
-
-        )}
-
+            <div className="notification-error">
+              Browser permission is allowed, but push
+              notifications are not connected yet.
+            </div>
+          )}
 
         {/* ====================================================
             DENIED
@@ -517,17 +443,12 @@ function Notifications() {
 
         {!checkingPush &&
           notificationPermission === "denied" && (
-
-          <div className="notification-error">
-
-            Browser notifications are blocked.
-            Please allow notifications from your browser
-            settings.
-
-          </div>
-
-        )}
-
+            <div className="notification-error">
+              Browser notifications are blocked.
+              Please allow notifications from your
+              browser settings.
+            </div>
+          )}
 
         {/* ====================================================
             UNSUPPORTED
@@ -535,31 +456,21 @@ function Notifications() {
 
         {!checkingPush &&
           notificationPermission === "unsupported" && (
-
-          <div className="notification-error">
-
-            Browser notifications are not supported
-            by this browser.
-
-          </div>
-
-        )}
-
+            <div className="notification-error">
+              Browser notifications are not supported
+              by this browser.
+            </div>
+          )}
 
         {/* ====================================================
-            SUCCESS MESSAGE
+            ENABLE SUCCESS
         ==================================================== */}
 
         {notificationEnabledMessage && (
-
           <div className="notification-success">
-
             {notificationEnabledMessage}
-
           </div>
-
         )}
-
 
         {/* ====================================================
             ENABLE / SYNC BUTTON
@@ -568,42 +479,33 @@ function Notifications() {
         {!checkingPush &&
           notificationPermission !== "denied" &&
           notificationPermission !== "unsupported" && (
-
-          <button
-            type="button"
-            className="notification-send-button"
-            onClick={
-              handleEnableNotifications
-            }
-            disabled={
-              enablingNotifications
-            }
-          >
-
-            {enablingNotifications
-              ? "Connecting..."
-              : "🔔 Enable / Sync Notifications"
-            }
-
-          </button>
-
-        )}
-
+            <button
+              type="button"
+              className="notification-send-button"
+              onClick={
+                handleEnableNotifications
+              }
+              disabled={
+                enablingNotifications
+              }
+            >
+              {enablingNotifications
+                ? "Connecting..."
+                : "🔔 Enable / Sync Notifications"}
+            </button>
+          )}
       </div>
-
 
       {/* ======================================================
           SEND NOTIFICATION CARD
       ====================================================== */}
 
       <div className="notifications-card">
-
         {/* ====================================================
             TITLE
         ==================================================== */}
 
         <div className="notification-field">
-
           <label>
             Notification Title
           </label>
@@ -612,28 +514,20 @@ function Notifications() {
             type="text"
             value={title}
             onChange={(event) => {
-
-              setTitle(
-                event.target.value
-              );
-
+              setTitle(event.target.value);
               setSuccessMessage("");
               setErrorMessage("");
-
             }}
             placeholder="Example: Special Offer 🎉"
             disabled={loading}
           />
-
         </div>
-
 
         {/* ====================================================
             MESSAGE
         ==================================================== */}
 
         <div className="notification-field">
-
           <label>
             Notification Message
           </label>
@@ -641,52 +535,35 @@ function Notifications() {
           <textarea
             value={body}
             onChange={(event) => {
-
-              setBody(
-                event.target.value
-              );
-
+              setBody(event.target.value);
               setSuccessMessage("");
               setErrorMessage("");
-
             }}
             placeholder="Example: Get 20% off today!"
             rows={5}
             disabled={loading}
           />
-
         </div>
-
 
         {/* ====================================================
             ERROR
         ==================================================== */}
 
         {errorMessage && (
-
           <div className="notification-error">
-
             {errorMessage}
-
           </div>
-
         )}
-
 
         {/* ====================================================
             SUCCESS
         ==================================================== */}
 
         {successMessage && (
-
           <div className="notification-success">
-
-            {successMessage }
-
+            {successMessage}
           </div>
-
         )}
-
 
         {/* ====================================================
             SEND BUTTON
@@ -700,16 +577,11 @@ function Notifications() {
           }
           disabled={loading}
         >
-
           {loading
             ? "Sending..."
-            : "Send Notification"
-          }
-
+            : "Send Notification"}
         </button>
-
       </div>
-
     </div>
   );
 }

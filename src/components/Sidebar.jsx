@@ -1,6 +1,64 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { NavLink, useNavigate } from "react-router-dom";
 import { clearAuth } from "../utils/auth";
+
+// ============================================================
+// LOGOUT CONFIRM MODAL
+// ============================================================
+//
+// Rendered through a portal straight into document.body.
+//
+// Why: .sidebar has `transform: translateX(...)` in the CSS
+// (needed for the slide in/out animation). Any CSS "transform"
+// on an ancestor creates a new containing block for
+// position:fixed descendants - so a fixed-position modal placed
+// INSIDE .sidebar was being fixed relative to the sidebar box
+// (260px wide, overflow:hidden), not the actual browser viewport.
+// That's why the modal appeared squeezed into the sidebar area.
+// A portal renders this JSX as a direct child of <body>, outside
+// the sidebar's DOM subtree entirely, so it is unaffected by the
+// sidebar's transform and always covers the full page.
+// ============================================================
+
+function LogoutConfirmModal({ onCancel, onConfirm }) {
+  return createPortal(
+    <div
+      className="logout-confirm-overlay"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onCancel();
+        }
+      }}
+    >
+      <div className="logout-confirm-modal">
+        <div className="logout-confirm-icon">🚪</div>
+
+        <h3>Log out?</h3>
+        <p>Are you sure you want to log out of the admin panel?</p>
+
+        <div className="logout-confirm-actions">
+          <button
+            type="button"
+            className="logout-confirm-cancel"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            className="logout-confirm-submit"
+            onClick={onConfirm}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
 
 function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
@@ -89,39 +147,10 @@ function Sidebar({ isOpen, setIsOpen }) {
       </div>
 
       {showLogoutConfirm && (
-        <div
-          className="logout-confirm-overlay"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              setShowLogoutConfirm(false);
-            }
-          }}
-        >
-          <div className="logout-confirm-modal">
-            <div className="logout-confirm-icon">🚪</div>
-
-            <h3>Log out?</h3>
-            <p>Are you sure you want to log out of the admin panel?</p>
-
-            <div className="logout-confirm-actions">
-              <button
-                type="button"
-                className="logout-confirm-cancel"
-                onClick={() => setShowLogoutConfirm(false)}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                className="logout-confirm-submit"
-                onClick={confirmLogout}
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
+        <LogoutConfirmModal
+          onCancel={() => setShowLogoutConfirm(false)}
+          onConfirm={confirmLogout}
+        />
       )}
     </aside>
   );

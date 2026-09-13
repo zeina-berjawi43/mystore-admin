@@ -621,7 +621,9 @@ function Orders() {
 
         <button
           type="button"
-          className="refresh-orders-button"
+          className={`refresh-orders-button ${
+            refreshing ? "is-refreshing" : ""
+          }`}
           onClick={handleRefresh}
           disabled={refreshing}
           title="Refresh orders"

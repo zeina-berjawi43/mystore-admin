@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,22 +10,15 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // ============================================================
-  // LOGIN
-  // ============================================================
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     setError("");
-
-    // ==========================================================
-    // VALIDATION
-    // ==========================================================
 
     if (!email.trim() || !password) {
       setError("Please enter email and password");
@@ -36,10 +28,6 @@ function Login() {
     try {
       setLoading(true);
 
-      // ========================================================
-      // ADMIN LOGIN
-      // ========================================================
-
       const response = await axios.post(
         `${API_URL}/auth/admin/login`,
         {
@@ -48,139 +36,73 @@ function Login() {
         }
       );
 
-      console.log(
-        "ADMIN LOGIN RESPONSE:",
-        response.data
-      );
-
       const {
         user,
         accessToken,
         refreshToken,
       } = response.data;
 
-      // ========================================================
-      // CHECK ADMIN
-      // ========================================================
-
       if (!user || user.role !== "admin") {
         setError(
           "Access denied. Admin account required."
         );
-
         return;
       }
-
-      // ========================================================
-      // CHECK TOKENS
-      // ========================================================
 
       if (!accessToken || !refreshToken) {
         setError(
           "Login failed. Authentication tokens are missing."
         );
-
         return;
       }
 
       // ========================================================
       // SAVE AUTH DATA
       // ========================================================
-
-      localStorage.setItem(
-        "accessToken",
-        accessToken
-      );
-
-      localStorage.setItem(
-        "refreshToken",
-        refreshToken
-      );
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-      );
-
-      localStorage.setItem(
-        "isLoggedIn",
-        "true"
-      );
-
+      //
+      // Tokens are always written to localStorage so every other
+      // page (which reads localStorage directly) keeps working
+      // unchanged. "Remember me" is implemented separately via the
+      // "rememberMe" flag below + the one-time check at the top of
+      // App.jsx: if this is a brand new browser session and
+      // rememberMe was "false", the app wipes the saved session
+      // before rendering, effectively logging the user out once
+      // they close and reopen the browser (but NOT on a simple
+      // page refresh, since sessionStorage survives refreshes).
       // ========================================================
-      // GO DASHBOARD
-      // ========================================================
+
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("rememberMe", rememberMe ? "true" : "false");
 
       navigate("/dashboard");
-
     } catch (error) {
-      console.log(
-        "ADMIN LOGIN ERROR:",
-        error
-      );
-
-      // ========================================================
-      // SERVER ERROR
-      // ========================================================
-
       if (error.response) {
         setError(
           error.response.data?.message ||
             "Login failed"
         );
-      }
-
-      // ========================================================
-      // NETWORK ERROR
-      // ========================================================
-
-      else {
+      } else {
         setError(
           "Cannot connect to the server"
         );
       }
-
     } finally {
       setLoading(false);
     }
   };
 
-  // ============================================================
-  // UI
-  // ============================================================
-
   return (
     <div className="login-page">
-
       <div className="login-card">
-
-        {/* ====================================================
-            ICON
-        ==================================================== */}
-
-        <div className="login-icon">
-          🔐
-        </div>
-
-        {/* ====================================================
-            HEADER
-        ==================================================== */}
+        <div className="login-icon">🔐</div>
 
         <div className="login-header">
-
-          <h1>
-            BStore
-          </h1>
-
-          <p>
-            Admin Panel
-          </p>
-
+          <h1>BStore</h1>
+          <p>Admin Panel</p>
         </div>
-
-        {/* ====================================================
-            ERROR
-        ==================================================== */}
 
         {error && (
           <div className="login-error">
@@ -188,95 +110,61 @@ function Login() {
           </div>
         )}
 
-        {/* ====================================================
-            FORM
-        ==================================================== */}
-
         <form
           className="login-form"
           onSubmit={handleLogin}
         >
-
-          {/* ==================================================
-              EMAIL
-          ================================================== */}
-
           <div className="login-form-group">
-
-            <label htmlFor="email">
-              Email
-            </label>
+            <label htmlFor="email">Email</label>
 
             <input
               id="email"
               type="email"
               value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter admin email"
               autoComplete="email"
               disabled={loading}
             />
-
           </div>
 
-          {/* ==================================================
-              PASSWORD
-          ================================================== */}
-
           <div className="login-form-group">
-
-            <label htmlFor="password">
-              Password
-            </label>
+            <label htmlFor="password">Password</label>
 
             <input
               id="password"
               type="password"
               value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password"
               autoComplete="current-password"
               disabled={loading}
             />
-
           </div>
 
-          {/* ==================================================
-              LOGIN BUTTON
-          ================================================== */}
+          <label className="login-remember-row">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              disabled={loading}
+            />
+            <span>Remember me</span>
+          </label>
 
           <button
             type="submit"
             className="login-button"
             disabled={loading}
           >
-
-            {loading
-              ? "Logging in..."
-              : "Login"}
-
+            {loading ? "Logging in..." : "Login"}
           </button>
-
         </form>
 
-        {/* ====================================================
-            FOOTER
-        ==================================================== */}
-
         <div className="login-footer">
-
-          <span>
-            BStore Admin Panel
-          </span>
-
+          <span>BStore Admin Panel</span>
         </div>
-
       </div>
-
     </div>
   );
 }

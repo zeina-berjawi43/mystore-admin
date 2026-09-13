@@ -2970,6 +2970,110 @@ button:disabled {
   font-size: 11px;
 }
 
+.login-remember-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -2px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-remember-row input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ============================================================
+   LOGOUT CONFIRM MODAL
+============================================================ */
+
+.logout-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(23, 23, 23, 0.5);
+}
+
+.logout-confirm-modal {
+  width: 100%;
+  max-width: 340px;
+  padding: 26px 24px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.logout-confirm-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--danger-bg);
+  font-size: 20px;
+}
+
+.logout-confirm-modal h3 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.logout-confirm-modal p {
+  margin: 0 0 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.logout-confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.logout-confirm-cancel,
+.logout-confirm-submit {
+  flex: 1;
+  min-height: 42px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.logout-confirm-cancel {
+  border: 1px solid #ddd4ca;
+  background: #fff;
+  color: var(--text);
+}
+
+.logout-confirm-cancel:hover {
+  background: var(--surface-warm);
+}
+
+.logout-confirm-submit {
+  border: 1px solid var(--danger);
+  background: var(--danger);
+  color: #fff;
+}
+
+.logout-confirm-submit:hover {
+  background: #8f3232;
+  border-color: #8f3232;
+}
+
 /* ============================================================
    GENERIC INPUT GROUP
 ============================================================ */

@@ -374,15 +374,13 @@ function Orders() {
       setError("");
 
 
-      const response =
-        await axios.get(
-          `${API_URL}/orders/admin/all`,
-          {
-            headers:
-              getAuthHeaders(),
-          }
-        );
-
+      const response = await axios.get(
+  `${API_URL}/orders/admin/all`,
+  {
+    headers: getAuthHeaders(),
+    params: { _t: Date.now() }, // 👈 يمنع أي caching
+  }
+);
 
       const receivedOrders =
         Array.isArray(

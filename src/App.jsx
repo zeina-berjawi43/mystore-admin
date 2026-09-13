@@ -11,6 +11,7 @@ import "./App.css";
 
 // WEB PUSH
 import { subscribeToWebPush } from "./utils/webPush";
+import { getToken, getCurrentUser } from "./utils/auth";
 
 // PAGES
 import Login from "./pages/Login";
@@ -30,6 +31,38 @@ import Invoice from "./pages/Invoice";
 import AdminLayout from "./layouts/AdminLayout";
 
 // ============================================================
+// "REMEMBER ME" ENFORCEMENT
+// ============================================================
+//
+// Runs once, the moment this module is first loaded (i.e. once
+// per browser tab). sessionStorage survives page refreshes but is
+// cleared when the tab/browser is closed - so if this is a brand
+// new session AND the user didn't check "remember me" at login,
+// we clear the saved auth data now, before anything renders.
+// A normal refresh within the same tab is unaffected.
+// ============================================================
+
+(function enforceRememberMe() {
+  const alreadyRanThisSession = sessionStorage.getItem(
+    "bstoreSessionActive"
+  );
+
+  if (!alreadyRanThisSession) {
+    sessionStorage.setItem("bstoreSessionActive", "true");
+
+    const rememberMe = localStorage.getItem("rememberMe");
+
+    if (rememberMe === "false") {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("rememberMe");
+    }
+  }
+})();
+
+// ============================================================
 // AUTO SYNC WEB PUSH
 // ============================================================
 
@@ -37,33 +70,15 @@ function AutoSyncWebPush() {
   useEffect(() => {
     const syncNotifications = async () => {
       try {
-        const accessToken = localStorage.getItem("accessToken");
+        const accessToken = getToken();
 
         if (!accessToken) {
-          console.log(
-            "WEB PUSH AUTO SYNC: No admin token."
-          );
           return;
         }
 
-        let user = null;
-
-        try {
-          user = JSON.parse(
-            localStorage.getItem("user") || "null"
-          );
-        } catch (error) {
-          console.log(
-            "WEB PUSH AUTO SYNC: User parse error:",
-            error
-          );
-          return;
-        }
+        const user = getCurrentUser();
 
         if (!user || user.role !== "admin") {
-          console.log(
-            "WEB PUSH AUTO SYNC: Current user is not admin."
-          );
           return;
         }
 
@@ -72,69 +87,22 @@ function AutoSyncWebPush() {
           !("serviceWorker" in navigator) ||
           !("PushManager" in window)
         ) {
-          console.log(
-            "WEB PUSH AUTO SYNC: Browser does not support Web Push."
-          );
           return;
         }
 
         const permission = Notification.permission;
 
-        console.log(
-          "WEB PUSH AUTO SYNC: Permission:",
-          permission
-        );
-
-        if (permission === "denied") {
-          console.log(
-            "WEB PUSH AUTO SYNC: Notifications are blocked."
-          );
+        if (permission !== "granted") {
           return;
         }
 
-        if (permission === "default") {
-          console.log(
-            "WEB PUSH AUTO SYNC: Permission not granted yet. Waiting for user action."
-          );
-          return;
-        }
+        const subscription = await subscribeToWebPush(accessToken);
 
-        if (permission === "granted") {
-          console.log(
-            "WEB PUSH AUTO SYNC: Permission already granted."
-          );
-
-          console.log(
-            "WEB PUSH AUTO SYNC: Starting automatic sync..."
-          );
-
-          const subscription = await subscribeToWebPush(
-            accessToken
-          );
-
-          if (
-            subscription &&
-            subscription.endpoint
-          ) {
-            console.log(
-              "WEB PUSH AUTO SYNC: Subscription synced successfully."
-            );
-
-            console.log(
-              "WEB PUSH AUTO SYNC: Endpoint:",
-              subscription.endpoint
-            );
-          } else {
-            console.log(
-              "WEB PUSH AUTO SYNC: No valid subscription returned."
-            );
-          }
+        if (!subscription || !subscription.endpoint) {
+          console.log("WEB PUSH AUTO SYNC: No valid subscription returned.");
         }
       } catch (error) {
-        console.error(
-          "WEB PUSH AUTO SYNC ERROR:",
-          error
-        );
+        console.error("WEB PUSH AUTO SYNC ERROR:", error);
       }
     };
 
@@ -147,37 +115,20 @@ function AutoSyncWebPush() {
 // ============================================================
 // PROTECTED ADMIN ROUTE
 // ============================================================
+//
+// NOTE: this check only controls what renders in the browser.
+// It does not (and cannot) replace real authorization checks on
+// the backend - anyone can edit localStorage and bypass this.
+// Make sure every admin API route independently verifies the
+// token + role server-side.
+// ============================================================
 
 function ProtectedRoute({ children }) {
-  const token = localStorage.getItem("accessToken");
+  const token = getToken();
+  const user = getCurrentUser();
 
-  let user = null;
-
-  try {
-    user = JSON.parse(
-      localStorage.getItem("user") || "null"
-    );
-  } catch (error) {
-    console.log("USER PARSE ERROR:", error);
-    user = null;
-  }
-
-  if (!token) {
-    return (
-      <Navigate
-        to="/login"
-        replace
-      />
-    );
-  }
-
-  if (!user || user.role !== "admin") {
-    return (
-      <Navigate
-        to="/login"
-        replace
-      />
-    );
+  if (!token || !user || user.role !== "admin") {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -193,20 +144,10 @@ function App() {
       <AutoSyncWebPush />
 
       <Routes>
+        {/* PUBLIC */}
+        <Route path="/login" element={<Login />} />
 
-        {/* ====================================================
-            PUBLIC
-        ==================================================== */}
-
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-        {/* ====================================================
-            PROTECTED ADMIN AREA
-        ==================================================== */}
-
+        {/* PROTECTED ADMIN AREA */}
         <Route
           element={
             <ProtectedRoute>
@@ -214,103 +155,25 @@ function App() {
             </ProtectedRoute>
           }
         >
-
-          {/* DASHBOARD */}
-          <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          />
-
-          {/* ORDERS */}
-          <Route
-            path="/orders"
-            element={<Orders />}
-          />
-
-          {/* INVOICE */}
-          <Route
-            path="/invoices/:invoiceId"
-            element={<Invoice />}
-          />
-
-          {/* PRODUCTS */}
-          <Route
-            path="/products"
-            element={<Products />}
-          />
-
-          {/* USERS */}
-          <Route
-            path="/users"
-            element={<Users />}
-          />
-
-          {/* PHONE VERIFICATION */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/invoices/:invoiceId" element={<Invoice />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/users" element={<Users />} />
           <Route
             path="/phone-verification"
             element={<PhoneVerification />}
           />
-
-          {/* ADD ADMIN */}
-          <Route
-            path="/add-admin"
-            element={<AddAdmin />}
-          />
-
-          {/* CATEGORIES */}
-          <Route
-            path="/categories"
-            element={<Categories />}
-          />
-
-          {/* BRANDS */}
-          <Route
-            path="/brands"
-            element={<Brands />}
-          />
-
-          {/* SLIDESHOW */}
-          <Route
-            path="/slideshow"
-            element={<Slideshow />}
-          />
-
-          {/* NOTIFICATIONS */}
-          <Route
-            path="/notifications"
-            element={<Notifications />}
-          />
-
+          <Route path="/add-admin" element={<AddAdmin />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/brands" element={<Brands />} />
+          <Route path="/slideshow" element={<Slideshow />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Route>
 
-        {/* ====================================================
-            DEFAULT
-        ==================================================== */}
-
-        <Route
-          path="/"
-          element={
-            <Navigate
-              to="/login"
-              replace
-            />
-          }
-        />
-
-        {/* ====================================================
-            UNKNOWN ROUTES
-        ==================================================== */}
-
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to="/login"
-              replace
-            />
-          }
-        />
-
+        {/* DEFAULT / UNKNOWN */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

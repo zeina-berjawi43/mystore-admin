@@ -457,18 +457,9 @@ function Brands() {
 
                     <td>
 
-                      <div className="management-name">
-
-                        <div className="management-icon">
-                          🏷️
-                        </div>
-
-                        <strong>
-                          {brand.name}
-                        </strong>
-
-                      </div>
-
+                     <div className="management-name">
+  <strong>{brand.name}</strong>
+</div>
                     </td>
 
 

@@ -3,8 +3,7 @@ import {
   subscribeToWebPush,
 } from "../utils/webPush";
 
-const API_URL =
-  import.meta.env.VITE_API_URL;
+const API_URL = "https://mystore-backend-u6ey.onrender.com";
 
 function Notifications() {
   // ============================================================
@@ -59,10 +58,6 @@ function Notifications() {
     try {
       setCheckingPush(true);
 
-      // --------------------------------------------------------
-      // CHECK SUPPORT
-      // --------------------------------------------------------
-
       if (
         !("Notification" in window) ||
         !("serviceWorker" in navigator) ||
@@ -73,59 +68,20 @@ function Notifications() {
         return;
       }
 
-      // --------------------------------------------------------
-      // CHECK PERMISSION
-      // --------------------------------------------------------
-
       setNotificationPermission(
         Notification.permission
       );
 
-      // --------------------------------------------------------
-      // WAIT FOR SERVICE WORKER
-      // --------------------------------------------------------
-
       const registration =
         await navigator.serviceWorker.ready;
-
-      console.log(
-        "WEB PUSH CHECK - Service Worker:",
-        registration
-      );
-
-      // --------------------------------------------------------
-      // GET CURRENT SUBSCRIPTION
-      // --------------------------------------------------------
 
       const subscription =
         await registration.pushManager.getSubscription();
 
-      console.log(
-        "WEB PUSH CHECK - Subscription:",
-        subscription
-      );
-
-      console.log(
-        "WEB PUSH CHECK - Endpoint:",
-        subscription?.endpoint
-      );
-
-      // --------------------------------------------------------
-      // UPDATE STATE
-      // --------------------------------------------------------
-
       if (subscription) {
         setPushSubscribed(true);
-
-        console.log(
-          "WEB PUSH CHECK: Browser push subscription exists."
-        );
       } else {
         setPushSubscribed(false);
-
-        console.log(
-          "WEB PUSH CHECK: Browser has NO push subscription."
-        );
       }
     } catch (error) {
       console.error(
@@ -170,32 +126,10 @@ function Notifications() {
       try {
         setEnablingNotifications(true);
 
-        console.log(
-          "WEB PUSH: Starting subscription..."
-        );
-
-        // ------------------------------------------------------
-        // CREATE / GET SUBSCRIPTION
-        // ------------------------------------------------------
-
         const subscription =
           await subscribeToWebPush(
             accessToken
           );
-
-        console.log(
-          "WEB PUSH: Subscription returned:",
-          subscription
-        );
-
-        console.log(
-          "WEB PUSH: Endpoint:",
-          subscription?.endpoint
-        );
-
-        // ------------------------------------------------------
-        // VERIFY
-        // ------------------------------------------------------
 
         if (
           !subscription ||
@@ -205,10 +139,6 @@ function Notifications() {
             "Browser push subscription was not created."
           );
         }
-
-        // ------------------------------------------------------
-        // UPDATE STATE
-        // ------------------------------------------------------
 
         setPushSubscribed(true);
 
@@ -220,10 +150,6 @@ function Notifications() {
 
         setNotificationEnabledMessage(
           "Notifications enabled successfully."
-        );
-
-        console.log(
-          "WEB PUSH: Notifications enabled successfully."
         );
       } catch (error) {
         console.error(
@@ -255,10 +181,6 @@ function Notifications() {
       setSuccessMessage("");
       setErrorMessage("");
 
-      // --------------------------------------------------------
-      // VALIDATION
-      // --------------------------------------------------------
-
       const cleanTitle = title.trim();
       const cleanBody = body.trim();
 
@@ -276,10 +198,6 @@ function Notifications() {
         return;
       }
 
-      // --------------------------------------------------------
-      // TOKEN
-      // --------------------------------------------------------
-
       const accessToken =
         localStorage.getItem("accessToken");
 
@@ -292,10 +210,6 @@ function Notifications() {
 
       try {
         setLoading(true);
-
-        // ------------------------------------------------------
-        // SEND NOTIFICATION
-        // ------------------------------------------------------
 
         const response = await fetch(
           `${API_URL}/admin/send-offer-notification`,
@@ -320,20 +234,12 @@ function Notifications() {
         const data =
           await response.json();
 
-        // ------------------------------------------------------
-        // ERROR
-        // ------------------------------------------------------
-
         if (!response.ok) {
           throw new Error(
             data.message ||
               "Failed to send notification."
           );
         }
-
-        // ------------------------------------------------------
-        // SUCCESS
-        // ------------------------------------------------------
 
         setSuccessMessage(
           `Notification sent successfully to ${
@@ -343,11 +249,6 @@ function Notifications() {
 
         setTitle("");
         setBody("");
-
-        console.log(
-          "NOTIFICATION RESPONSE:",
-          data
-        );
       } catch (error) {
         console.error(
           "SEND NOTIFICATION ERROR:",
@@ -369,10 +270,6 @@ function Notifications() {
 
   return (
     <div className="notifications-page">
-      {/* ======================================================
-          HEADER
-      ====================================================== */}
-
       <div className="notifications-header">
         <div>
           <h1>
@@ -384,10 +281,6 @@ function Notifications() {
           </p>
         </div>
       </div>
-
-      {/* ======================================================
-          ADMIN BROWSER NOTIFICATIONS
-      ====================================================== */}
 
       <div className="notifications-card">
         <div className="notification-field">
@@ -402,19 +295,11 @@ function Notifications() {
           </p>
         </div>
 
-        {/* ====================================================
-            CHECKING
-        ==================================================== */}
-
         {checkingPush && (
           <div className="notification-success">
             Checking browser notifications...
           </div>
         )}
-
-        {/* ====================================================
-            ENABLED
-        ==================================================== */}
 
         {!checkingPush &&
           notificationPermission === "granted" &&
@@ -423,10 +308,6 @@ function Notifications() {
               Browser notifications are enabled.
             </div>
           )}
-
-        {/* ====================================================
-            GRANTED BUT NOT CONNECTED
-        ==================================================== */}
 
         {!checkingPush &&
           notificationPermission === "granted" &&
@@ -437,10 +318,6 @@ function Notifications() {
             </div>
           )}
 
-        {/* ====================================================
-            DENIED
-        ==================================================== */}
-
         {!checkingPush &&
           notificationPermission === "denied" && (
             <div className="notification-error">
@@ -450,10 +327,6 @@ function Notifications() {
             </div>
           )}
 
-        {/* ====================================================
-            UNSUPPORTED
-        ==================================================== */}
-
         {!checkingPush &&
           notificationPermission === "unsupported" && (
             <div className="notification-error">
@@ -462,19 +335,11 @@ function Notifications() {
             </div>
           )}
 
-        {/* ====================================================
-            ENABLE SUCCESS
-        ==================================================== */}
-
         {notificationEnabledMessage && (
           <div className="notification-success">
             {notificationEnabledMessage}
           </div>
         )}
-
-        {/* ====================================================
-            ENABLE / SYNC BUTTON
-        ==================================================== */}
 
         {!checkingPush &&
           notificationPermission !== "denied" &&
@@ -496,15 +361,7 @@ function Notifications() {
           )}
       </div>
 
-      {/* ======================================================
-          SEND NOTIFICATION CARD
-      ====================================================== */}
-
       <div className="notifications-card">
-        {/* ====================================================
-            TITLE
-        ==================================================== */}
-
         <div className="notification-field">
           <label>
             Notification Title
@@ -522,10 +379,6 @@ function Notifications() {
             disabled={loading}
           />
         </div>
-
-        {/* ====================================================
-            MESSAGE
-        ==================================================== */}
 
         <div className="notification-field">
           <label>
@@ -545,29 +398,17 @@ function Notifications() {
           />
         </div>
 
-        {/* ====================================================
-            ERROR
-        ==================================================== */}
-
         {errorMessage && (
           <div className="notification-error">
             {errorMessage}
           </div>
         )}
 
-        {/* ====================================================
-            SUCCESS
-        ==================================================== */}
-
         {successMessage && (
           <div className="notification-success">
             {successMessage}
           </div>
         )}
-
-        {/* ====================================================
-            SEND BUTTON
-        ==================================================== */}
 
         <button
           type="button"

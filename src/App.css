@@ -385,15 +385,18 @@ select:disabled {
 
 /* ============================================================
    COMMON PAGE WRAPPERS
+   NOTE: .products-page, .slideshow-page and .invoice-page are
+   intentionally NOT listed here anymore - those three pages own
+   their layout completely in Products.css / Slideshow.css /
+   Invoice.css. Listing them here too was the exact cause of the
+   "random" CSS bugs (two different rules fighting over the same
+   class, winner decided by import order).
 ============================================================ */
 
 .dashboard-page,
 .admin-page,
 .orders-page,
 .users-page,
-.products-page,
-.slideshow-page,
-.invoice-page,
 .management-page,
 .notifications-page,
 .notification-page,
@@ -408,8 +411,6 @@ select:disabled {
 .dashboard-page,
 .orders-page,
 .users-page,
-.products-page,
-.slideshow-page,
 .management-page,
 .notifications-page,
 .notification-page,
@@ -432,13 +433,13 @@ select:disabled {
 
 /* ============================================================
    COMMON HEADERS
+   (.products-header and .slideshow-header removed from this
+   group - each has its own definition in its own CSS file)
 ============================================================ */
 
 .dashboard-header,
 .orders-header,
 .users-header,
-.products-header,
-.slideshow-header,
 .management-header,
 .notifications-header,
 .notification-header,
@@ -454,8 +455,6 @@ select:disabled {
 .dashboard-header h1,
 .orders-header h1,
 .users-header h1,
-.products-header h1,
-.slideshow-header h1,
 .management-header h1,
 .notifications-header h1,
 .notification-header h1,
@@ -471,8 +470,6 @@ select:disabled {
 .dashboard-header p,
 .orders-header p,
 .users-header p,
-.products-header p,
-.slideshow-header p,
 .management-header p,
 .notifications-header p,
 .notification-header p,
@@ -501,8 +498,6 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-.add-product-button,
-.add-slide-button,
 .management-add-button,
 .view-order-button {
   min-height: 40px;
@@ -513,16 +508,9 @@ a:focus-visible {
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-}
-
-.add-product-button,
-.add-slide-button,
-.management-add-button {
   padding: 0 16px;
 }
 
-.add-product-button:hover,
-.add-slide-button:hover,
 .management-add-button:hover,
 .view-order-button:hover {
   background: var(--primary);
@@ -535,8 +523,9 @@ button:disabled {
 }
 
 /* ============================================================
-   REFRESH BUTTONS
-   All refresh buttons use the same black-arrow icon design.
+   REFRESH BUTTONS (generic fallback - see also the
+   button[class*="refresh"] rule near the end of this file,
+   which is what actually applies to every refresh button)
 ============================================================ */
 
 .refresh-button,
@@ -589,16 +578,6 @@ button:disabled {
   border-color: var(--text) !important;
   color: var(--text) !important;
   transform: none !important;
-}
-
-.refresh-button:hover::before,
-.refresh-orders-button:hover::before,
-.orders-refresh-button:hover::before,
-.users-refresh-button:hover::before,
-.phone-verification-refresh-button:hover::before,
-.refresh-phone-verification-button:hover::before,
-.phone-refresh-button:hover::before {
-  color: var(--text);
 }
 
 /* ============================================================
@@ -737,8 +716,6 @@ button:disabled {
 .dashboard-loading,
 .orders-loading,
 .users-loading,
-.products-loading,
-.slideshow-loading,
 .phone-verification-loading,
 .notifications-loading {
   min-height: 45vh;
@@ -768,8 +745,6 @@ button:disabled {
 .dashboard-loading p,
 .orders-loading p,
 .users-loading p,
-.products-loading p,
-.slideshow-loading p,
 .phone-verification-loading p,
 .notifications-loading p {
   margin: 0;
@@ -817,7 +792,8 @@ button:disabled {
 }
 
 /* ============================================================
-   DASHBOARD PRODUCT TABLE
+   DASHBOARD PRODUCT TABLE (top-selling products list, dashboard
+   only - unrelated to the Products.jsx page table)
 ============================================================ */
 
 .products-table,
@@ -1272,12 +1248,12 @@ button:disabled {
 }
 
 /* ============================================================
-   FILTER BARS
+   FILTER BARS (orders / users - products filter bar lives in
+   Products.css)
 ============================================================ */
 
 .orders-filters,
-.users-filters,
-.products-filters {
+.users-filters {
   width: 100%;
   display: flex;
   align-items: center;
@@ -1291,8 +1267,7 @@ button:disabled {
 }
 
 .orders-search,
-.users-search,
-.search-box {
+.users-search {
   min-width: 0;
   flex: 1;
   height: 42px;
@@ -1308,23 +1283,20 @@ button:disabled {
 
 .orders-search:focus-within,
 .users-search:focus-within,
-.search-box:focus-within,
 .management-search:focus-within {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(227, 91, 63, 0.07);
 }
 
 .orders-search span,
-.users-search span,
-.search-icon {
+.users-search span {
   flex-shrink: 0;
   color: var(--text-secondary);
   font-size: 15px;
 }
 
 .orders-search input,
-.users-search input,
-.search-box input {
+.users-search input {
   width: 100%;
   min-width: 0;
   padding: 0;
@@ -1337,15 +1309,13 @@ button:disabled {
 
 .orders-search input::placeholder,
 .users-search input::placeholder,
-.search-box input::placeholder,
 .management-search input::placeholder {
   color: #aaa;
 }
 
 .orders-date-filter,
 .orders-filters select,
-.users-filters select,
-.products-filters select {
+.users-filters select {
   height: 42px;
   min-width: 140px;
   padding: 0 11px;
@@ -1359,15 +1329,13 @@ button:disabled {
 
 .orders-date-filter:focus,
 .orders-filters select:focus,
-.users-filters select:focus,
-.products-filters select:focus {
+.users-filters select:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(227, 91, 63, 0.07);
 }
 
 .clear-orders-button,
 .users-clear-button,
-.clear-filters-button,
 .management-clear-button {
   height: 42px;
   flex-shrink: 0;
@@ -1383,7 +1351,6 @@ button:disabled {
 
 .clear-orders-button:hover,
 .users-clear-button:hover,
-.clear-filters-button:hover,
 .management-clear-button:hover {
   background: var(--surface-warm);
   border-color: #cfc2b4;
@@ -1391,7 +1358,6 @@ button:disabled {
 }
 
 .orders-error,
-.products-error,
 .management-error,
 .users-error {
   display: flex;
@@ -1425,21 +1391,18 @@ button:disabled {
 
 .orders-count,
 .users-count,
-.products-count,
-.management-count,
-.slideshow-count {
+.management-count {
   margin: 0 0 9px;
   color: var(--text-secondary);
   font-size: 12px;
 }
 
 /* ============================================================
-   TABLE CONTAINERS
+   TABLE CONTAINERS (orders / users / management)
 ============================================================ */
 
 .orders-table-container,
 .users-table-container,
-.products-table-container,
 .management-table-container {
   width: 100%;
   overflow-x: auto;
@@ -1452,7 +1415,6 @@ button:disabled {
 
 .orders-real-table,
 .users-table,
-.products-table-real,
 .management-table {
   border-collapse: collapse;
 }
@@ -1469,12 +1431,6 @@ button:disabled {
   table-layout: fixed;
 }
 
-.products-table-real {
-  width: 100%;
-  min-width: 1100px;
-  table-layout: fixed;
-}
-
 .management-table {
   width: 100%;
   min-width: 520px;
@@ -1483,14 +1439,12 @@ button:disabled {
 
 .orders-real-table thead,
 .users-table thead,
-.products-table-real thead,
 .management-table thead {
   background: var(--surface-soft);
 }
 
 .orders-real-table th,
 .users-table th,
-.products-table-real th,
 .management-table th {
   padding: 12px 13px;
   border-bottom: 1px solid var(--border-light);
@@ -1503,7 +1457,6 @@ button:disabled {
 
 .orders-real-table td,
 .users-table td,
-.products-table-real td,
 .management-table td {
   padding: 13px;
   border-bottom: 1px solid #f1ece6;
@@ -1514,14 +1467,12 @@ button:disabled {
 
 .orders-real-table tbody tr:last-child td,
 .users-table tbody tr:last-child td,
-.products-table-real tbody tr:last-child td,
 .management-table tbody tr:last-child td {
   border-bottom: none;
 }
 
 .orders-real-table tbody tr:hover,
 .users-table tbody tr:hover,
-.products-table-real tbody tr:hover,
 .management-table tbody tr:hover {
   background: #fdfaf6;
 }
@@ -1593,12 +1544,12 @@ button:disabled {
 }
 
 /* ============================================================
-   ACTION BUTTONS
+   ACTION BUTTONS (orders / users / management - products
+   actions live in Products.css)
 ============================================================ */
 
 .order-actions,
 .user-actions,
-.product-actions,
 .management-actions {
   display: flex;
   align-items: center;
@@ -1612,8 +1563,6 @@ button:disabled {
 .delete-order-button,
 .user-edit-button,
 .user-delete-button,
-.edit-product-button,
-.delete-product-button,
 .management-edit-button,
 .management-delete-button {
   min-height: 34px;
@@ -1627,7 +1576,6 @@ button:disabled {
 .create-invoice-button,
 .view-invoice-button,
 .user-edit-button,
-.edit-product-button,
 .management-edit-button {
   border: 1px solid #dcd3c8;
   background: #fff;
@@ -1637,7 +1585,6 @@ button:disabled {
 .create-invoice-button:hover,
 .view-invoice-button:hover,
 .user-edit-button:hover,
-.edit-product-button:hover,
 .management-edit-button:hover {
   border-color: var(--text);
   background: var(--text);
@@ -1646,7 +1593,6 @@ button:disabled {
 
 .delete-order-button,
 .user-delete-button,
-.delete-product-button,
 .management-delete-button {
   border: 1px solid var(--danger-border);
   background: var(--danger-bg);
@@ -1655,7 +1601,6 @@ button:disabled {
 
 .delete-order-button:hover,
 .user-delete-button:hover,
-.delete-product-button:hover,
 .management-delete-button:hover {
   border-color: var(--danger);
   background: var(--danger);
@@ -1705,12 +1650,12 @@ button:disabled {
 }
 
 /* ============================================================
-   MODALS
+   MODALS (order / management / user modals - products and
+   slideshow modals live in their own CSS files)
 ============================================================ */
 
 .order-modal-overlay,
 .management-modal-overlay,
-.invoice-modal-overlay,
 .modal-overlay,
 .user-modal-overlay,
 .edit-user-modal-overlay {
@@ -1728,8 +1673,6 @@ button:disabled {
 
 .order-modal,
 .management-modal,
-.product-modal,
-.slide-modal,
 .user-modal,
 .edit-user-modal {
   width: 100%;
@@ -1745,9 +1688,7 @@ button:disabled {
   max-width: 680px;
 }
 
-.management-modal,
-.product-modal,
-.slide-modal {
+.management-modal {
   max-width: 620px;
 }
 
@@ -1758,8 +1699,6 @@ button:disabled {
 
 .order-modal-header,
 .management-modal-header,
-.product-modal-header,
-.slide-modal-header,
 .user-modal-header,
 .edit-user-modal-header {
   display: flex;
@@ -1772,8 +1711,6 @@ button:disabled {
 
 .order-modal-header h2,
 .management-modal-header h2,
-.product-modal-header h2,
-.slide-modal-header h2,
 .user-modal-header h2,
 .edit-user-modal-header h2 {
   margin: 0;
@@ -1785,8 +1722,6 @@ button:disabled {
 
 .order-modal-header p,
 .management-modal-header p,
-.product-modal-header p,
-.slide-modal-header p,
 .user-modal-header p,
 .edit-user-modal-header p {
   margin: 4px 0 0;
@@ -1797,8 +1732,6 @@ button:disabled {
 
 .order-modal-close,
 .management-modal-close,
-.product-modal-close,
-.slide-modal-close,
 .user-modal-close,
 .edit-user-modal-close {
   width: 34px;
@@ -1817,8 +1750,6 @@ button:disabled {
 
 .order-modal-close:hover,
 .management-modal-close:hover,
-.product-modal-close:hover,
-.slide-modal-close:hover,
 .user-modal-close:hover,
 .edit-user-modal-close:hover {
   background: #ece4da;
@@ -2172,145 +2103,21 @@ button:disabled {
 }
 
 /* ============================================================
-   PRODUCTS
+   MANAGEMENT FORMS (Categories / Brands modals)
 ============================================================ */
 
-.products-page {
-  padding-bottom: 18px;
-}
-
-.products-filters {
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(140px, 180px)) auto;
-  align-items: center;
-}
-
-.product-cell {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.product-image {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  object-fit: contain;
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  background: #fff;
-}
-
-.product-cell > div:last-child {
-  min-width: 0;
-}
-
-.product-cell strong {
-  display: block;
-  max-width: 250px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text);
-  font-size: 13px;
-}
-
-.product-cell small {
-  display: block;
-  margin-top: 3px;
-  color: var(--text-muted);
-  font-size: 11px;
-}
-
-.price-input,
-.discount-input {
-  width: 85px;
-  height: 34px;
-  padding: 0 8px;
-  border: 1px solid #ddd4ca;
-  border-radius: 7px;
-  background: #fff;
-  color: var(--text);
-  font-size: 12px;
-}
-
-.price-input:focus,
-.discount-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(227, 91, 63, 0.07);
-}
-
-.availability-switch {
-  position: relative;
-  width: 40px;
-  height: 22px;
-  display: inline-block;
-}
-
-.availability-switch input {
-  width: 0;
-  height: 0;
-  opacity: 0;
-}
-
-.availability-slider {
-  position: absolute;
-  inset: 0;
-  border-radius: 30px;
-  background: #d7d0c8;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.availability-slider::before {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  left: 3px;
-  top: 3px;
-  border-radius: 50%;
-  background: #fff;
-  transition: 0.2s ease;
-}
-
-.availability-switch input:checked + .availability-slider {
-  background: var(--primary);
-}
-
-.availability-switch input:checked + .availability-slider::before {
-  transform: translateX(18px);
-}
-
-/* ============================================================
-   MANAGEMENT FORMS
-============================================================ */
-
-.management-modal,
-.product-modal,
-.slide-modal {
-  padding: 0;
-}
-
-.management-form,
-.product-form,
-.slide-form {
+.management-form {
   padding: 20px;
 }
 
-.management-form-group,
-.product-form-group,
-.slide-form-group {
+.management-form-group {
   display: flex;
   flex-direction: column;
   gap: 7px;
   margin-bottom: 14px;
 }
 
-.management-form-group label,
-.product-form-group label,
-.slide-form-group label {
+.management-form-group label {
   color: #4c4741;
   font-size: 13px;
   font-weight: 700;
@@ -2318,13 +2125,7 @@ button:disabled {
 
 .management-form-group input,
 .management-form-group textarea,
-.management-form-group select,
-.product-form-group input,
-.product-form-group textarea,
-.product-form-group select,
-.slide-form-group input,
-.slide-form-group textarea,
-.slide-form-group select {
+.management-form-group select {
   width: 100%;
   min-height: 43px;
   padding: 10px 11px;
@@ -2337,29 +2138,19 @@ button:disabled {
 
 .management-form-group input:focus,
 .management-form-group textarea:focus,
-.management-form-group select:focus,
-.product-form-group input:focus,
-.product-form-group textarea:focus,
-.product-form-group select:focus,
-.slide-form-group input:focus,
-.slide-form-group textarea:focus,
-.slide-form-group select:focus {
+.management-form-group select:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(227, 91, 63, 0.07);
 }
 
-.management-form-actions,
-.product-form-actions,
-.slide-form-actions {
+.management-form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 18px;
 }
 
-.management-cancel-button,
-.product-cancel-button,
-.slide-cancel-button {
+.management-cancel-button {
   min-height: 40px;
   padding: 0 14px;
   border: 1px solid #ddd4ca;
@@ -2371,9 +2162,7 @@ button:disabled {
   cursor: pointer;
 }
 
-.management-save-button,
-.product-save-button,
-.slide-save-button {
+.management-save-button {
   min-height: 40px;
   padding: 0 15px;
   border: 1px solid var(--text);
@@ -2385,15 +2174,11 @@ button:disabled {
   cursor: pointer;
 }
 
-.management-cancel-button:hover,
-.product-cancel-button:hover,
-.slide-cancel-button:hover {
+.management-cancel-button:hover {
   background: #f7f2ec;
 }
 
-.management-save-button:hover,
-.product-save-button:hover,
-.slide-save-button:hover {
+.management-save-button:hover {
   background: var(--primary);
   border-color: var(--primary);
 }
@@ -2511,169 +2296,6 @@ button:disabled {
 .brands-page .management-table td:last-child,
 .management-page.brand-page .management-table td:last-child {
   width: 170px;
-}
-
-/* ============================================================
-   SLIDESHOW
-============================================================ */
-
-.slideshow-page {
-  padding-bottom: 18px;
-}
-
-.slideshow-count {
-  margin-bottom: 12px;
-}
-
-.slideshow-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.slide-card {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: #fff;
-  box-shadow: var(--shadow-sm);
-}
-
-.slide-image-container {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 8;
-  overflow: hidden;
-  background: #f8f3ed;
-}
-
-.slide-image-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.slide-order {
-  position: absolute;
-  top: 9px;
-  left: 9px;
-  padding: 6px 8px;
-  border-radius: 20px;
-  background: rgba(23, 23, 23, 0.78);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.slide-card-content {
-  padding: 13px;
-}
-
-.slide-info {
-  min-width: 0;
-}
-
-.slide-info strong {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text);
-  font-size: 13px;
-}
-
-.active-text,
-.inactive-text {
-  display: inline-block;
-  margin-top: 5px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.active-text {
-  color: var(--success);
-}
-
-.inactive-text {
-  color: var(--text-muted);
-}
-
-.slide-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.edit-slide-button,
-.toggle-slide-button,
-.delete-slide-button {
-  min-height: 34px;
-  padding: 0 9px;
-  border-radius: 7px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.edit-slide-button,
-.toggle-slide-button {
-  border: 1px solid #ddd4ca;
-  background: #fff;
-  color: #333;
-}
-
-.edit-slide-button:hover,
-.toggle-slide-button:hover {
-  border-color: var(--text);
-  background: var(--text);
-  color: #fff;
-}
-
-.delete-slide-button {
-  border: 1px solid var(--danger-border);
-  background: var(--danger-bg);
-  color: var(--danger);
-}
-
-.delete-slide-button:hover {
-  border-color: var(--danger);
-  background: var(--danger);
-  color: #fff;
-}
-
-.slideshow-empty {
-  padding: 45px 18px;
-  border: 1px dashed #ddd1c3;
-  border-radius: 10px;
-  background: var(--surface-soft);
-  color: var(--text-muted);
-  text-align: center;
-  font-size: 13px;
-}
-
-.slide-upload-area {
-  padding: 20px;
-  border: 2px dashed #ddd1c3;
-  border-radius: 9px;
-  background: var(--surface-soft);
-  text-align: center;
-  cursor: pointer;
-}
-
-.slide-upload-area:hover {
-  border-color: var(--primary);
-  background: #fff8f5;
-}
-
-.slide-preview {
-  width: 100%;
-  max-height: 200px;
-  margin-top: 10px;
-  object-fit: contain;
-  border-radius: 8px;
-  background: #f8f3ed;
 }
 
 /* ============================================================
@@ -2821,79 +2443,6 @@ button:disabled {
   margin-bottom: 18px;
 }
 
-.add-admin-page .input-group {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-bottom: 15px;
-}
-
-.add-admin-page .input-group label {
-  display: block;
-  color: #3f3a35;
-  font-size: 14px;
-  line-height: 1.25;
-  font-weight: 700;
-}
-
-.add-admin-page .input-group input {
-  width: 100%;
-  min-height: 45px;
-  padding: 10px 12px;
-  border: 1px solid var(--border-input);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--text);
-  font-size: 14px;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
-}
-
-.add-admin-page .input-group input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(227, 91, 63, 0.07);
-}
-
-.add-admin-page .input-group input::placeholder {
-  color: #aaa;
-}
-
-.add-admin-page .error-message {
-  padding: 11px 13px !important;
-  border: 1px solid var(--danger-border);
-  border-radius: 8px;
-  background: var(--danger-bg);
-  color: var(--danger);
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.add-admin-page form > button[type="submit"] {
-  min-height: 44px !important;
-  border: 1px solid var(--text) !important;
-  border-radius: 8px !important;
-  background: var(--text) !important;
-  color: #fff !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-}
-
-.add-admin-page form > button[type="submit"]:hover {
-  background: var(--primary) !important;
-  border-color: var(--primary) !important;
-}
-
-.add-admin-page > div:last-child > button[type="button"] {
-  color: var(--text-secondary);
-  font-size: 13px !important;
-}
-
-.add-admin-page > div:last-child > button[type="button"]:hover {
-  color: var(--primary);
-  background: transparent !important;
-}
-
 .add-admin-card {
   width: 100%;
   padding: 22px;
@@ -2934,6 +2483,13 @@ button:disabled {
   font-size: 13px;
 }
 
+.add-admin-form-group input:focus,
+.add-admin-form-group textarea:focus,
+.add-admin-form-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(227, 91, 63, 0.07);
+}
+
 .add-admin-form-actions {
   display: flex;
   justify-content: flex-end;
@@ -2941,35 +2497,40 @@ button:disabled {
   margin-top: 4px;
 }
 
-.add-admin-cancel-button {
-  min-height: 42px;
-  padding: 0 14px;
-  border: 1px solid #ddd4ca;
-  border-radius: 8px;
-  background: #fff;
-  color: #555;
-  font-size: 12px;
-  font-weight: 700;
+.add-admin-back {
+  margin-top: 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.add-admin-submit-button,
-.add-admin-save-button {
-  min-height: 42px;
-  padding: 0 17px;
+.add-admin-back:hover {
+  color: var(--primary);
+}
+
+.add-admin-submit {
+  width: 100%;
+  min-height: 44px;
   border: 1px solid var(--text);
   border-radius: 8px;
   background: var(--text);
   color: #fff;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
 }
 
-.add-admin-submit-button:hover,
-.add-admin-save-button:hover {
+.add-admin-submit:hover {
   background: var(--primary);
   border-color: var(--primary);
+}
+
+.add-admin-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .add-admin-error,
@@ -3005,11 +2566,72 @@ button:disabled {
   margin-bottom: 18px;
 }
 
-.phone-verification-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+.phone-verification-loading,
+.phone-verification-spinner {
+  /* .phone-verification-loading sizing/centering comes from the
+     .dashboard-loading group above; this just adds the spinner
+     itself, since the JSX uses a different class name than the
+     shared .loading-spinner */
+}
+
+.phone-verification-spinner {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 11px;
+  border: 3px solid #e4dbd0;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: bstore-spin 0.75s linear infinite;
+}
+
+.phone-verification-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
+  padding: 13px 15px;
+  border: 1px solid var(--danger-border);
+  border-radius: 10px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.phone-verification-error button {
+  flex-shrink: 0;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--danger);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--danger);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.phone-verification-empty-icon {
+  font-size: 38px;
+  margin-bottom: 10px;
+}
+
+.phone-verification-empty h2 {
+  margin: 0 0 6px;
+  color: var(--text);
+  font-size: 18px;
+}
+
+.phone-verification-empty small {
+  display: block;
+  margin-top: 10px;
+  color: var(--text-muted);
+}
+
+.phone-verification-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
 }
 
 .phone-verification-card {
@@ -3019,6 +2641,7 @@ button:disabled {
   border-radius: 10px;
   background: #fff;
   box-shadow: var(--shadow-sm);
+  margin-bottom: 14px;
 }
 
 .phone-verification-card h3 {
@@ -3059,98 +2682,6 @@ button:disabled {
   color: #fff;
 }
 
-.phone-verification-table-container {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: #fff;
-  -webkit-overflow-scrolling: touch;
-}
-
-.phone-verification-table {
-  width: 100%;
-  min-width: 760px;
-  border-collapse: collapse;
-}
-
-.phone-verification-table th {
-  padding: 12px 13px;
-  background: var(--surface-soft);
-  border-bottom: 1px solid var(--border-light);
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 700;
-  text-align: left;
-}
-
-.phone-verification-table td {
-  padding: 12px 13px;
-  border-bottom: 1px solid #f1ece6;
-  color: #333;
-  font-size: 13px;
-}
-
-.phone-verification-table tr:last-child td {
-  border-bottom: none;
-}
-
-.phone-verification-table tr:hover {
-  background: #fdfaf6;
-}
-
-.phone-verification-user {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 0;
-}
-
-.phone-verification-user > div:last-child {
-  min-width: 0;
-}
-
-.phone-verification-user strong,
-.phone-verification-user span {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.phone-verification-user strong {
-  color: var(--text);
-  font-size: 13px;
-}
-
-.phone-verification-user span {
-  margin-top: 3px;
-  color: var(--text-muted);
-  font-size: 11px;
-}
-
-.phone-verification-status {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 9px;
-  border-radius: 20px;
-  background: var(--warning-bg);
-  color: var(--warning);
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.phone-verification-status.verified,
-.phone-verification-status.approved {
-  background: #e7f6e7;
-  color: #28733b;
-}
-
-.phone-verification-status.rejected {
-  background: #ffe8e8;
-  color: var(--danger);
-}
-
 .phone-verification-empty {
   padding: 42px 18px;
   border: 1px dashed #ddd1c3;
@@ -3161,381 +2692,139 @@ button:disabled {
   text-align: center;
 }
 
-/* ============================================================
-   INVOICE
-============================================================ */
-
-.invoice-page {
-  padding-bottom: 22px;
+.phone-verification-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--text);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
 }
 
-.invoice-top-bar {
+.phone-verification-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.phone-verification-card-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.phone-verification-card-user h3 {
+  margin: 0;
+}
+
+.phone-verification-card-user p {
+  margin: 3px 0 0;
+}
+
+.phone-verification-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 20px;
+  background: var(--warning-bg);
+  color: var(--warning);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.phone-verification-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.phone-verification-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  margin-bottom: 10px;
+}
+
+.phone-verification-info {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 15px;
+  gap: 10px;
 }
 
-.invoice-top-bar h1 {
-  margin: 0;
+.phone-verification-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.phone-verification-info strong {
   color: var(--text);
-  font-size: 28px;
-  font-weight: 800;
-}
-
-.invoice-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.invoice-button,
-.invoice-save-button,
-.invoice-print-button,
-.invoice-preview-button,
-.invoice-download-button,
-.invoice-duplicate-button,
-.invoice-cancel-button {
-  min-height: 36px;
-  padding: 0 11px;
-  border-radius: 7px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.invoice-button,
-.invoice-preview-button,
-.invoice-download-button,
-.invoice-duplicate-button {
-  border: 1px solid #ddd4ca;
-  background: #fff;
-  color: #333;
-}
-
-.invoice-button:hover,
-.invoice-preview-button:hover,
-.invoice-download-button:hover,
-.invoice-duplicate-button:hover {
-  border-color: var(--text);
-  background: var(--text);
-  color: #fff;
-}
-
-.invoice-save-button,
-.invoice-print-button {
-  border: 1px solid var(--text);
-  background: var(--text);
-  color: #fff;
-}
-
-.invoice-save-button:hover,
-.invoice-print-button:hover {
-  border-color: var(--primary);
-  background: var(--primary);
-}
-
-.invoice-cancel-button {
-  border: 1px solid var(--danger-border);
-  background: var(--danger-bg);
-  color: var(--danger);
-}
-
-.invoice-cancel-button:hover {
-  border-color: var(--danger);
-  background: var(--danger);
-  color: #fff;
-}
-
-.invoice-status {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 9px;
-  border-radius: 20px;
-  background: #f1ece5;
-  color: #555;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.invoice-message {
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border-radius: 8px;
   font-size: 12px;
 }
 
-.invoice-message.success {
-  background: var(--success-bg);
+.phone-verification-otp {
+  letter-spacing: 1px;
+  color: var(--primary);
+}
+
+.phone-verification-waiting {
+  color: var(--warning);
+}
+
+.phone-verification-type.register {
+  color: var(--info);
+}
+
+.phone-verification-type.login {
   color: var(--success);
 }
 
-.invoice-message.error {
-  background: var(--danger-bg);
-  color: var(--danger);
+.phone-verification-type.change-phone {
+  color: var(--purple);
 }
 
-.invoice-settings {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.invoice-setting {
-  padding: 12px;
-  border: 1px solid var(--border);
+.phone-verification-address {
+  padding: 10px 12px;
+  margin-bottom: 10px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--primary-soft);
 }
 
-.invoice-setting label {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--text-secondary);
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.invoice-setting input,
-.invoice-setting select {
-  width: 100%;
-  height: 36px;
-  padding: 0 8px;
-  border: 1px solid #ddd4ca;
-  border-radius: 7px;
-  background: #fff;
-  font-size: 12px;
-}
-
-.invoice-paper {
-  width: 100%;
-  margin: 0 auto;
-  padding: 28px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: #fff;
-  box-shadow: 0 3px 15px rgba(70, 52, 35, 0.035);
-}
-
-.invoice-paper.a4 {
-  max-width: 850px;
-}
-
-.invoice-paper.thermal {
-  max-width: 340px;
-  padding: 15px;
-}
-
-.invoice-paper-header {
-  padding-bottom: 14px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid var(--border);
-  text-align: center;
-}
-
-.invoice-paper-header h2 {
-  margin: 0;
-  color: var(--text);
-  font-size: 21px;
-  font-weight: 800;
-}
-
-.invoice-paper-header p {
+.phone-verification-address p {
   margin: 4px 0 0;
   color: var(--text-secondary);
-  font-size: 11px;
-}
-
-.invoice-customer {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
-  margin-bottom: 14px;
-}
-
-.invoice-customer-box {
-  padding: 10px;
-  border-radius: 8px;
-  background: var(--surface-soft);
-}
-
-.invoice-customer-box span {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--text-muted);
-  font-size: 10px;
-}
-
-.invoice-customer-box strong {
-  color: var(--text);
   font-size: 12px;
+  line-height: 1.5;
 }
 
-.invoice-products {
-  width: 100%;
-  border-collapse: collapse;
+.phone-verification-whatsapp {
+  background: #e7f6e7 !important;
+  color: #1c7a3f !important;
+  border-color: #bfe3c8 !important;
 }
 
-.invoice-products th,
-.invoice-products td {
-  padding: 8px;
-  border-bottom: 1px solid var(--border-light);
-  text-align: left;
-  font-size: 11px;
-}
-
-.invoice-products th {
-  color: var(--text-secondary);
-  font-weight: 700;
-}
-
-.invoice-products td {
-  color: #333;
-}
-
-.invoice-summary {
-  width: 270px;
-  max-width: 100%;
-  margin-top: 14px;
-  margin-left: auto;
-}
-
-.invoice-summary-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 7px 0;
-  border-bottom: 1px solid #f0ebe4;
-  font-size: 12px;
-}
-
-.invoice-summary-row.total {
-  margin-top: 4px;
-  border-bottom: none;
-  font-size: 15px;
-  font-weight: 800;
-}
-
-.invoice-notes {
-  margin-top: 16px;
-  padding: 10px;
-  border-radius: 8px;
-  background: var(--surface-soft);
-}
-
-.invoice-notes h4 {
-  margin: 0 0 4px;
-  font-size: 10px;
-}
-
-.invoice-notes p {
-  margin: 0;
-  color: #555;
-  font-size: 10px;
-  line-height: 1.55;
-}
-
-.invoice-footer {
-  margin-top: 18px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-  color: var(--text-muted);
-  font-size: 9px;
-  text-align: center;
-}
-
-.invoice-edit-table {
-  width: 100%;
-  margin-top: 14px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.invoice-edit-table table {
-  width: 100%;
-  min-width: 620px;
-  border-collapse: collapse;
-}
-
-.invoice-edit-table th,
-.invoice-edit-table td {
-  padding: 7px;
-  border-bottom: 1px solid var(--border-light);
-  font-size: 10px;
-}
-
-.invoice-edit-table input {
-  width: 70px;
-  height: 30px;
-  padding: 0 6px;
-  border: 1px solid #ddd4ca;
-  border-radius: 6px;
-  font-size: 10px;
-}
-
-.invoice-thermal-screen {
-  max-width: 340px;
-  margin: 0 auto;
-}
-
-.invoice-thermal-screen table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.invoice-thermal-screen th,
-.invoice-thermal-screen td {
-  padding: 5px 2px;
-  border-bottom: 1px dashed #ccc;
-  font-size: 10px;
-  text-align: left;
-}
-
-.invoice-preview-modal {
-  width: 100%;
-  max-width: 900px;
-  max-height: 92vh;
-  max-height: 92dvh;
-  overflow-y: auto;
-  padding: 16px;
-  border-radius: 12px;
-  background: #f1ece5;
-}
-
-.invoice-preview-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 9px;
-  margin-bottom: 13px;
-}
-
-.invoice-preview-header h2 {
-  margin: 0;
-  font-size: 19px;
-}
-
-.invoice-preview-body {
-  display: flex;
-  justify-content: center;
-  overflow-x: auto;
-  padding: 13px;
-}
-
-.invoice-preview-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 7px;
-  margin-top: 11px;
+.phone-verification-complete {
+  background: var(--text) !important;
+  color: #fff !important;
 }
 
 /* ============================================================
    LOGIN
-   Compact login
 ============================================================ */
 
 .login-page {
@@ -3549,66 +2838,57 @@ button:disabled {
   background: var(--bg);
 }
 
-.login-container {
-  width: 100%;
-  max-width: 330px;
-  min-width: 0;
-  margin: 0 auto;
-}
-
 .login-card {
-  width: 30vw;
-  max-width: 30vw;
+  width: 100%;
+  max-width: 380px;
   min-width: 0;
-  padding: 20px 21px 22px;
+  padding: 28px 26px 30px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   background: #fff;
-  box-shadow: 0 7px 24px rgba(70, 52, 35, 0.055);
+  box-shadow: 0 7px 24px rgba(70, 52, 35, 0.07);
+  text-align: center;
 }
 
-.login-logo {
-  width: 42px;
-  height: 42px;
+.login-icon {
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 10px;
-  border-radius: 10px;
+  margin: 0 auto 14px;
+  border-radius: 12px;
   background: var(--text);
   color: #fff;
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 20px;
 }
 
-.login-card h1 {
+.login-header h1 {
   margin: 0;
   color: var(--text);
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.2;
   font-weight: 800;
-  text-align: center;
 }
 
-.login-card > p {
-  margin: 5px 0 16px;
+.login-header p {
+  margin: 5px 0 20px;
   color: var(--text-secondary);
-  font-size: 11px;
-  line-height: 1.4;
-  text-align: center;
+  font-size: 13px;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 13px;
   width: 100%;
+  text-align: left;
 }
 
 .login-form-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   width: 100%;
 }
 
@@ -3616,7 +2896,7 @@ button:disabled {
   display: block;
   margin: 0;
   color: #3f3a35;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.2;
   font-weight: 700;
 }
@@ -3624,14 +2904,14 @@ button:disabled {
 .login-form-group input {
   display: block;
   width: 100%;
-  height: 38px;
+  height: 44px;
   margin: 0;
-  padding: 0 10px;
+  padding: 0 12px;
   border: 1px solid var(--border-input);
-  border-radius: 7px;
+  border-radius: 8px;
   background: #fff;
   color: var(--text);
-  font-size: 11px;
+  font-size: 13px;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -3646,13 +2926,13 @@ button:disabled {
 
 .login-button {
   width: 100%;
-  height: 38px;
-  margin: 3px 0 0;
+  height: 44px;
+  margin: 4px 0 0;
   border: 1px solid var(--text);
-  border-radius: 7px;
+  border-radius: 8px;
   background: var(--text);
   color: #fff;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -3666,27 +2946,29 @@ button:disabled {
   transform: translateY(1px);
 }
 
-.login-error,
-.login-success {
-  width: 100%;
-  padding: 8px 9px;
-  border-radius: 7px;
-  font-size: 10px;
-  line-height: 1.4;
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .login-error {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
   border: 1px solid var(--danger-border);
   background: var(--danger-bg);
   color: var(--danger);
+  text-align: left;
 }
 
-.login-success {
-  border: 1px solid var(--success-border);
-  background: var(--success-bg);
-  color: var(--success);
+.login-footer {
+  margin-top: 20px;
+  color: var(--text-muted);
+  font-size: 11px;
 }
-
 
 /* ============================================================
    GENERIC INPUT GROUP
@@ -3764,14 +3046,6 @@ button:disabled {
   .status-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
-  .slideshow-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .phone-verification-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 /* ============================================================
@@ -3791,24 +3065,6 @@ button:disabled {
 
   .admin-layout.sidebar-is-open .sidebar-toggle {
     left: 278px;
-  }
-
-  .products-filters {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .invoice-settings {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .phone-verification-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .login-container {
-    width: 100%;
-    max-width: 330px;
-    min-width: 0;
   }
 }
 
@@ -3845,8 +3101,6 @@ button:disabled {
   .dashboard-header,
   .orders-header,
   .users-header,
-  .products-header,
-  .slideshow-header,
   .management-header,
   .notifications-header,
   .notification-header,
@@ -3861,8 +3115,6 @@ button:disabled {
   .dashboard-header h1,
   .orders-header h1,
   .users-header h1,
-  .products-header h1,
-  .slideshow-header h1,
   .management-header h1,
   .notifications-header h1,
   .notification-header h1,
@@ -3874,8 +3126,6 @@ button:disabled {
   .dashboard-header p,
   .orders-header p,
   .users-header p,
-  .products-header p,
-  .slideshow-header p,
   .management-header p,
   .notifications-header p,
   .notification-header p,
@@ -3884,8 +3134,6 @@ button:disabled {
     font-size: 13px;
   }
 
-  .add-product-button,
-  .add-slide-button,
   .management-add-button {
     width: fit-content;
   }
@@ -3948,18 +3196,6 @@ button:disabled {
     min-width: 120px;
   }
 
-  .products-filters {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .products-filters .search-box {
-    grid-column: 1 / -1;
-  }
-
-  .products-filters select {
-    min-width: 0;
-  }
-
   .management-toolbar {
     flex-wrap: wrap;
   }
@@ -3968,54 +3204,10 @@ button:disabled {
     flex-basis: 100%;
   }
 
-  .slideshow-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .invoice-top-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .invoice-actions {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .invoice-actions > * {
-    flex-shrink: 0;
-  }
-
-  .invoice-settings {
-    grid-template-columns: 1fr;
-  }
-
-  .invoice-paper {
-    padding: 20px;
-  }
-
-  .phone-verification-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
   .notifications-card,
   .notification-card,
   .add-admin-card {
     padding: 18px;
-  }
-
-  .login-container {
-    width: 100%;
-    max-width: 330px;
-    min-width: 0;
-  }
-
-  .login-card {
-    width: min(30vw, 420px);
-    max-width: min(30vw, 420px);
-    padding: 20px 21px 22px;
   }
 }
 
@@ -4036,39 +3228,15 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .products-filters {
-    grid-template-columns: 1fr;
-  }
-
-  .products-filters .search-box {
-    grid-column: auto;
-  }
-
-  .invoice-customer {
-    grid-template-columns: 1fr;
-  }
-
-  .invoice-summary {
-    width: 100%;
-  }
-
-  .phone-verification-grid {
-    grid-template-columns: 1fr;
-  }
-
   .add-admin-form-actions,
   .user-form-actions,
   .edit-user-form-actions,
   .user-edit-form-actions,
-  .management-form-actions,
-  .product-form-actions,
-  .slide-form-actions {
+  .management-form-actions {
     flex-direction: column-reverse;
   }
 
-  .add-admin-cancel-button,
-  .add-admin-submit-button,
-  .add-admin-save-button,
+  .add-admin-submit,
   .user-cancel-button,
   .user-save-button,
   .edit-user-cancel-button,
@@ -4076,11 +3244,7 @@ button:disabled {
   .user-edit-cancel-button,
   .user-edit-save-button,
   .management-cancel-button,
-  .management-save-button,
-  .product-cancel-button,
-  .product-save-button,
-  .slide-cancel-button,
-  .slide-save-button {
+  .management-save-button {
     width: 100%;
   }
 
@@ -4096,16 +3260,8 @@ button:disabled {
     padding: 30px 12px;
   }
 
-  .login-container {
-    width: 100%;
-    max-width: 330px;
-    min-width: 0;
-  }
-
   .login-card {
-    width: calc(100vw - 24px);
-    max-width: 400px;
-    padding: 19px 18px 21px;
+    padding: 24px 20px 26px;
   }
 }
 
@@ -4129,8 +3285,6 @@ button:disabled {
   .dashboard-header h1,
   .orders-header h1,
   .users-header h1,
-  .products-header h1,
-  .slideshow-header h1,
   .management-header h1,
   .notifications-header h1,
   .notification-header h1,
@@ -4142,8 +3296,6 @@ button:disabled {
   .dashboard-header p,
   .orders-header p,
   .users-header p,
-  .products-header p,
-  .slideshow-header p,
   .management-header p,
   .notifications-header p,
   .notification-header p,
@@ -4187,7 +3339,6 @@ button:disabled {
 
   .orders-filters,
   .users-filters,
-  .products-filters,
   .management-toolbar {
     padding: 8px;
   }
@@ -4209,10 +3360,6 @@ button:disabled {
     min-width: 760px;
   }
 
-  .products-table-real {
-    min-width: 950px;
-  }
-
   .management-table {
     min-width: 460px;
   }
@@ -4224,7 +3371,6 @@ button:disabled {
 
   .order-modal-overlay,
   .management-modal-overlay,
-  .invoice-modal-overlay,
   .modal-overlay,
   .user-modal-overlay,
   .edit-user-modal-overlay {
@@ -4234,8 +3380,6 @@ button:disabled {
 
   .order-modal,
   .management-modal,
-  .product-modal,
-  .slide-modal,
   .user-modal,
   .edit-user-modal {
     max-height: calc(100vh - 18px);
@@ -4245,8 +3389,6 @@ button:disabled {
 
   .order-modal-header,
   .management-modal-header,
-  .product-modal-header,
-  .slide-modal-header,
   .user-modal-header,
   .edit-user-modal-header {
     padding: 14px;
@@ -4254,8 +3396,6 @@ button:disabled {
 
   .order-modal-header h2,
   .management-modal-header h2,
-  .product-modal-header h2,
-  .slide-modal-header h2,
   .user-modal-header h2,
   .edit-user-modal-header h2 {
     font-size: 17px;
@@ -4300,81 +3440,30 @@ button:disabled {
     font-size: 13px;
   }
 
-  .invoice-preview-modal {
-    padding: 9px;
-  }
-
-  .invoice-preview-body {
-    padding: 7px;
-  }
-
-  .invoice-paper.a4 {
-    min-width: 650px;
-  }
-
   .login-page {
     align-items: center;
     justify-content: center;
     padding: 22px 10px;
   }
 
-  .login-container {
-    width: 100%;
-    max-width: 330px;
-    min-width: 0;
-  }
-
   .login-card {
-    width: calc(100vw - 20px);
-    max-width: 400px;
-    padding: 18px 16px 20px;
-    border-radius: 11px;
+    padding: 22px 16px 24px;
+    border-radius: 12px;
   }
 
-  .login-logo {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 9px;
+  .login-icon {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 10px;
   }
 
-  .login-card h1 {
+  .login-header h1 {
     font-size: 21px;
   }
 
-  .login-card > p {
-    margin: 5px 0 15px;
-    font-size: 11px;
-  }
-
-  .login-form {
-    gap: 10px;
-  }
-
-  .login-form-group {
-    gap: 5px;
-  }
-
-  .login-form-group label {
-    font-size: 11px;
-  }
-
-  .login-form-group input {
-    height: 38px;
-    font-size: 11px;
-  }
-
-  .login-button {
-    height: 38px;
-    font-size: 11px;
-  }
-
-  .add-admin-page .input-group label {
-    font-size: 13px;
-  }
-
-  .add-admin-page .input-group input {
-    min-height: 44px;
-    font-size: 13px;
+  .login-header p {
+    margin: 5px 0 16px;
+    font-size: 12px;
   }
 }
 
@@ -4445,41 +3534,6 @@ button:disabled {
     padding: 10px;
   }
 
-  .login-page {
-    align-items: center;
-    justify-content: center;
-    padding: 18px 9px;
-  }
-
-  .login-container {
-    width: 100%;
-    max-width: 330px;
-    min-width: 0;
-  }
-
-  .login-card {
-    width: calc(100vw - 18px);
-    max-width: 400px;
-    padding: 17px 13px 19px;
-  }
-
-  .login-card h1 {
-    font-size: 20px;
-  }
-
-  .login-form-group label {
-    font-size: 12px;
-  }
-
-  .login-form-group input {
-    height: 37px;
-    font-size: 11px;
-  }
-
-  .login-button {
-    height: 37px;
-  }
-
   .notifications-card,
   .notification-card {
     padding: 12px;
@@ -4501,9 +3555,6 @@ button:disabled {
   .admin-page,
   .orders-page,
   .users-page,
-  .products-page,
-  .slideshow-page,
-  .invoice-page,
   .management-page,
   .notifications-page,
   .notification-page,
@@ -4516,7 +3567,6 @@ button:disabled {
 
   .orders-filters,
   .users-filters,
-  .products-filters,
   .management-toolbar,
   .notification-form,
   .add-admin-form {
@@ -4539,7 +3589,6 @@ button:disabled {
   }
 
   .management-actions,
-  .product-actions,
   .user-actions,
   .order-actions {
     flex-wrap: wrap;
@@ -4554,21 +3603,11 @@ button:disabled {
   .sidebar-link:hover,
   .sidebar-add-admin:hover,
   .sidebar-logout:hover,
-  .refresh-button:hover,
-  .refresh-orders-button:hover,
-  .orders-refresh-button:hover,
-  .users-refresh-button:hover,
-  .phone-verification-refresh-button:hover,
-  .refresh-phone-verification-button:hover,
-  .phone-refresh-button:hover,
-  .add-product-button:hover,
-  .add-slide-button:hover,
   .management-add-button:hover,
   .view-order-button:hover,
   .orders-table-row:hover,
   .orders-real-table tbody tr:hover,
   .users-table tbody tr:hover,
-  .products-table-real tbody tr:hover,
   .management-table tbody tr:hover {
     transform: none;
   }
@@ -4594,6 +3633,10 @@ button:disabled {
 
 /* ============================================================
    PRINT
+   NOTE: invoice printing is fully self-contained inside
+   Invoice.css (it targets .invoice-page-a4 / .invoice-page-80mm
+   with named @page rules). This block only hides the app chrome
+   (sidebar/toggle) so nothing else bleeds onto the printed page.
 ============================================================ */
 
 @media print {
@@ -4611,8 +3654,7 @@ button:disabled {
 
   .sidebar,
   .sidebar-toggle,
-  .sidebar-overlay,
-  .admin-content > *:not(.invoice-page) {
+  .sidebar-overlay {
     display: none !important;
   }
 
@@ -4621,151 +3663,8 @@ button:disabled {
     margin: 0 !important;
     padding: 0 !important;
   }
-
-  .invoice-page {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .invoice-top-bar,
-  .invoice-actions,
-  .invoice-settings,
-  .invoice-message {
-    display: none !important;
-  }
-
-  .invoice-paper {
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-  }
-
-  .invoice-paper.a4 {
-    width: 210mm !important;
-    min-height: 297mm !important;
-    max-width: none !important;
-    padding: 12mm !important;
-  }
-
-  .invoice-paper.thermal,
-  .invoice-thermal-screen {
-    width: 80mm !important;
-    max-width: 80mm !important;
-    padding: 3mm !important;
-  }
-
-  .invoice-edit-table,
-  .invoice-preview-modal,
-  .invoice-modal-overlay,
-  .invoice-modal {
-    display: none !important;
-  }
 }
 
-/* ============================================================
-   80MM THERMAL PRINT
-============================================================ */
-
-@media print {
-  body.invoice-thermal-print,
-  body.invoice-thermal-print * {
-    max-width: 80mm;
-  }
-
-  body.invoice-thermal-print {
-    width: 80mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #fff !important;
-  }
-
-  body.invoice-thermal-print .invoice-page {
-    width: 80mm !important;
-    max-width: 80mm !important;
-  }
-
-  body.invoice-thermal-print .invoice-paper {
-    width: 80mm !important;
-    max-width: 80mm !important;
-    padding: 3mm !important;
-    margin: 0 !important;
-  }
-
-  body.invoice-thermal-print .invoice-paper-header {
-    padding-bottom: 7px !important;
-    margin-bottom: 7px !important;
-  }
-
-  body.invoice-thermal-print .invoice-paper-header h2 {
-    font-size: 15px !important;
-  }
-
-  body.invoice-thermal-print .invoice-paper-header p {
-    font-size: 8px !important;
-  }
-
-  body.invoice-thermal-print .invoice-customer {
-    display: block !important;
-  }
-
-  body.invoice-thermal-print .invoice-customer-box {
-    margin-bottom: 4px !important;
-    padding: 4px !important;
-  }
-
-  body.invoice-thermal-print .invoice-customer-box span {
-    font-size: 7px !important;
-  }
-
-  body.invoice-thermal-print .invoice-customer-box strong {
-    font-size: 8px !important;
-  }
-
-  body.invoice-thermal-print .invoice-products {
-    width: 100% !important;
-  }
-
-  body.invoice-thermal-print .invoice-products th,
-  body.invoice-thermal-print .invoice-products td {
-    padding: 3px 1px !important;
-    font-size: 7px !important;
-  }
-
-  body.invoice-thermal-print .invoice-summary {
-    width: 100% !important;
-  }
-
-  body.invoice-thermal-print .invoice-summary-row {
-    padding: 3px 0 !important;
-    font-size: 8px !important;
-  }
-
-  body.invoice-thermal-print .invoice-summary-row.total {
-    font-size: 10px !important;
-  }
-
-  body.invoice-thermal-print .invoice-notes {
-    margin-top: 8px !important;
-    padding: 5px !important;
-  }
-
-  body.invoice-thermal-print .invoice-notes h4 {
-    font-size: 7px !important;
-  }
-
-  body.invoice-thermal-print .invoice-notes p {
-    font-size: 7px !important;
-  }
-
-  body.invoice-thermal-print .invoice-footer {
-    margin-top: 8px !important;
-    padding-top: 5px !important;
-    font-size: 6px !important;
-  }
-}
 /* ============================================================
    GLOBAL REFRESH ICON
    Any button whose class contains "refresh" gets the same
@@ -4822,4 +3721,3 @@ button[class*="refresh"]:active,
 button[class*="Refresh"]:active {
   transform: scale(0.94) !important;
 }
-

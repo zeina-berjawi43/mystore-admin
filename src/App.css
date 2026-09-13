@@ -116,7 +116,7 @@ select:disabled {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #cfc6bc transparent;
+  scrollbar-color: var(--text-muted) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -129,12 +129,12 @@ select:disabled {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cfc6bc;
+  background: var(--text-muted);
   border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #b9aea2;
+  background: var(--text-muted);
 }
 
 /* ============================================================
@@ -181,7 +181,7 @@ select:disabled {
   display: flex;
   flex-direction: column;
   background: var(--sidebar);
-  color: #fff;
+  color: var(--surface);
   transform: translateX(-100%);
   transition: transform 0.25s ease;
   overflow: hidden;
@@ -211,7 +211,7 @@ select:disabled {
   align-items: center;
   justify-content: center;
   border-radius: 11px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 19px;
   font-weight: 800;
@@ -224,7 +224,7 @@ select:disabled {
 
 .sidebar-logo-text h2 {
   margin: 0;
-  color: #fff;
+  color: var(--surface);
   font-size: 21px;
   line-height: 1.05;
   font-weight: 800;
@@ -234,7 +234,7 @@ select:disabled {
 .sidebar-logo-text span {
   display: block;
   margin-top: 5px;
-  color: #999;
+  color: var(--text-muted);
   font-size: 12px;
   line-height: 1.2;
   white-space: nowrap;
@@ -250,7 +250,7 @@ select:disabled {
 
 .sidebar-section-title {
   margin: 3px 10px 10px;
-  color: #747474;
+  color: var(--text-secondary);
   font-size: 11px;
   line-height: 1.2;
   font-weight: 700;
@@ -269,7 +269,7 @@ select:disabled {
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: #aaa;
+  color: var(--text-muted);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
@@ -279,12 +279,12 @@ select:disabled {
 
 .sidebar-link:hover {
   background: var(--sidebar-hover);
-  color: #fff;
+  color: var(--surface);
   transform: translateX(2px);
 }
 
 .sidebar-link.active {
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
 }
 
@@ -327,7 +327,7 @@ select:disabled {
   border: 0;
   border-radius: 9px;
   background: transparent;
-  color: #aaa;
+  color: var(--text-muted);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -338,7 +338,7 @@ select:disabled {
 .sidebar-add-admin:hover,
 .sidebar-logout:hover {
   background: var(--sidebar-hover);
-  color: #fff;
+  color: var(--surface);
 }
 
 .sidebar-add-admin:active,
@@ -359,7 +359,7 @@ select:disabled {
   padding: 0;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 20px;
   cursor: pointer;
@@ -368,7 +368,7 @@ select:disabled {
 }
 
 .sidebar-toggle:hover {
-  background: #f3eee7;
+  background: var(--surface-warm);
 }
 
 .sidebar-toggle:active {
@@ -504,7 +504,7 @@ a:focus-visible {
   border: 1px solid var(--text);
   border-radius: 8px;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -546,7 +546,7 @@ button:disabled {
   padding: 0 !important;
   border: 1px solid var(--border-input) !important;
   border-radius: 9px !important;
-  background: #fff !important;
+  background: var(--surface) !important;
   color: var(--text) !important;
   font-size: 0 !important;
   line-height: 1 !important;
@@ -683,7 +683,7 @@ button:disabled {
   padding: 14px;
   border: 1px solid transparent;
   border-radius: 9px;
-  background: #f8f4ee;
+  background: var(--surface-warm);
 }
 
 .status-card span {
@@ -704,7 +704,7 @@ button:disabled {
 
 .empty-box {
   padding: 30px 18px;
-  border: 1px dashed #ddd1c3;
+  border: 1px dashed var(--border);
   border-radius: 9px;
   background: var(--surface-soft);
   color: var(--text-secondary);
@@ -730,7 +730,7 @@ button:disabled {
   width: 38px;
   height: 38px;
   margin-bottom: 11px;
-  border: 3px solid #e4dbd0;
+  border: 3px solid var(--border);
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: bstore-spin 0.75s linear infinite;
@@ -780,7 +780,7 @@ button:disabled {
   border: 1px solid var(--text);
   border-radius: 8px;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -823,8 +823,8 @@ button:disabled {
 
 .table-row {
   padding: 12px 11px;
-  border-bottom: 1px solid #f0ebe4;
-  color: #333;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text);
   font-size: 13px;
 }
 
@@ -873,7 +873,7 @@ button:disabled {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: #f6f1ea;
+  background: var(--surface-soft);
   font-size: 17px;
 }
 
@@ -907,8 +907,8 @@ button:disabled {
 
 .orders-table-row {
   padding: 12px 11px;
-  border-bottom: 1px solid #f0ebe4;
-  color: #333;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text);
   font-size: 13px;
   cursor: pointer;
   transition: background 0.16s ease, box-shadow 0.16s ease;
@@ -919,11 +919,11 @@ button:disabled {
 }
 
 .orders-table-row:hover {
-  background: #fcf9f5;
+  background: var(--surface-soft);
 }
 
 .orders-table-row.selected {
-  background: #fff7f3;
+  background: var(--primary-soft);
   box-shadow: inset 3px 0 0 var(--primary);
 }
 
@@ -967,7 +967,7 @@ button:disabled {
   justify-content: center;
   border-radius: 50%;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 12px;
   font-weight: 700;
 }
@@ -1036,17 +1036,17 @@ button:disabled {
 }
 
 .order-status.shipped {
-  background: #e6f6ee;
+  background: var(--success-bg);
   color: var(--success);
 }
 
 .order-status.delivered {
-  background: #e7f6e7;
+  background: var(--success-bg);
   color: #28733b;
 }
 
 .order-status.cancelled {
-  background: #ffe8e8;
+  background: var(--danger-bg);
   color: var(--danger);
 }
 
@@ -1059,7 +1059,7 @@ button:disabled {
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fcfaf7;
+  background: var(--surface-soft);
 }
 
 .selected-order-header {
@@ -1087,10 +1087,10 @@ button:disabled {
   flex-shrink: 0;
   min-height: 34px;
   padding: 0 11px;
-  border: 1px solid #ddd3c7;
+  border: 1px solid var(--border-input);
   border-radius: 7px;
-  background: #fff;
-  color: #555;
+  background: var(--surface);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -1106,7 +1106,7 @@ button:disabled {
   align-items: center;
   gap: 11px;
   padding-bottom: 14px;
-  border-bottom: 1px solid #ebe3d9;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .selected-order-customer > div:last-child {
@@ -1138,9 +1138,9 @@ button:disabled {
   flex-direction: column;
   gap: 5px;
   padding: 12px;
-  border: 1px solid #eee5db;
+  border: 1px solid var(--border-light);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .selected-order-summary span {
@@ -1179,7 +1179,7 @@ button:disabled {
 .empty-order-products {
   padding: 14px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text-muted);
   font-size: 12px;
   text-align: center;
@@ -1197,9 +1197,9 @@ button:disabled {
   justify-content: space-between;
   gap: 12px;
   padding: 10px;
-  border: 1px solid #eee5db;
+  border: 1px solid var(--border-light);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .order-product-info {
@@ -1237,7 +1237,7 @@ button:disabled {
   align-items: center;
   justify-content: center;
   border-radius: 7px;
-  background: #f6f1ea;
+  background: var(--surface-soft);
   font-size: 15px;
 }
 
@@ -1262,7 +1262,7 @@ button:disabled {
   padding: 11px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1277,7 +1277,7 @@ button:disabled {
   padding: 0 11px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -1310,7 +1310,7 @@ button:disabled {
 .orders-search input::placeholder,
 .users-search input::placeholder,
 .management-search input::placeholder {
-  color: #aaa;
+  color: var(--text-muted);
 }
 
 .orders-date-filter,
@@ -1321,8 +1321,8 @@ button:disabled {
   padding: 0 11px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
-  color: #333;
+  background: var(--surface);
+  color: var(--text);
   font-size: 13px;
   cursor: pointer;
 }
@@ -1342,7 +1342,7 @@ button:disabled {
   padding: 0 13px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 700;
@@ -1353,7 +1353,7 @@ button:disabled {
 .users-clear-button:hover,
 .management-clear-button:hover {
   background: var(--surface-warm);
-  border-color: #cfc2b4;
+  border-color: var(--border);
   color: var(--text);
 }
 
@@ -1408,7 +1408,7 @@ button:disabled {
   overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
   -webkit-overflow-scrolling: touch;
 }
@@ -1459,8 +1459,8 @@ button:disabled {
 .users-table td,
 .management-table td {
   padding: 13px;
-  border-bottom: 1px solid #f1ece6;
-  color: #333;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text);
   font-size: 13px;
   vertical-align: middle;
 }
@@ -1474,7 +1474,7 @@ button:disabled {
 .orders-real-table tbody tr:hover,
 .users-table tbody tr:hover,
 .management-table tbody tr:hover {
-  background: #fdfaf6;
+  background: var(--surface-soft);
 }
 
 /* ============================================================
@@ -1499,7 +1499,7 @@ button:disabled {
   justify-content: center;
   border-radius: 50%;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 12px;
   font-weight: 700;
 }
@@ -1577,9 +1577,9 @@ button:disabled {
 .view-invoice-button,
 .user-edit-button,
 .management-edit-button {
-  border: 1px solid #dcd3c8;
-  background: #fff;
-  color: #333;
+  border: 1px solid var(--border-input);
+  background: var(--surface);
+  color: var(--text);
 }
 
 .create-invoice-button:hover,
@@ -1588,7 +1588,7 @@ button:disabled {
 .management-edit-button:hover {
   border-color: var(--text);
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
 }
 
 .delete-order-button,
@@ -1604,7 +1604,7 @@ button:disabled {
 .management-delete-button:hover {
   border-color: var(--danger);
   background: var(--danger);
-  color: #fff;
+  color: var(--surface);
 }
 
 /* ============================================================
@@ -1632,7 +1632,7 @@ button:disabled {
   justify-content: center;
   margin-bottom: 9px;
   border-radius: 50%;
-  background: #f7f1e9;
+  background: var(--surface-soft);
   font-size: 20px;
 }
 
@@ -1680,7 +1680,7 @@ button:disabled {
   max-height: 90dvh;
   overflow-y: auto;
   border-radius: 13px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow-lg);
 }
 
@@ -1742,7 +1742,7 @@ button:disabled {
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: #f5f1eb;
+  background: var(--surface-soft);
   color: var(--text);
   font-size: 16px;
   cursor: pointer;
@@ -1752,7 +1752,7 @@ button:disabled {
 .management-modal-close:hover,
 .user-modal-close:hover,
 .edit-user-modal-close:hover {
-  background: #ece4da;
+  background: var(--surface-warm);
 }
 
 /* ============================================================
@@ -1797,7 +1797,7 @@ button:disabled {
 .order-detail-date,
 .shipping-address {
   margin: 0;
-  color: #555;
+  color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.55;
   white-space: pre-wrap;
@@ -1815,7 +1815,7 @@ button:disabled {
   justify-content: space-between;
   gap: 14px;
   padding: 11px 0;
-  border-bottom: 1px solid #f0ebe4;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .order-detail-product:last-child {
@@ -1873,24 +1873,24 @@ button:disabled {
 .status-change-button {
   min-height: 34px;
   padding: 0 10px;
-  border: 1px solid #ddd4ca;
+  border: 1px solid var(--border-input);
   border-radius: 7px;
-  background: #fff;
-  color: #555;
+  background: var(--surface);
+  color: var(--text-secondary);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .status-change-button:hover {
-  border-color: #bdb1a4;
-  background: #f8f3ed;
+  border-color: var(--text-muted);
+  background: var(--surface-warm);
 }
 
 .status-change-button.active {
   border-color: var(--text);
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
 }
 
 .status-change-button.pending.active {
@@ -1933,9 +1933,9 @@ button:disabled {
 .close-order-button {
   min-height: 38px;
   padding: 0 14px;
-  border: 1px solid #ddd4ca;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 12px;
   font-weight: 700;
@@ -1943,7 +1943,7 @@ button:disabled {
 }
 
 .close-order-button:hover {
-  background: #f7f2ec;
+  background: var(--surface-soft);
 }
 
 /* ============================================================
@@ -1973,7 +1973,7 @@ button:disabled {
 }
 
 .user-role.admin {
-  background: #f0eee9;
+  background: var(--surface-soft);
   color: var(--text);
 }
 
@@ -2008,7 +2008,7 @@ button:disabled {
 .edit-user-form-group label,
 .user-edit-form-group label {
   display: block;
-  color: #3f3a35;
+  color: var(--text);
   font-size: 13px;
   line-height: 1.25;
   font-weight: 700;
@@ -2028,7 +2028,7 @@ button:disabled {
   padding: 10px 11px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 13px;
 }
@@ -2049,7 +2049,7 @@ button:disabled {
 .user-form-group input::placeholder,
 .edit-user-form-group input::placeholder,
 .user-edit-form-group input::placeholder {
-  color: #aaa;
+  color: var(--text-muted);
 }
 
 .user-form-actions,
@@ -2066,10 +2066,10 @@ button:disabled {
 .user-edit-cancel-button {
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid #ddd4ca;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
-  color: #555;
+  background: var(--surface);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -2083,7 +2083,7 @@ button:disabled {
   border: 1px solid var(--text);
   border-radius: 8px;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -2099,7 +2099,7 @@ button:disabled {
 .user-cancel-button:hover,
 .edit-user-cancel-button:hover,
 .user-edit-cancel-button:hover {
-  background: #f7f2ec;
+  background: var(--surface-soft);
 }
 
 /* ============================================================
@@ -2118,7 +2118,7 @@ button:disabled {
 }
 
 .management-form-group label {
-  color: #4c4741;
+  color: var(--text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -2131,7 +2131,7 @@ button:disabled {
   padding: 10px 11px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 13px;
 }
@@ -2153,10 +2153,10 @@ button:disabled {
 .management-cancel-button {
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid #ddd4ca;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
-  color: #555;
+  background: var(--surface);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -2168,14 +2168,14 @@ button:disabled {
   border: 1px solid var(--text);
   border-radius: 8px;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .management-cancel-button:hover {
-  background: #f7f2ec;
+  background: var(--surface-soft);
 }
 
 .management-save-button:hover {
@@ -2208,7 +2208,7 @@ button:disabled {
   padding: 11px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
 
@@ -2222,7 +2222,7 @@ button:disabled {
   padding: 0 11px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .management-search input {
@@ -2247,7 +2247,7 @@ button:disabled {
   object-fit: contain;
   border: 1px solid var(--border-light);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .management-empty {
@@ -2324,7 +2324,7 @@ button:disabled {
   padding: 22px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
 
@@ -2340,7 +2340,7 @@ button:disabled {
 .notification-field label {
   display: block;
   margin-bottom: 7px;
-  color: #3f3a35;
+  color: var(--text);
   font-size: 14px;
   line-height: 1.3;
   font-weight: 700;
@@ -2361,7 +2361,7 @@ button:disabled {
   padding: 10px 12px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 14px;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
@@ -2381,7 +2381,7 @@ button:disabled {
 
 .notification-field input::placeholder,
 .notification-field textarea::placeholder {
-  color: #aaa;
+  color: var(--text-muted);
 }
 
 .notification-send-button,
@@ -2393,7 +2393,7 @@ button:disabled {
   border: 1px solid var(--text);
   border-radius: 8px;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -2448,7 +2448,7 @@ button:disabled {
   padding: 22px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
 
@@ -2465,7 +2465,7 @@ button:disabled {
 }
 
 .add-admin-form-group label {
-  color: #3f3a35;
+  color: var(--text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -2478,7 +2478,7 @@ button:disabled {
   padding: 10px 11px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 13px;
 }
@@ -2517,7 +2517,7 @@ button:disabled {
   border: 1px solid var(--text);
   border-radius: 8px;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -2578,7 +2578,7 @@ button:disabled {
   width: 38px;
   height: 38px;
   margin-bottom: 11px;
-  border: 3px solid #e4dbd0;
+  border: 3px solid var(--border);
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: bstore-spin 0.75s linear infinite;
@@ -2639,7 +2639,7 @@ button:disabled {
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow-sm);
   margin-bottom: 14px;
 }
@@ -2667,10 +2667,10 @@ button:disabled {
 .phone-verification-actions button {
   min-height: 36px;
   padding: 0 10px;
-  border: 1px solid #ddd4ca;
+  border: 1px solid var(--border-input);
   border-radius: 7px;
-  background: #fff;
-  color: #333;
+  background: var(--surface);
+  color: var(--text);
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -2679,12 +2679,12 @@ button:disabled {
 .phone-verification-actions button:hover {
   border-color: var(--text);
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
 }
 
 .phone-verification-empty {
   padding: 42px 18px;
-  border: 1px dashed #ddd1c3;
+  border: 1px dashed var(--border);
   border-radius: 10px;
   background: var(--surface-soft);
   color: var(--text-muted);
@@ -2701,7 +2701,7 @@ button:disabled {
   justify-content: center;
   border-radius: 50%;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 14px;
   font-weight: 700;
 }
@@ -2813,14 +2813,14 @@ button:disabled {
 }
 
 .phone-verification-whatsapp {
-  background: #e7f6e7 !important;
+  background: var(--success-bg) !important;
   color: #1c7a3f !important;
-  border-color: #bfe3c8 !important;
+  border-color: var(--success-border) !important;
 }
 
 .phone-verification-complete {
   background: var(--text) !important;
-  color: #fff !important;
+  color: var(--surface) !important;
 }
 
 /* ============================================================
@@ -2845,7 +2845,7 @@ button:disabled {
   padding: 28px 26px 30px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 7px 24px rgba(70, 52, 35, 0.07);
   text-align: center;
 }
@@ -2859,7 +2859,7 @@ button:disabled {
   margin: 0 auto 14px;
   border-radius: 12px;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 20px;
 }
 
@@ -2895,7 +2895,7 @@ button:disabled {
 .login-form-group label {
   display: block;
   margin: 0;
-  color: #3f3a35;
+  color: var(--text);
   font-size: 12px;
   line-height: 1.2;
   font-weight: 700;
@@ -2909,7 +2909,7 @@ button:disabled {
   padding: 0 12px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 13px;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
@@ -2921,7 +2921,7 @@ button:disabled {
 }
 
 .login-form-group input::placeholder {
-  color: #aaa;
+  color: var(--text-muted);
 }
 
 .login-button {
@@ -2931,7 +2931,7 @@ button:disabled {
   border: 1px solid var(--text);
   border-radius: 8px;
   background: var(--text);
-  color: #fff;
+  color: var(--surface);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -3007,7 +3007,7 @@ button:disabled {
   max-width: 340px;
   padding: 26px 24px;
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: var(--shadow-lg);
   text-align: center;
 }
@@ -3054,8 +3054,8 @@ button:disabled {
 }
 
 .logout-confirm-cancel {
-  border: 1px solid #ddd4ca;
-  background: #fff;
+  border: 1px solid var(--border-input);
+  background: var(--surface);
   color: var(--text);
 }
 
@@ -3066,7 +3066,7 @@ button:disabled {
 .logout-confirm-submit {
   border: 1px solid var(--danger);
   background: var(--danger);
-  color: #fff;
+  color: var(--surface);
 }
 
 .logout-confirm-submit:hover {
@@ -3087,7 +3087,7 @@ button:disabled {
 }
 
 .input-group label {
-  color: #3f3a35;
+  color: var(--text);
   font-size: 13px;
   font-weight: 700;
 }
@@ -3100,7 +3100,7 @@ button:disabled {
   padding: 10px 11px;
   border: 1px solid var(--border-input);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 13px;
 }
@@ -3749,7 +3749,7 @@ button:disabled {
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    background: #fff !important;
+    background: var(--surface) !important;
   }
 
   body {
@@ -3788,10 +3788,10 @@ button[class*="Refresh"] {
   justify-content: center !important;
   flex-shrink: 0 !important;
   padding: 0 !important;
-  border: 1px solid #cfc8bf !important;
+  border: 1px solid var(--border-input) !important;
   border-radius: 8px !important;
-  background: #ffffff !important;
-  color: #171717 !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
   font-size: 0 !important;
   line-height: 1 !important;
   cursor: pointer !important;
@@ -3802,7 +3802,7 @@ button[class*="refresh"]::before,
 button[class*="Refresh"]::before {
   content: "↻" !important;
   display: block !important;
-  color: #171717 !important;
+  color: var(--text) !important;
   font-size: 22px !important;
   font-weight: 700 !important;
   line-height: 1 !important;
@@ -3811,14 +3811,14 @@ button[class*="Refresh"]::before {
 button[class*="refresh"]:hover,
 button[class*="Refresh"]:hover {
   background: var(--surface-warm) !important;
-  border-color: #171717 !important;
-  color: #171717 !important;
+  border-color: var(--text) !important;
+  color: var(--text) !important;
   transform: none !important;
 }
 
 button[class*="refresh"]:hover::before,
 button[class*="Refresh"]:hover::before {
-  color: #171717 !important;
+  color: var(--text) !important;
 }
 
 button[class*="refresh"]:active,

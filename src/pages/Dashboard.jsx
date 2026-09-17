@@ -1,59 +1,24 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+const API_URL = "https://mystore-backend-u6ey.onrender.com";
 
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { ThemedText } from '@/components/themed-text';
-import AdminMenu from './admin-menu';
-
-const API_URL =
-  'https://mystore-backend-u6ey.onrender.com';
-
-// ============================================================
-// DASHBOARD
-// ============================================================
-
-export default function DashboardScreen() {
-  const router = useRouter();
-
+function Dashboard() {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [error, setError] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   // ============================================================
-  // FETCH DASHBOARD
+  // FETCH DASHBOARD DATA
   // ============================================================
 
-  const fetchDashboard = useCallback(async () => {
+  const fetchDashboard = async () => {
     try {
       setLoading(true);
-      setError('');
-      setSelectedOrderId(null);
+      setError("");
 
-      const token =
-        await AsyncStorage.getItem('accessToken');
-
-      if (!token) {
-        router.replace('/login');
-        return;
-      }
+      const token = localStorage.getItem("accessToken");
 
       const response = await axios.get(
         `${API_URL}/dashboard/statistics`,
@@ -64,164 +29,46 @@ export default function DashboardScreen() {
         }
       );
 
-      console.log(
-        'DASHBOARD RESPONSE:',
-        response.data
-      );
+      console.log("DASHBOARD RESPONSE:", response.data);
 
-      setStatistics(
-        response.data?.statistics || null
-      );
-    } catch (err) {
-      console.log(
-        'DASHBOARD ERROR:',
-        err
-      );
+      setStatistics(response.data.statistics);
+      setSelectedOrderId(null);
+    } catch (error) {
+      console.log("DASHBOARD ERROR:", error);
 
       if (
-        err?.response?.status === 401 ||
-        err?.response?.status === 403
+        error.response?.status === 401 ||
+        error.response?.status === 403
       ) {
-        await AsyncStorage.multiRemove([
-          'accessToken',
-          'refreshToken',
-          'user',
-          'isLoggedIn',
-        ]);
-
-        router.replace('/login');
+        localStorage.clear();
+        window.location.href = "/login";
         return;
       }
 
       setError(
-        err?.response?.data?.message ||
-          'Cannot load dashboard'
+        error.response?.data?.message ||
+          "Cannot load dashboard"
       );
     } finally {
       setLoading(false);
     }
-  }, [router]);
+  };
+
+  // ============================================================
+  // LOAD DATA
+  // ============================================================
 
   useEffect(() => {
     fetchDashboard();
-  }, [fetchDashboard]);
-
-  // ============================================================
-  // CUSTOMER HELPERS
-  // ============================================================
-
-  const getCustomer = (order) => {
-    return order?.user || order?.customer || {};
-  };
-
-  const getCustomerName = (order) => {
-    const customer = getCustomer(order);
-
-    if (
-      typeof customer.name === 'string' &&
-      customer.name.trim()
-    ) {
-      return customer.name.trim();
-    }
-
-    if (
-      typeof order?.customerName === 'string' &&
-      order.customerName.trim()
-    ) {
-      return order.customerName.trim();
-    }
-
-    const firstName =
-      customer.firstName || '';
-
-    const lastName =
-      customer.lastName || '';
-
-    const fullName =
-      `${firstName} ${lastName}`.trim();
-
-    if (fullName) {
-      return fullName;
-    }
-
-    if (customer.phone) {
-      return customer.phone;
-    }
-
-    return 'Unknown User';
-  };
-
-  const getCustomerEmail = (order) => {
-    const customer = getCustomer(order);
-
-    return (
-      customer.email ||
-      ''
-    );
-  };
-
-  const getCustomerPhone = (order) => {
-    const customer = getCustomer(order);
-
-    return (
-      customer.phone ||
-      ''
-    );
-  };
-
-  // ============================================================
-  // ORDER HELPERS
-  // ============================================================
-
-  const getOrderTotal = (order) => {
-    return Number(
-      order?.totalPrice ??
-      order?.totalAmount ??
-      order?.total ??
-      0
-    );
-  };
-
-  const getOrderNumber = (order, index) => {
-    if (order?.orderNumber) {
-      return order.orderNumber;
-    }
-
-    if (order?.orderId) {
-      return order.orderId;
-    }
-
-    if (order?._id) {
-      return String(order._id).slice(-8);
-    }
-
-    return String(index + 1);
-  };
-
-  const getOrderId = (order, index) => {
-    return (
-      order?._id ||
-      order?.orderId ||
-      `order-${index}`
-    );
-  };
-
-  const getItemCount = (order) => {
-    return Array.isArray(order?.items)
-      ? order.items.length
-      : 0;
-  };
+  }, []);
 
   // ============================================================
   // TOGGLE ORDER DETAILS
-  // SAME BEHAVIOR AS WEB ADMIN
   // ============================================================
 
   const toggleOrderDetails = (orderId) => {
     setSelectedOrderId((currentId) =>
-      currentId === orderId
-        ? null
-        : orderId
+      currentId === orderId ? null : orderId
     );
   };
 
@@ -231,20 +78,11 @@ export default function DashboardScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.page}>
-        <View style={styles.centerContainer}>
-          <ActivityIndicator
-            size="large"
-            color="#E35B3F"
-          />
+      <div className="dashboard-loading">
+        <div className="loading-spinner"></div>
 
-          <ThemedText
-            style={styles.loadingText}
-          >
-            Loading dashboard...
-          </ThemedText>
-        </View>
-      </SafeAreaView>
+        <p>Loading dashboard...</p>
+      </div>
     );
   }
 
@@ -254,34 +92,15 @@ export default function DashboardScreen() {
 
   if (error) {
     return (
-      <SafeAreaView style={styles.page}>
-        <View style={styles.centerContainer}>
-          <View style={styles.errorBox}>
-            <ThemedText
-              style={styles.errorTitle}
-            >
-              Something went wrong
-            </ThemedText>
+      <div className="dashboard-error">
+        <h2>Something went wrong</h2>
 
-            <ThemedText
-              style={styles.errorMessage}
-            >
-              {error}
-            </ThemedText>
-          </View>
+        <p>{error}</p>
 
-          <Pressable
-            style={styles.tryAgainButton}
-            onPress={fetchDashboard}
-          >
-            <ThemedText
-              style={styles.tryAgainText}
-            >
-              Try Again
-            </ThemedText>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+        <button onClick={fetchDashboard}>
+          Try Again
+        </button>
+      </div>
     );
   }
 
@@ -290,16 +109,12 @@ export default function DashboardScreen() {
   // ============================================================
 
   if (!statistics) {
-    return (
-      <SafeAreaView style={styles.page}>
-        <View style={styles.centerContainer}>
-          <ThemedText>
-            No dashboard data available.
-          </ThemedText>
-        </View>
-      </SafeAreaView>
-    );
+    return null;
   }
+
+  // ============================================================
+  // STATISTICS
+  // ============================================================
 
   const {
     totalSales = 0,
@@ -312,2145 +127,792 @@ export default function DashboardScreen() {
   } = statistics;
 
   // ============================================================
-  // SELECTED ORDER
-  // ============================================================
-
-  const selectedOrder =
-    selectedOrderId
-      ? recentOrders.find(
-          (order, index) =>
-            getOrderId(order, index) ===
-            selectedOrderId
-        )
-      : null;
-
-  // ============================================================
-  // RENDER
+  // RETURN
   // ============================================================
 
   return (
-    <SafeAreaView style={styles.page}>
-      <View style={styles.mainContainer}>
+    <div className="dashboard-page">
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.content}
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
+
+      <div className="dashboard-header">
+
+        <div>
+          <h1>
+            Admin Dashboard
+          </h1>
+
+          <p>
+            Overview of your store
+          </p>
+        </div>
+
+        <button
+          type="button"
+          className="refresh-button"
+          onClick={fetchDashboard}
         >
+          ↻ Refresh
+        </button>
 
-          {/* ==================================================
-              HEADER
-          ================================================== */}
+      </div>
 
-          <View style={styles.header}>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.menuButton,
-                pressed &&
-                  styles.menuButtonPressed,
-              ]}
-              onPress={() =>
-                setMenuVisible(true)
-              }
-            >
-              <ThemedText
-                style={styles.menuButtonText}
-              >
-                ☰
-              </ThemedText>
-            </Pressable>
+      {/* ======================================================
+          MAIN STATISTICS
+      ====================================================== */}
 
-            <View style={styles.headerText}>
-              <ThemedText
-                style={styles.headerTitle}
-              >
-                Admin Dashboard
-              </ThemedText>
+      <div className="stats-grid">
 
-              <ThemedText
-                style={styles.headerSubtitle}
-              >
-                Overview of your store
-              </ThemedText>
-            </View>
+        {/* TOTAL SALES */}
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.refreshButton,
-                pressed &&
-                  styles.refreshPressed,
-              ]}
-              onPress={fetchDashboard}
-            >
-              <ThemedText
-                style={styles.refreshText}
-              >
-                ↻ Refresh
-              </ThemedText>
-            </Pressable>
+        <div className="stat-card">
 
-          </View>
+          <div className="stat-icon">
+            💰
+          </div>
 
-          {/* ==================================================
-              MAIN STATISTICS
-          ================================================== */}
+          <div>
+            <p>Total Sales</p>
 
-          <View style={styles.statsGrid}>
+            <h2>
+              ${Number(totalSales).toFixed(2)}
+            </h2>
+          </div>
 
-            <StatCard
-              icon="💰"
-              title="Total Sales"
-              value={`$${Number(
-                totalSales
-              ).toFixed(2)}`}
-            />
+        </div>
 
-            <StatCard
-              icon="📦"
-              title="Total Orders"
-              value={String(totalOrders)}
-            />
 
-            <StatCard
-              icon="👥"
-              title="Total Users"
-              value={String(totalUsers)}
-            />
+        {/* TOTAL ORDERS */}
 
-            <StatCard
-              icon="🛍️"
-              title="Total Products"
-              value={String(totalProducts)}
-            />
+        <div className="stat-card">
 
-          </View>
+          <div className="stat-icon">
+            📦
+          </div>
 
-          {/* ==================================================
-              ORDERS BY STATUS
-          ================================================== */}
+          <div>
+            <p>Total Orders</p>
 
-          <DashboardSection
-            title="Orders by Status"
-            subtitle="Current order distribution"
-          >
+            <h2>
+              {totalOrders}
+            </h2>
+          </div>
 
-            <View style={styles.statusGrid}>
+        </div>
 
-              <StatusCard
-                title="Pending"
-                value={
-                  ordersByStatus.pending || 0
-                }
-                type="pending"
-              />
 
-              <StatusCard
-                title="Confirmed"
-                value={
-                  ordersByStatus.confirmed || 0
-                }
-                type="confirmed"
-              />
+        {/* TOTAL USERS */}
 
-              <StatusCard
-                title="Preparing"
-                value={
-                  ordersByStatus.preparing || 0
-                }
-                type="preparing"
-              />
+        <div className="stat-card">
 
-              <StatusCard
-                title="Shipped"
-                value={
-                  ordersByStatus.shipped || 0
-                }
-                type="shipped"
-              />
+          <div className="stat-icon">
+            👥
+          </div>
 
-              <StatusCard
-                title="Delivered"
-                value={
-                  ordersByStatus.delivered || 0
-                }
-                type="delivered"
-              />
+          <div>
+            <p>Total Users</p>
 
-              <StatusCard
-                title="Cancelled"
-                value={
-                  ordersByStatus.cancelled || 0
-                }
-                type="cancelled"
-              />
+            <h2>
+              {totalUsers}
+            </h2>
+          </div>
 
-            </View>
+        </div>
 
-          </DashboardSection>
 
-          {/* ==================================================
-              TOP SELLING PRODUCTS
-          ================================================== */}
+        {/* TOTAL PRODUCTS */}
 
-          <DashboardSection
-            title="🔥 Top Selling Products"
-            subtitle="Best performing products"
-          >
+        <div className="stat-card">
 
-            {topSellingProducts.length === 0 ? (
+          <div className="stat-icon">
+            🛍️
+          </div>
 
-              <View style={styles.emptyBox}>
-                <ThemedText
-                  style={styles.emptyText}
+          <div>
+            <p>Total Products</p>
+
+            <h2>
+              {totalProducts}
+            </h2>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ======================================================
+          ORDERS BY STATUS
+      ====================================================== */}
+
+      <section className="dashboard-section">
+
+        <div className="section-header">
+
+          <div>
+            <h2>
+              Orders by Status
+            </h2>
+
+            <p>
+              Current order distribution
+            </p>
+          </div>
+
+        </div>
+
+
+        <div className="status-grid">
+
+          <div className="status-card pending">
+            <span>Pending</span>
+
+            <strong>
+              {ordersByStatus.pending || 0}
+            </strong>
+          </div>
+
+
+          <div className="status-card confirmed">
+            <span>Confirmed</span>
+
+            <strong>
+              {ordersByStatus.confirmed || 0}
+            </strong>
+          </div>
+
+
+          <div className="status-card preparing">
+            <span>Preparing</span>
+
+            <strong>
+              {ordersByStatus.preparing || 0}
+            </strong>
+          </div>
+
+
+          <div className="status-card shipped">
+            <span>Shipped</span>
+
+            <strong>
+              {ordersByStatus.shipped || 0}
+            </strong>
+          </div>
+
+
+          <div className="status-card delivered">
+            <span>Delivered</span>
+
+            <strong>
+              {ordersByStatus.delivered || 0}
+            </strong>
+          </div>
+
+
+          <div className="status-card cancelled">
+            <span>Cancelled</span>
+
+            <strong>
+              {ordersByStatus.cancelled || 0}
+            </strong>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* ======================================================
+          TOP SELLING PRODUCTS
+      ====================================================== */}
+
+      <section className="dashboard-section">
+
+        <div className="section-header">
+
+          <div>
+            <h2>
+              🔥 Top Selling Products
+            </h2>
+
+            <p>
+              Best performing products
+            </p>
+          </div>
+
+        </div>
+
+
+        {topSellingProducts.length === 0 ? (
+
+          <div className="empty-box">
+            No sales yet.
+          </div>
+
+        ) : (
+
+          <div className="products-table">
+
+            {/* TABLE HEADER */}
+
+            <div className="table-header">
+
+              <span>
+                Product
+              </span>
+
+              <span>
+                Price
+              </span>
+
+              <span>
+                Sold
+              </span>
+
+              <span>
+                Revenue
+              </span>
+
+            </div>
+
+
+            {/* TABLE ROWS */}
+
+            {topSellingProducts.map(
+              (product, index) => (
+
+                <div
+                  className="table-row"
+                  key={
+                    product.productId ||
+                    product._id ||
+                    index
+                  }
                 >
-                  No sales yet.
-                </ThemedText>
-              </View>
 
-            ) : (
+                  {/* PRODUCT */}
 
-              <View style={styles.productsTable}>
+                  <div className="product-info">
 
-                <View style={styles.tableHeader}>
+                    <span className="rank">
+                      #{index + 1}
+                    </span>
 
-                  <ThemedText
-                    style={[
-                      styles.tableHeaderText,
-                      styles.productColumn,
-                    ]}
-                  >
-                    Product
-                  </ThemedText>
+                    <div className="product-image-placeholder">
+                      🛍️
+                    </div>
 
-                  <ThemedText
-                    style={[
-                      styles.tableHeaderText,
-                      styles.priceColumn,
-                    ]}
-                  >
-                    Price
-                  </ThemedText>
+                    <div>
 
-                  <ThemedText
-                    style={[
-                      styles.tableHeaderText,
-                      styles.soldColumn,
-                    ]}
-                  >
-                    Sold
-                  </ThemedText>
+                      <strong>
+                        {product.name}
+                      </strong>
 
-                  <ThemedText
-                    style={[
-                      styles.tableHeaderText,
-                      styles.revenueColumn,
-                    ]}
-                  >
-                    Revenue
-                  </ThemedText>
+                      <small>
+                        {product.category || ""}
+                      </small>
 
-                </View>
+                    </div>
 
-                {topSellingProducts.map(
-                  (product, index) => (
+                  </div>
 
-                    <View
-                      key={
-                        product?.productId ||
-                        product?._id ||
-                        String(index)
-                      }
-                      style={styles.tableRow}
-                    >
 
-                      <View
-                        style={[
-                          styles.productInfo,
-                          styles.productColumn,
-                        ]}
-                      >
+                  {/* PRICE */}
 
-                        <ThemedText
-                          style={styles.rank}
-                        >
-                          #{index + 1}
-                        </ThemedText>
+                  <span>
+                    $
+                    {Number(
+                      product.price || 0
+                    ).toFixed(2)}
+                  </span>
 
-                        <View
-                          style={styles.productIcon}
-                        >
-                          <ThemedText>
-                            🛍️
-                          </ThemedText>
-                        </View>
 
-                        <View
-                          style={styles.productText}
-                        >
-                          <ThemedText
-                            numberOfLines={1}
-                            style={styles.productName}
-                          >
-                            {product?.name || ''}
-                          </ThemedText>
+                  {/* SOLD */}
 
-                          <ThemedText
-                            numberOfLines={1}
-                            style={styles.productCategory}
-                          >
-                            {product?.category || ''}
-                          </ThemedText>
-                        </View>
+                  <span>
+                    {product.totalQuantitySold || 0}
+                  </span>
 
-                      </View>
 
-                      <ThemedText
-                        style={[
-                          styles.tableValue,
-                          styles.priceColumn,
-                        ]}
-                      >
-                        $
-                        {Number(
-                          product?.price || 0
-                        ).toFixed(2)}
-                      </ThemedText>
+                  {/* REVENUE */}
 
-                      <ThemedText
-                        style={[
-                          styles.tableValue,
-                          styles.soldColumn,
-                        ]}
-                      >
-                        {product?.totalQuantitySold || 0}
-                      </ThemedText>
+                  <strong>
+                    $
+                    {Number(
+                      product.totalRevenue || 0
+                    ).toFixed(2)}
+                  </strong>
 
-                      <ThemedText
-                        style={[
-                          styles.tableValueStrong,
-                          styles.revenueColumn,
-                        ]}
-                      >
-                        $
-                        {Number(
-                          product?.totalRevenue || 0
-                        ).toFixed(2)}
-                      </ThemedText>
+                </div>
 
-                    </View>
-                  )
-                )}
-
-              </View>
+              )
             )}
 
-          </DashboardSection>
+          </div>
 
-          {/* ==================================================
-              RECENT ORDERS
-          ================================================== */}
+        )}
 
-          <DashboardSection
-            title="🕐 Recent Orders"
-            subtitle="Select an order to view its products and details"
-          >
+      </section>
 
-            {recentOrders.length === 0 ? (
 
-              <View style={styles.emptyBox}>
-                <ThemedText
-                  style={styles.emptyText}
-                >
-                  No orders found.
-                </ThemedText>
-              </View>
+      {/* ======================================================
+          RECENT ORDERS
+      ====================================================== */}
 
-            ) : (
+      <section className="dashboard-section">
 
-              <View
-                style={styles.recentOrdersContainer}
-              >
+        <div className="section-header">
 
-                {/* ==================================================
-                    ORDERS TABLE
-                ================================================== */}
+          <div>
+            <h2>
+              🕐 Recent Orders
+            </h2>
 
-                <View style={styles.ordersTable}>
+            <p>
+              Select an order to view its products and details
+            </p>
+          </div>
 
-                  <View
-                    style={styles.ordersTableHeader}
-                  >
+        </div>
 
-                    <ThemedText
-                      style={[
-                        styles.ordersHeaderText,
-                        styles.customerColumn,
-                      ]}
-                    >
-                      Customer
-                    </ThemedText>
 
-                    <ThemedText
-                      style={[
-                        styles.ordersHeaderText,
-                        styles.orderColumn,
-                      ]}
-                    >
-                      Order
-                    </ThemedText>
+        {recentOrders.length === 0 ? (
 
-                    <ThemedText
-                      style={[
-                        styles.ordersHeaderText,
-                        styles.totalColumn,
-                      ]}
-                    >
-                      Total
-                    </ThemedText>
+          <div className="empty-box">
+            No orders found.
+          </div>
 
-                    <ThemedText
-                      style={[
-                        styles.ordersHeaderText,
-                        styles.statusColumn,
-                      ]}
-                    >
-                      Status
-                    </ThemedText>
+        ) : (
 
-                    <ThemedText
-                      style={[
-                        styles.ordersHeaderText,
-                        styles.dateColumn,
-                      ]}
-                    >
-                      Date
-                    </ThemedText>
+          <div className="recent-orders-container">
 
-                  </View>
+            {/* ==================================================
+                COMPACT ORDER LIST
+            ================================================== */}
 
-                  {/* ORDERS */}
+            <div className="orders-table">
 
-                  {recentOrders.map(
-                    (order, index) => {
+              {/* TABLE HEADER */}
 
-                      const orderId =
-                        getOrderId(
-                          order,
-                          index
-                        );
+              <div className="orders-table-header">
 
-                      const isSelected =
-                        selectedOrderId ===
-                        orderId;
+                <span>
+                  Customer
+                </span>
 
-                      const customerName =
-                        getCustomerName(
-                          order
-                        );
+                <span>
+                  Order
+                </span>
 
-                      const customerEmail =
-                        getCustomerEmail(
-                          order
-                        );
+                <span>
+                  Total
+                </span>
 
-                      const total =
-                        getOrderTotal(
-                          order
-                        );
+                <span>
+                  Status
+                </span>
 
-                      const itemCount =
-                        getItemCount(
-                          order
-                        );
+                <span>
+                  Date
+                </span>
 
-                      return (
-                        <Pressable
-                          key={orderId}
-                          accessibilityRole="button"
-                          onPress={() =>
-                            toggleOrderDetails(
-                              orderId
-                            )
-                          }
-                          style={({ pressed }) => [
-                            styles.ordersTableRow,
+              </div>
 
-                            isSelected &&
-                              styles.ordersTableRowSelected,
 
-                            pressed &&
-                              styles.ordersTableRowPressed,
-                          ]}
-                        >
+              {/* ORDERS */}
 
-                          {/* CUSTOMER */}
+              {recentOrders.map(
+                (order, index) => {
 
-                          <View
-                            style={[
-                              styles.customerInfo,
-                              styles.customerColumn,
-                            ]}
-                          >
+                  const orderId =
+                    order._id || `order-${index}`;
 
-                            <View
-                              style={
-                                styles.customerAvatar
-                              }
-                            >
-                              <ThemedText
-                                style={
-                                  styles.customerAvatarText
-                                }
-                              >
-                                {customerName
-                                  .charAt(0)
-                                  .toUpperCase() ||
-                                  'U'}
-                              </ThemedText>
-                            </View>
+                  const isSelected =
+                    selectedOrderId === orderId;
 
-                            <View
-                              style={
-                                styles.customerText
-                              }
-                            >
-
-                              <ThemedText
-                                numberOfLines={1}
-                                style={
-                                  styles.customerNameText
-                                }
-                              >
-                                {customerName}
-                              </ThemedText>
-
-                              {customerEmail ? (
-                                <ThemedText
-                                  numberOfLines={1}
-                                  style={
-                                    styles.customerEmailText
-                                  }
-                                >
-                                  {customerEmail}
-                                </ThemedText>
-                              ) : null}
-
-                            </View>
-
-                          </View>
-
-                          {/* ORDER */}
-
-                          <View
-                            style={[
-                              styles.orderNumberInfo,
-                              styles.orderColumn,
-                            ]}
-                          >
-
-                            <ThemedText
-                              style={
-                                styles.orderNumberText
-                              }
-                            >
-                              #
-                              {String(
-                                order?._id ||
-                                order?.orderNumber ||
-                                order?.orderId ||
-                                index + 1
-                              ).slice(-8)}
-                            </ThemedText>
-
-                            <ThemedText
-                              style={
-                                styles.orderItemsText
-                              }
-                            >
-                              {itemCount}{' '}
-                              {itemCount === 1
-                                ? 'item'
-                                : 'items'}
-                            </ThemedText>
-
-                          </View>
-
-                          {/* TOTAL */}
-
-                          <ThemedText
-                            style={[
-                              styles.orderTotal,
-                              styles.totalColumn,
-                            ]}
-                          >
-                            $
-                            {total.toFixed(2)}
-                          </ThemedText>
-
-                          {/* STATUS */}
-
-                          <View
-                            style={[
-                              styles.statusColumn,
-                              styles.statusCell,
-                            ]}
-                          >
-                            <StatusBadge
-                              status={
-                                order?.status ||
-                                'Unknown'
-                              }
-                            />
-                          </View>
-
-                          {/* DATE */}
-
-                          <ThemedText
-                            style={[
-                              styles.orderDate,
-                              styles.dateColumn,
-                            ]}
-                          >
-                            {order?.createdAt
-                              ? new Date(
-                                  order.createdAt
-                                ).toLocaleDateString()
-                              : '-'}
-                          </ThemedText>
-
-                        </Pressable>
-                      );
-                    }
-                  )}
-
-                </View>
-
-                {/* ==================================================
-                    SELECTED ORDER DETAILS
-                ================================================== */}
-
-                {selectedOrder && (
-
-                  <View
-                    style={
-                      styles.selectedOrderDetails
-                    }
-                  >
-
-                    {/* HEADER */}
-
-                    <View
-                      style={
-                        styles.selectedOrderHeader
+                  return (
+                    <div
+                      className={`orders-table-row ${
+                        isSelected
+                          ? "selected"
+                          : ""
+                      }`}
+                      key={orderId}
+                      onClick={() =>
+                        toggleOrderDetails(orderId)
                       }
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (
+                          event.key === "Enter" ||
+                          event.key === " "
+                        ) {
+                          event.preventDefault();
+                          toggleOrderDetails(orderId);
+                        }
+                      }}
                     >
 
-                      <View
-                        style={
-                          styles.selectedOrderHeaderText
-                        }
-                      >
+                      {/* CUSTOMER */}
 
-                        <ThemedText
-                          style={
-                            styles.selectedOrderTitle
-                          }
-                        >
-                          Order Details
-                        </ThemedText>
+                      <div className="customer-info">
 
-                        <ThemedText
-                          style={
-                            styles.selectedOrderSubtitle
-                          }
-                        >
-                          Order #
+                        <div className="customer-avatar">
+
+                          {order.user?.name
+                            ?.charAt(0)
+                            ?.toUpperCase() || "U"}
+
+                        </div>
+
+                        <div>
+
+                          <strong>
+                            {order.user?.name ||
+                              "Unknown User"}
+                          </strong>
+
+                          <small>
+                            {order.user?.email || ""}
+                          </small>
+
+                        </div>
+
+                      </div>
+
+
+                      {/* ORDER */}
+
+                      <div className="order-number">
+
+                        <strong>
+                          #
                           {String(
-                            selectedOrder?._id ||
-                            selectedOrder?.orderNumber ||
-                            selectedOrder?.orderId ||
-                            ''
+                            order._id || index + 1
                           ).slice(-8)}
-                        </ThemedText>
+                        </strong>
 
-                      </View>
+                        <small>
+                          {Array.isArray(order.items)
+                            ? `${order.items.length} ${
+                                order.items.length === 1
+                                  ? "item"
+                                  : "items"
+                              }`
+                            : "0 items"}
+                        </small>
 
-                      <Pressable
-                        style={({ pressed }) => [
-                          styles.hideDetailsButton,
-                          pressed &&
-                            styles.hideDetailsPressed,
-                        ]}
-                        onPress={() =>
-                          setSelectedOrderId(null)
-                        }
+                      </div>
+
+
+                      {/* TOTAL */}
+
+                      <strong className="order-total">
+
+                        $
+                        {Number(
+                          order.totalPrice || 0
+                        ).toFixed(2)}
+
+                      </strong>
+
+
+                      {/* STATUS */}
+
+                      <span
+                        className={`order-status ${
+                          String(
+                            order.status || ""
+                          ).toLowerCase()
+                        }`}
                       >
-                        <ThemedText
-                          style={
-                            styles.hideDetailsText
-                          }
+                        {order.status || "Unknown"}
+                      </span>
+
+
+                      {/* DATE */}
+
+                      <span className="order-date">
+
+                        {order.createdAt
+                          ? new Date(
+                              order.createdAt
+                            ).toLocaleDateString()
+                          : "-"}
+
+                      </span>
+
+                    </div>
+                  );
+                }
+              )}
+
+            </div>
+
+
+            {/* ==================================================
+                SELECTED ORDER DETAILS
+            ================================================== */}
+
+            {selectedOrderId && (
+              <div className="selected-order-details">
+
+                {(() => {
+                  const selectedOrder =
+                    recentOrders.find(
+                      (order, index) =>
+                        (order._id ||
+                          `order-${index}`) ===
+                        selectedOrderId
+                    );
+
+                  if (!selectedOrder) {
+                    return null;
+                  }
+
+                  return (
+                    <>
+                      {/* DETAILS HEADER */}
+
+                      <div className="selected-order-header">
+
+                        <div>
+                          <h3>
+                            Order Details
+                          </h3>
+
+                          <p>
+                            Order #
+                            {String(
+                              selectedOrder._id || ""
+                            ).slice(-8)}
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="close-order-details"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setSelectedOrderId(null);
+                          }}
                         >
                           Hide Details
-                        </ThemedText>
-                      </Pressable>
+                        </button>
 
-                    </View>
+                      </div>
 
-                    {/* CUSTOMER */}
 
-                    <View
-                      style={
-                        styles.selectedCustomer
-                      }
-                    >
+                      {/* CUSTOMER DETAILS */}
 
-                      <View
-                        style={[
-                          styles.customerAvatar,
-                          styles.largeAvatar,
-                        ]}
-                      >
-                        <ThemedText
-                          style={
-                            styles.largeAvatarText
-                          }
-                        >
-                          {getCustomerName(
-                            selectedOrder
-                          )
-                            .charAt(0)
-                            .toUpperCase() ||
-                            'U'}
-                        </ThemedText>
-                      </View>
+                      <div className="selected-order-customer">
 
-                      <View
-                        style={
-                          styles.selectedCustomerText
-                        }
-                      >
+                        <div className="customer-avatar large">
 
-                        <ThemedText
-                          style={
-                            styles.selectedCustomerName
-                          }
-                        >
-                          {getCustomerName(
-                            selectedOrder
+                          {selectedOrder.user?.name
+                            ?.charAt(0)
+                            ?.toUpperCase() || "U"}
+
+                        </div>
+
+                        <div>
+
+                          <strong>
+                            {selectedOrder.user?.name ||
+                              "Unknown User"}
+                          </strong>
+
+                          {selectedOrder.user?.email && (
+                            <small>
+                              {selectedOrder.user.email}
+                            </small>
                           )}
-                        </ThemedText>
 
-                        {getCustomerEmail(
-                          selectedOrder
-                        ) ? (
-                          <ThemedText
-                            style={
-                              styles.selectedCustomerMeta
-                            }
+                          {selectedOrder.user?.phone && (
+                            <small>
+                              {selectedOrder.user.phone}
+                            </small>
+                          )}
+
+                        </div>
+
+                      </div>
+
+
+                      {/* ORDER SUMMARY */}
+
+                      <div className="selected-order-summary">
+
+                        <div>
+                          <span>
+                            Status
+                          </span>
+
+                          <strong
+                            className={`order-status ${
+                              String(
+                                selectedOrder.status || ""
+                              ).toLowerCase()
+                            }`}
                           >
-                            {getCustomerEmail(
-                              selectedOrder
-                            )}
-                          </ThemedText>
-                        ) : null}
+                            {selectedOrder.status ||
+                              "Unknown"}
+                          </strong>
+                        </div>
 
-                        {getCustomerPhone(
-                          selectedOrder
-                        ) ? (
-                          <ThemedText
-                            style={
-                              styles.selectedCustomerMeta
-                            }
-                          >
-                            {getCustomerPhone(
-                              selectedOrder
-                            )}
-                          </ThemedText>
-                        ) : null}
+                        <div>
+                          <span>
+                            Date
+                          </span>
 
-                      </View>
+                          <strong>
+                            {selectedOrder.createdAt
+                              ? new Date(
+                                  selectedOrder.createdAt
+                                ).toLocaleDateString()
+                              : "-"}
+                          </strong>
+                        </div>
 
-                    </View>
+                        <div>
+                          <span>
+                            Total
+                          </span>
 
-                    {/* SUMMARY */}
+                          <strong>
+                            $
+                            {Number(
+                              selectedOrder.totalPrice || 0
+                            ).toFixed(2)}
+                          </strong>
+                        </div>
 
-                    <View
-                      style={
-                        styles.selectedOrderSummary
-                      }
-                    >
+                      </div>
 
-                      <View
-                        style={
-                          styles.summaryItem
-                        }
-                      >
-                        <ThemedText
-                          style={
-                            styles.summaryLabel
-                          }
-                        >
-                          Status
-                        </ThemedText>
 
-                        <StatusBadge
-                          status={
-                            selectedOrder?.status ||
-                            'Unknown'
-                          }
-                        />
-                      </View>
+                      {/* PRODUCTS */}
 
-                      <View
-                        style={
-                          styles.summaryItem
-                        }
-                      >
-                        <ThemedText
-                          style={
-                            styles.summaryLabel
-                          }
-                        >
-                          Date
-                        </ThemedText>
+                      <div className="selected-order-products">
 
-                        <ThemedText
-                          style={
-                            styles.summaryValue
-                          }
-                        >
-                          {selectedOrder?.createdAt
-                            ? new Date(
-                                selectedOrder.createdAt
-                              ).toLocaleDateString()
-                            : '-'}
-                        </ThemedText>
-                      </View>
+                        <div className="selected-products-title">
+                          <h4>
+                            Products
+                          </h4>
 
-                      <View
-                        style={
-                          styles.summaryItem
-                        }
-                      >
-                        <ThemedText
-                          style={
-                            styles.summaryLabel
-                          }
-                        >
-                          Total
-                        </ThemedText>
+                          <span>
+                            {Array.isArray(
+                              selectedOrder.items
+                            )
+                              ? selectedOrder.items.length
+                              : 0}{" "}
+                            {Array.isArray(
+                              selectedOrder.items
+                            ) &&
+                            selectedOrder.items.length === 1
+                              ? "item"
+                              : "items"}
+                          </span>
+                        </div>
 
-                        <ThemedText
-                          style={
-                            styles.summaryTotal
-                          }
-                        >
-                          $
-                          {getOrderTotal(
-                            selectedOrder
-                          ).toFixed(2)}
-                        </ThemedText>
-                      </View>
 
-                    </View>
+                        {!selectedOrder.items ||
+                        selectedOrder.items.length === 0 ? (
 
-                    {/* PRODUCTS */}
-
-                    <View
-                      style={
-                        styles.selectedProducts
-                      }
-                    >
-
-                      <View
-                        style={
-                          styles.selectedProductsHeader
-                        }
-                      >
-
-                        <ThemedText
-                          style={
-                            styles.selectedProductsTitle
-                          }
-                        >
-                          Products
-                        </ThemedText>
-
-                        <ThemedText
-                          style={
-                            styles.selectedProductsCount
-                          }
-                        >
-                          {Array.isArray(
-                            selectedOrder?.items
-                          )
-                            ? selectedOrder.items.length
-                            : 0}{' '}
-                          {Array.isArray(
-                            selectedOrder?.items
-                          ) &&
-                          selectedOrder.items.length ===
-                            1
-                            ? 'item'
-                            : 'items'}
-                        </ThemedText>
-
-                      </View>
-
-                      {!Array.isArray(
-                        selectedOrder?.items
-                      ) ||
-                      selectedOrder.items.length ===
-                        0 ? (
-
-                        <View
-                          style={
-                            styles.emptyOrderProducts
-                          }
-                        >
-                          <ThemedText
-                            style={
-                              styles.emptyText
-                            }
-                          >
+                          <div className="empty-order-products">
                             No products found for this order.
-                          </ThemedText>
-                        </View>
+                          </div>
 
-                      ) : (
+                        ) : (
 
-                        <View
-                          style={
-                            styles.orderProductsList
-                          }
-                        >
+                          <div className="order-products-list">
 
-                          {selectedOrder.items.map(
-                            (item, itemIndex) => {
+                            {selectedOrder.items.map(
+                              (item, itemIndex) => {
 
-                              const productName =
-                                item?.product?.name ||
-                                item?.productName ||
-                                item?.name ||
-                                'Product';
+                                const productName =
+                                  item.product?.name ||
+                                  item.productName ||
+                                  "Product";
 
-                              const quantity =
-                                Number(
-                                  item?.quantity || 0
-                                );
+                                const quantity =
+                                  Number(
+                                    item.quantity || 0
+                                  );
 
-                              const price =
-                                Number(
-                                  item?.price ??
-                                  item?.product?.price ??
-                                  0
-                                );
+                                const price =
+                                  Number(
+                                    item.price ||
+                                      item.product?.price ||
+                                      0
+                                  );
 
-                              const itemTotal =
-                                price * quantity;
+                                const itemTotal =
+                                  price * quantity;
 
-                              return (
-                                <View
-                                  key={
-                                    item?._id ||
-                                    item?.product?._id ||
-                                    String(itemIndex)
-                                  }
-                                  style={
-                                    styles.orderProductRow
-                                  }
-                                >
-
-                                  <View
-                                    style={
-                                      styles.orderProductInfo
+                                return (
+                                  <div
+                                    className="order-product-row"
+                                    key={
+                                      item._id ||
+                                      item.product?._id ||
+                                      itemIndex
                                     }
                                   >
 
-                                    <View
-                                      style={
-                                        styles.orderProductImage
-                                      }
-                                    >
-                                      <ThemedText>
+                                    <div className="order-product-info">
+
+                                      <div className="order-product-image">
                                         🛍️
-                                      </ThemedText>
-                                    </View>
+                                      </div>
 
-                                    <View
-                                      style={
-                                        styles.orderProductText
-                                      }
-                                    >
+                                      <div>
+                                        <strong>
+                                          {productName}
+                                        </strong>
 
-                                      <ThemedText
-                                        numberOfLines={2}
-                                        style={
-                                          styles.orderProductName
-                                        }
-                                      >
-                                        {productName}
-                                      </ThemedText>
+                                        <small>
+                                          ${price.toFixed(2)} ×{" "}
+                                          {quantity}
+                                        </small>
+                                      </div>
 
-                                      <ThemedText
-                                        style={
-                                          styles.orderProductMeta
-                                        }
-                                      >
-                                        $
-                                        {price.toFixed(2)}
-                                        {' × '}
-                                        {quantity}
-                                      </ThemedText>
+                                    </div>
 
-                                    </View>
+                                    <strong>
+                                      $
+                                      {itemTotal.toFixed(2)}
+                                    </strong>
 
-                                  </View>
+                                  </div>
+                                );
+                              }
+                            )}
 
-                                  <ThemedText
-                                    style={
-                                      styles.orderProductTotal
-                                    }
-                                  >
-                                    $
-                                    {itemTotal.toFixed(2)}
-                                  </ThemedText>
+                          </div>
 
-                                </View>
-                              );
-                            }
-                          )}
+                        )}
 
-                        </View>
-                      )}
+                      </div>
 
-                    </View>
+                    </>
+                  );
+                })()}
 
-                  </View>
-                )}
-
-              </View>
+              </div>
             )}
 
-          </DashboardSection>
+          </div>
 
-        </ScrollView>
+        )}
 
-        {/* ======================================================
-            ADMIN MENU
-        ====================================================== */}
+      </section>
 
-        {menuVisible ? (
-          <View style={styles.menuOverlay}>
-
-            <AdminMenu />
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.closeMenuButton,
-                pressed &&
-                  styles.closeMenuPressed,
-              ]}
-              onPress={() =>
-                setMenuVisible(false)
-              }
-            >
-              <ThemedText
-                style={styles.closeMenuText}
-              >
-                ×
-              </ThemedText>
-            </Pressable>
-
-          </View>
-        ) : null}
-
-      </View>
-    </SafeAreaView>
+    </div>
   );
 }
 
-// ============================================================
-// STATUS BADGE
-// ============================================================
-
-function StatusBadge({ status }) {
-  const normalized = String(
-    status || ''
-  )
-    .toLowerCase()
-    .replace(/\s+/g, '');
-
-  const type =
-    normalized === 'pending'
-      ? 'pending'
-      : normalized === 'confirmed'
-      ? 'confirmed'
-      : normalized === 'preparing'
-      ? 'preparing'
-      : normalized === 'shipped'
-      ? 'shipped'
-      : normalized === 'delivered'
-      ? 'delivered'
-      : normalized === 'cancelled'
-      ? 'cancelled'
-      : 'unknown';
-
-  return (
-    <View
-      style={[
-        styles.statusBadge,
-        badgeStyles[type],
-      ]}
-    >
-      <ThemedText
-        style={[
-          styles.statusBadgeText,
-          badgeTextStyles[type],
-        ]}
-      >
-        {status || 'Unknown'}
-      </ThemedText>
-    </View>
-  );
-}
-
-// ============================================================
-// STAT CARD
-// ============================================================
-
-function StatCard({
-  icon,
-  title,
-  value,
-}) {
-  return (
-    <View style={styles.statCard}>
-
-      <View style={styles.statIcon}>
-        <ThemedText
-          style={styles.statIconText}
-        >
-          {icon}
-        </ThemedText>
-      </View>
-
-      <View style={styles.statContent}>
-
-        <ThemedText
-          style={styles.statTitle}
-        >
-          {title}
-        </ThemedText>
-
-        <ThemedText
-          style={styles.statValue}
-        >
-          {value}
-        </ThemedText>
-
-      </View>
-
-    </View>
-  );
-}
-
-// ============================================================
-// STATUS CARD
-// ============================================================
-
-function StatusCard({
-  title,
-  value,
-  type,
-}) {
-  return (
-    <View
-      style={[
-        styles.statusCard,
-        statusStyles[type],
-      ]}
-    >
-
-      <ThemedText
-        style={styles.statusTitle}
-      >
-        {title}
-      </ThemedText>
-
-      <ThemedText
-        style={styles.statusValue}
-      >
-        {value}
-      </ThemedText>
-
-    </View>
-  );
-}
-
-// ============================================================
-// SECTION
-// ============================================================
-
-function DashboardSection({
-  title,
-  subtitle,
-  children,
-}) {
-  return (
-    <View style={styles.section}>
-
-      <View style={styles.sectionHeader}>
-
-        <ThemedText
-          style={styles.sectionTitle}
-        >
-          {title}
-        </ThemedText>
-
-        <ThemedText
-          style={styles.sectionSubtitle}
-        >
-          {subtitle}
-        </ThemedText>
-
-      </View>
-
-      {children}
-
-    </View>
-  );
-}
-
-// ============================================================
-// STYLES
-// ============================================================
-
-const styles = StyleSheet.create({
-
-  page: {
-    flex: 1,
-    backgroundColor: '#F7F3EC',
-  },
-
-  mainContainer: {
-    flex: 1,
-  },
-
-  content: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-
-  centerContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-
-  loadingText: {
-    marginTop: 12,
-    color: '#817B71',
-    fontSize: 14,
-  },
-
-  errorBox: {
-    width: '100%',
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E7B8B2',
-    borderRadius: 10,
-    backgroundColor: '#FCEDEC',
-  },
-
-  errorTitle: {
-    marginBottom: 6,
-    color: '#171717',
-    fontSize: 18,
-    fontWeight: '800',
-  },
-
-  errorMessage: {
-    color: '#B42318',
-    fontSize: 13,
-    lineHeight: 19,
-  },
-
-  tryAgainButton: {
-    marginTop: 14,
-    minWidth: 120,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 18,
-    borderRadius: 8,
-    backgroundColor: '#171717',
-  },
-
-  tryAgainText: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-
-  // ----------------------------------------------------------
-  // HEADER
-  // ----------------------------------------------------------
-
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 22,
-  },
-
-  menuButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-  },
-
-  menuButtonPressed: {
-    backgroundColor: '#F8F2EA',
-  },
-
-  menuButtonText: {
-    color: '#171717',
-    fontSize: 21,
-    lineHeight: 24,
-    fontWeight: '700',
-  },
-
-  headerText: {
-    flex: 1,
-    paddingRight: 10,
-  },
-
-  headerTitle: {
-    color: '#171717',
-    fontSize: 23,
-    lineHeight: 29,
-    fontWeight: '800',
-  },
-
-  headerSubtitle: {
-    marginTop: 4,
-    color: '#817B71',
-    fontSize: 12,
-  },
-
-  refreshButton: {
-    height: 40,
-    paddingHorizontal: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-  },
-
-  refreshPressed: {
-    backgroundColor: '#F8F2EA',
-  },
-
-  refreshText: {
-    color: '#171717',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-
-  // ----------------------------------------------------------
-  // MENU
-  // ----------------------------------------------------------
-
-  menuOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 100,
-    elevation: 100,
-    backgroundColor: '#FFFFFF',
-  },
-
-  closeMenuButton: {
-    position: 'absolute',
-    top: 12,
-    right: 14,
-    width: 38,
-    height: 38,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 9,
-    backgroundColor: '#F8F2EA',
-  },
-
-  closeMenuPressed: {
-    opacity: 0.7,
-  },
-
-  closeMenuText: {
-    color: '#171717',
-    fontSize: 28,
-    lineHeight: 31,
-    fontWeight: '400',
-  },
-
-  // ----------------------------------------------------------
-  // STATS
-  // ----------------------------------------------------------
-
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 26,
-  },
-
-  statCard: {
-    width: '48%',
-    minHeight: 105,
-    padding: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-  },
-
-  statIcon: {
-    width: 42,
-    height: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 11,
-    borderRadius: 10,
-    backgroundColor: '#F8F2EA',
-  },
-
-  statIconText: {
-    fontSize: 20,
-  },
-
-  statContent: {
-    flex: 1,
-  },
-
-  statTitle: {
-    marginBottom: 5,
-    color: '#817B71',
-    fontSize: 11,
-    fontWeight: '600',
-  },
-
-  statValue: {
-    color: '#171717',
-    fontSize: 18,
-    fontWeight: '800',
-  },
-
-  // ----------------------------------------------------------
-  // SECTIONS
-  // ----------------------------------------------------------
-
-  section: {
-    marginBottom: 28,
-  },
-
-  sectionHeader: {
-    marginBottom: 13,
-  },
-
-  sectionTitle: {
-    color: '#171717',
-    fontSize: 19,
-    fontWeight: '800',
-  },
-
-  sectionSubtitle: {
-    marginTop: 4,
-    color: '#817B71',
-    fontSize: 12,
-  },
-
-  // ----------------------------------------------------------
-  // STATUS CARDS
-  // ----------------------------------------------------------
-
-  statusGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-
-  statusCard: {
-    width: '31.5%',
-    minHeight: 78,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 5,
-    borderWidth: 1,
-    borderRadius: 10,
-  },
-
-  statusTitle: {
-    color: '#171717',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-
-  statusValue: {
-    marginTop: 6,
-    color: '#171717',
-    fontSize: 20,
-    fontWeight: '800',
-  },
-
-  // ----------------------------------------------------------
-  // PRODUCTS
-  // ----------------------------------------------------------
-
-  productsTable: {
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
-  },
-
-  tableHeader: {
-    minHeight: 42,
-    paddingHorizontal: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E7DED1',
-    backgroundColor: '#F8F2EA',
-  },
-
-  tableHeaderText: {
-    color: '#817B71',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-
-  tableRow: {
-    minHeight: 70,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE7DD',
-  },
-
-  productColumn: {
-    flex: 2.7,
-  },
-
-  priceColumn: {
-    flex: 1,
-    textAlign: 'center',
-  },
-
-  soldColumn: {
-    flex: 0.8,
-    textAlign: 'center',
-  },
-
-  revenueColumn: {
-    flex: 1.2,
-    textAlign: 'right',
-  },
-
-  productInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minWidth: 0,
-  },
-
-  rank: {
-    width: 25,
-    color: '#817B71',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-
-  productIcon: {
-    width: 34,
-    height: 34,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 7,
-    borderRadius: 8,
-    backgroundColor: '#F8F2EA',
-  },
-
-  productText: {
-    flex: 1,
-    minWidth: 0,
-  },
-
-  productName: {
-    color: '#171717',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-
-  productCategory: {
-    marginTop: 2,
-    color: '#817B71',
-    fontSize: 9,
-  },
-
-  tableValue: {
-    color: '#171717',
-    fontSize: 10,
-  },
-
-  tableValueStrong: {
-    color: '#171717',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-
-  emptyBox: {
-    minHeight: 75,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
-  },
-
-  emptyText: {
-    color: '#817B71',
-    fontSize: 13,
-  },
-
-  // ----------------------------------------------------------
-  // RECENT ORDERS
-  // ----------------------------------------------------------
-
-  recentOrdersContainer: {
-    width: '100%',
-  },
-
-  ordersTable: {
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
-  },
-
-  ordersTableHeader: {
-    minHeight: 46,
-    paddingHorizontal: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E7DED1',
-    backgroundColor: '#F8F2EA',
-  },
-
-  ordersHeaderText: {
-    color: '#817B71',
-    fontSize: 9,
-    fontWeight: '800',
-  },
-
-  customerColumn: {
-    flex: 2.15,
-  },
-
-  orderColumn: {
-    flex: 1.35,
-  },
-
-  totalColumn: {
-    flex: 1.1,
-    textAlign: 'right',
-  },
-
-  statusColumn: {
-    flex: 1.25,
-  },
-
-  dateColumn: {
-    flex: 1.15,
-    textAlign: 'right',
-  },
-
-  ordersTableRow: {
-    minHeight: 78,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE7DD',
-  },
-
-  ordersTableRowSelected: {
-    backgroundColor: '#F8F2EA',
-  },
-
-  ordersTableRowPressed: {
-    backgroundColor: '#F3ECE2',
-  },
-
-  customerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minWidth: 0,
-    paddingRight: 5,
-  },
-
-  customerAvatar: {
-    width: 34,
-    height: 34,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 7,
-    borderRadius: 17,
-    backgroundColor: '#EDE3D5',
-  },
-
-  customerAvatarText: {
-    color: '#5E554A',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-
-  customerText: {
-    flex: 1,
-    minWidth: 0,
-  },
-
-  customerNameText: {
-    color: '#171717',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-
-  customerEmailText: {
-    marginTop: 2,
-    color: '#817B71',
-    fontSize: 8,
-  },
-
-  orderNumberInfo: {
-    paddingRight: 4,
-  },
-
-  orderNumberText: {
-    color: '#171717',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-
-  orderItemsText: {
-    marginTop: 3,
-    color: '#817B71',
-    fontSize: 8,
-  },
-
-  orderTotal: {
-    color: '#171717',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-
-  statusCell: {
-    alignItems: 'flex-start',
-  },
-
-  orderDate: {
-    color: '#817B71',
-    fontSize: 8,
-  },
-
-  // ----------------------------------------------------------
-  // STATUS BADGE
-  // ----------------------------------------------------------
-
-  statusBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 7,
-    paddingVertical: 5,
-    borderWidth: 1,
-    borderRadius: 7,
-  },
-
-  statusBadgeText: {
-    fontSize: 8,
-    fontWeight: '800',
-  },
-
-  // ----------------------------------------------------------
-  // SELECTED ORDER
-  // ----------------------------------------------------------
-
-  selectedOrderDetails: {
-    marginTop: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#E0D4C5',
-    borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-  },
-
-  selectedOrderHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingBottom: 13,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE7DD',
-  },
-
-  selectedOrderHeaderText: {
-    flex: 1,
-    paddingRight: 10,
-  },
-
-  selectedOrderTitle: {
-    color: '#171717',
-    fontSize: 17,
-    fontWeight: '800',
-  },
-
-  selectedOrderSubtitle: {
-    marginTop: 3,
-    color: '#817B71',
-    fontSize: 10,
-  },
-
-  hideDetailsButton: {
-    minHeight: 36,
-    paddingHorizontal: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 8,
-    backgroundColor: '#F8F2EA',
-  },
-
-  hideDetailsPressed: {
-    opacity: 0.7,
-  },
-
-  hideDetailsText: {
-    color: '#171717',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-
-  // ----------------------------------------------------------
-  // CUSTOMER
-  // ----------------------------------------------------------
-
-  selectedCustomer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-  },
-
-  largeAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 11,
-  },
-
-  largeAvatarText: {
-    color: '#5E554A',
-    fontSize: 17,
-    fontWeight: '800',
-  },
-
-  selectedCustomerText: {
-    flex: 1,
-  },
-
-  selectedCustomerName: {
-    color: '#171717',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-
-  selectedCustomerMeta: {
-    marginTop: 3,
-    color: '#817B71',
-    fontSize: 10,
-  },
-
-  // ----------------------------------------------------------
-  // SUMMARY
-  // ----------------------------------------------------------
-
-  selectedOrderSummary: {
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 10,
-    backgroundColor: '#F8F2EA',
-  },
-
-  summaryItem: {
-    flex: 1,
-    paddingHorizontal: 4,
-  },
-
-  summaryLabel: {
-    marginBottom: 5,
-    color: '#817B71',
-    fontSize: 9,
-    fontWeight: '700',
-  },
-
-  summaryValue: {
-    color: '#171717',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-
-  summaryTotal: {
-    color: '#171717',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-
-  // ----------------------------------------------------------
-  // ORDER PRODUCTS
-  // ----------------------------------------------------------
-
-  selectedProducts: {
-    marginTop: 15,
-  },
-
-  selectedProductsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-
-  selectedProductsTitle: {
-    color: '#171717',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-
-  selectedProductsCount: {
-    color: '#817B71',
-    fontSize: 10,
-  },
-
-  emptyOrderProducts: {
-    minHeight: 65,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 9,
-    backgroundColor: '#F8F2EA',
-  },
-
-  orderProductsList: {
-    borderWidth: 1,
-    borderColor: '#E7DED1',
-    borderRadius: 9,
-    overflow: 'hidden',
-  },
-
-  orderProductRow: {
-    minHeight: 65,
-    paddingHorizontal: 10,
-    paddingVertical: 9,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE7DD',
-    backgroundColor: '#FFFFFF',
-  },
-
-  orderProductInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingRight: 10,
-    minWidth: 0,
-  },
-
-  orderProductImage: {
-    width: 38,
-    height: 38,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 9,
-    borderRadius: 8,
-    backgroundColor: '#F8F2EA',
-  },
-
-  orderProductText: {
-    flex: 1,
-    minWidth: 0,
-  },
-
-  orderProductName: {
-    color: '#171717',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-
-  orderProductMeta: {
-    marginTop: 3,
-    color: '#817B71',
-    fontSize: 9,
-  },
-
-  orderProductTotal: {
-    color: '#171717',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-
-});
-
-// ============================================================
-// STATUS CARD COLORS
-// ============================================================
-
-const statusStyles = StyleSheet.create({
-
-  pending: {
-    borderColor: '#D2C5B4',
-    backgroundColor: '#F2E8D8',
-  },
-
-  confirmed: {
-    borderColor: '#AABFD4',
-    backgroundColor: '#DDEAF5',
-  },
-
-  preparing: {
-    borderColor: '#D5B978',
-    backgroundColor: '#F4E6C7',
-  },
-
-  shipped: {
-    borderColor: '#B6B7D4',
-    backgroundColor: '#E5E5F2',
-  },
-
-  delivered: {
-    borderColor: '#9FC5AA',
-    backgroundColor: '#DCEDE1',
-  },
-
-  cancelled: {
-    borderColor: '#D9A29D',
-    backgroundColor: '#F5DDDA',
-  },
-
-});
-
-// ============================================================
-// BADGE COLORS
-// ============================================================
-
-const badgeStyles = StyleSheet.create({
-
-  pending: {
-    borderColor: '#D2C5B4',
-    backgroundColor: '#F2E8D8',
-  },
-
-  confirmed: {
-    borderColor: '#AABFD4',
-    backgroundColor: '#DDEAF5',
-  },
-
-  preparing: {
-    borderColor: '#D5B978',
-    backgroundColor: '#F4E6C7',
-  },
-
-  shipped: {
-    borderColor: '#B6B7D4',
-    backgroundColor: '#E5E5F2',
-  },
-
-  delivered: {
-    borderColor: '#9FC5AA',
-    backgroundColor: '#DCEDE1',
-  },
-
-  cancelled: {
-    borderColor: '#D9A29D',
-    backgroundColor: '#F5DDDA',
-  },
-
-  unknown: {
-    borderColor: '#D2C5B4',
-    backgroundColor: '#F2E8D8',
-  },
-
-});
-
-// ============================================================
-// BADGE TEXT COLORS
-// ============================================================
-
-const badgeTextStyles = StyleSheet.create({
-
-  pending: {
-    color: '#765E3D',
-  },
-
-  confirmed: {
-    color: '#46627A',
-  },
-
-  preparing: {
-    color: '#80662D',
-  },
-
-  shipped: {
-    color: '#56577A',
-  },
-
-  delivered: {
-    color: '#3E6E4D',
-  },
-
-  cancelled: {
-    color: '#8A4540',
-  },
-
-  unknown: {
-    color: '#6F665B',
-  },
-
-});
+export default Dashboard;

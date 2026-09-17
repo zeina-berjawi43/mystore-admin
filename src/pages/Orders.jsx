@@ -4,6 +4,7 @@ import {
 } from "react";
 
 import axios from "axios";
+import Pagination from "../components/Pagination";
 
 
 const API_URL =
@@ -180,6 +181,9 @@ function Orders() {
   const [deletingOrder, setDeletingOrder] = useState(false);
   const [creatingInvoice, setCreatingInvoice] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
 
   /* ============================================================
      FETCH ALL ORDERS
@@ -319,6 +323,24 @@ function Orders() {
 
     return matchesSearch && matchesInvoiceDate && matchesStatus;
   });
+
+  // Reset to page 1 whenever the filters change, so the user
+  // never lands on an empty page 4 after narrowing the results.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, invoiceDate, statusFilter]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredOrders.length / pageSize)
+  );
+
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const paginatedOrders = filteredOrders.slice(
+    (safeCurrentPage - 1) * pageSize,
+    safeCurrentPage * pageSize
+  );
 
 
   /* ============================================================
@@ -724,7 +746,7 @@ function Orders() {
                 </td>
               </tr>
             ) : (
-              filteredOrders.map((order) => {
+              paginatedOrders.map((order) => {
                 const customer = order.user || order.customer || {};
                 const customerName = getCustomerName(customer);
 
@@ -792,6 +814,18 @@ function Orders() {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        currentPage={safeCurrentPage}
+        totalItems={filteredOrders.length}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setCurrentPage(1);
+        }}
+        itemLabel="orders"
+      />
 
 
       {/* ORDER MODAL */}

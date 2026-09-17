@@ -2566,14 +2566,10 @@ button:disabled {
   margin-bottom: 18px;
 }
 
-.phone-verification-loading,
-.phone-verification-spinner {
-  /* .phone-verification-loading sizing/centering comes from the
-     .dashboard-loading group above; this just adds the spinner
-     itself, since the JSX uses a different class name than the
-     shared .loading-spinner */
-}
-
+/* .phone-verification-loading sizing/centering comes from the
+   .dashboard-loading group above; this just adds the spinner
+   itself, since the JSX uses a different class name than the
+   shared .loading-spinner */
 .phone-verification-spinner {
   width: 38px;
   height: 38px;
@@ -3136,6 +3132,102 @@ button:disabled {
 
 .hidden {
   display: none !important;
+}
+
+/* ============================================================
+   PAGINATION
+   Shared by Products / Orders / Users tables.
+============================================================ */
+
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-info {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pagination-button {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--border-input);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pagination-button:hover:not(:disabled) {
+  border-color: var(--text);
+  background: var(--surface-warm);
+}
+
+.pagination-button.active {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--surface);
+}
+
+.pagination-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pagination-ellipsis {
+  padding: 0 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.pagination-page-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.pagination-page-size select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border-input);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .pagination-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-controls {
+    justify-content: center;
+  }
 }
 
 /* ============================================================

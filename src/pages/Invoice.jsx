@@ -1653,7 +1653,7 @@ function Invoice() {
           "Failed to create PDF."
       );
     } finally {
-      setActionLoading("");
+      setActionLoading(null);
     }
   };
 
@@ -1718,7 +1718,7 @@ function Invoice() {
             "Failed to duplicate invoice."
         );
       } finally {
-        setActionLoading("");
+        setActionLoading(null);
       }
     };
 
@@ -1812,7 +1812,7 @@ function Invoice() {
             "Failed to cancel invoice."
         );
       } finally {
-        setActionLoading("");
+        setActionLoading(null);
       }
     };
 

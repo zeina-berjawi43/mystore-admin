@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
 const emptyForm = { name: "", image: "", order: "0", active: true };
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
 export default function Departments() {
   const [departments, setDepartments] = useState([]);
@@ -11,7 +12,21 @@ export default function Departments() {
   const [editing, setEditing] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [saving, setSaving] = useState(false);
+  const previewUrl = useRef(null);
+
+  const clearPreview = () => {
+    if (previewUrl.current) {
+      URL.revokeObjectURL(previewUrl.current);
+      previewUrl.current = null;
+    }
+  };
+
+  useEffect(() => () => {
+    if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
+  }, []);
 
   const load = async () => {
     try {
@@ -30,13 +45,25 @@ export default function Departments() {
 
   useEffect(() => { load(); }, []);
 
+  const closeModal = () => {
+    if (saving) return;
+    clearPreview();
+    setImageFile(null);
+    setImagePreview("");
+    setShowModal(false);
+  };
+
   const openAdd = () => {
+    clearPreview();
     setEditing(null);
     setForm({ ...emptyForm });
+    setImageFile(null);
+    setImagePreview("");
     setShowModal(true);
   };
 
   const openEdit = (department) => {
+    clearPreview();
     setEditing(department);
     setForm({
       name: department.name || "",
@@ -44,28 +71,80 @@ export default function Departments() {
       order: String(department.order ?? 0),
       active: department.active !== false,
     });
+    setImageFile(null);
+    setImagePreview(department.image || "");
     setShowModal(true);
+  };
+
+  const chooseImage = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      alert("Choose a JPG, PNG or WEBP image.");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      alert("Image must be smaller than 5 MB.");
+      event.target.value = "";
+      return;
+    }
+    clearPreview();
+    const url = URL.createObjectURL(file);
+    previewUrl.current = url;
+    setImageFile(file);
+    setImagePreview(url);
+  };
+
+  const uploadImage = async (file, token) => {
+    const payload = new FormData();
+    payload.append("image", file);
+    // Existing backend image validation recognizes "categories".
+    // If the upload endpoint has a dedicated "departments" type, change this value there and here.
+    payload.append("type", "categories");
+
+    const response = await fetch(`${API_URL}/upload/image`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: payload,
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Failed to upload image");
+
+    const url = data.url || data.imageUrl || data.image?.url || data.data?.url;
+    if (typeof url !== "string" || !/^https?:\/\//i.test(url)) {
+      throw new Error("Image uploaded but the server did not return a recognized URL. Check /upload/image response format.");
+    }
+    return url;
   };
 
   const save = async (event) => {
     event.preventDefault();
+    if (saving) return;
     const name = form.name.trim();
     const order = Number(form.order);
     if (!name) return alert("Department name is required.");
-    if (!form.order.trim() || !Number.isFinite(order)) return alert("Enter a valid order.");
+    if (!form.order.trim() || !Number.isFinite(order) || !Number.isInteger(order)) {
+      return alert("Enter a valid whole-number order.");
+    }
+    const token = localStorage.getItem("accessToken");
+    if (!token) return alert("Session expired. Please log in again.");
+
     try {
       setSaving(true);
+      // Upload first; only save the department once a public image URL is available.
+      const image = imageFile ? await uploadImage(imageFile, token) : form.image;
       const response = await fetch(
         editing ? `${API_URL}/departments/${editing._id}` : `${API_URL}/departments`,
         {
           method: editing ? "PUT" : "POST",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             name,
-            image: form.image.trim(),
+            image,
             order,
             ...(editing ? { active: form.active } : {}),
           }),
@@ -73,6 +152,9 @@ export default function Departments() {
       );
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Failed to save department");
+      clearPreview();
+      setImageFile(null);
+      setImagePreview("");
       setShowModal(false);
       await load();
     } catch (err) {
@@ -122,7 +204,7 @@ export default function Departments() {
                 {filtered.length === 0 ? <tr><td colSpan="5" className="management-empty">No departments found.</td></tr> : filtered.map((item, index) => (
                   <tr key={item._id}>
                     <td>{index + 1}</td>
-                    <td><div className="management-name"><div className="management-icon">{item.image ? <img src={item.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "🏬"}</div><strong>{item.name}</strong></div></td>
+                    <td><div className="management-name"><div className="management-icon">{item.image ? <img src={item.image} alt="" /> : "🏬"}</div><strong>{item.name}</strong></div></td>
                     <td>{item.order ?? 0}</td>
                     <td>{item.active === false ? "Inactive" : "Active"}</td>
                     <td><div className="management-actions"><button type="button" className="management-edit-button" onClick={() => openEdit(item)}>Edit</button><button type="button" className="management-delete-button" onClick={() => remove(item)}>Delete</button></div></td>
@@ -133,15 +215,20 @@ export default function Departments() {
           </div>
         </>
       )}
-      {showModal && <div className="management-modal-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget && !saving) setShowModal(false); }}>
+      {showModal && <div className="management-modal-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closeModal(); }}>
         <div className="management-modal">
-          <div className="management-modal-header"><div><h2>{editing ? "Edit Department" : "Add Department"}</h2><p>Set the department name, image URL and order.</p></div><button type="button" className="management-modal-close" disabled={saving} onClick={() => setShowModal(false)}>✕</button></div>
+          <div className="management-modal-header"><div><h2>{editing ? "Edit Department" : "Add Department"}</h2><p>Choose a department image, then set its name and order.</p></div><button type="button" className="management-modal-close" disabled={saving} onClick={closeModal}>✕</button></div>
           <form className="management-form" onSubmit={save}>
             <div className="management-form-group"><label htmlFor="department-name">Department Name *</label><input id="department-name" required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></div>
-            <div className="management-form-group"><label htmlFor="department-image">Image URL (optional)</label><input id="department-image" type="url" placeholder="https://..." value={form.image} onChange={(event) => setForm({ ...form, image: event.target.value })} />{form.image && <img src={form.image} alt="Department preview" style={{ width: 90, height: 90, objectFit: "cover", marginTop: 12, borderRadius: 12 }} />}</div>
+            <div className="management-form-group">
+              <label htmlFor="department-image">Department Image (optional)</label>
+              <input id="department-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={saving} onChange={chooseImage} />
+              {imagePreview && <img src={imagePreview} alt="Department preview" style={{ width: 90, height: 90, objectFit: "cover", marginTop: 12, borderRadius: 12 }} />}
+              {(imageFile || form.image) && <button type="button" disabled={saving} className="management-cancel-button" onClick={() => { clearPreview(); setImageFile(null); setImagePreview(""); setForm((previous) => ({ ...previous, image: "" })); }}>Remove image</button>}
+            </div>
             <div className="management-form-group"><label htmlFor="department-order">Display Order *</label><input id="department-order" type="number" required step="1" value={form.order} onChange={(event) => setForm({ ...form, order: event.target.value })} /></div>
             {editing && <div className="management-form-group"><label><input type="checkbox" checked={form.active} onChange={(event) => setForm({ ...form, active: event.target.checked })} /> Active</label></div>}
-            <div className="management-form-actions"><button type="button" className="management-cancel-button" disabled={saving} onClick={() => setShowModal(false)}>Cancel</button><button type="submit" className="management-save-button" disabled={saving}>{saving ? "Saving..." : editing ? "Update Department" : "Add Department"}</button></div>
+            <div className="management-form-actions"><button type="button" className="management-cancel-button" disabled={saving} onClick={closeModal}>Cancel</button><button type="submit" className="management-save-button" disabled={saving}>{saving ? "Saving..." : editing ? "Update Department" : "Add Department"}</button></div>
           </form>
         </div>
       </div>}

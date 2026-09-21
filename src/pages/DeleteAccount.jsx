@@ -8,9 +8,9 @@ const deletionEmail =
     "BStore Account Deletion Request"
   )}&body=${encodeURIComponent(
     "Hello BStore,\n\n" +
-    "I would like to request deletion of my BStore account.\n\n" +
-    "My registered phone number: \n\n" +
-    "Please let me know how to verify account ownership.\n"
+      "I would like to request deletion of my BStore account.\n\n" +
+      "My registered phone number: \n\n" +
+      "Please let me know how to verify account ownership.\n"
   )}`;
 
 export default function DeleteAccount() {
@@ -19,6 +19,7 @@ export default function DeleteAccount() {
       <div className="legal-container">
         <header className="legal-header">
           <h1>BStore — Delete Your Account</h1>
+
           <p>
             Request deletion of your BStore account
             and associated personal data.
@@ -46,14 +47,14 @@ export default function DeleteAccount() {
 
           <p>
             If you no longer have access to the app,
-            send an account deletion request to BStore.
+            you can request account deletion by email.
           </p>
 
           <p>
-            Include your registered phone number so
-            we can identify your account. We will
-            verify account ownership before processing
-            the request.
+            Include your registered phone number
+            so we can identify your account.
+            We will verify account ownership
+            before processing the request.
           </p>
 
           <p>
@@ -94,10 +95,10 @@ export default function DeleteAccount() {
           <h2>What data may be retained?</h2>
 
           <p>
-            Historical invoices and sales records
-            may be retained for accounting, business
-            recordkeeping, dispute resolution, or
-            applicable legal requirements.
+            Historical orders, invoices, and sales
+            records may be retained for applicable
+            legal, accounting, and legitimate
+            business requirements.
           </p>
 
           <p>
@@ -109,10 +110,17 @@ export default function DeleteAccount() {
           </p>
 
           <p>
-            BStore is finalizing its detailed
-            retention schedule. You may contact us
-            to ask about information retained after
-            account deletion.
+            We retain these records for as long as
+            necessary to meet the applicable
+            requirements. When retention is no
+            longer necessary, we delete or anonymize
+            personal information, where appropriate.
+          </p>
+
+          <p>
+            You may contact us for information
+            about records retained after your
+            account has been deleted.
           </p>
         </section>
 

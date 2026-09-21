@@ -187,8 +187,8 @@ if (type === "REGISTER") {
   return "Register";
 }
 
-if (type === "LOGIN") {
-  return "Login";
+if (type === "RESET_PASSWORD") {
+  return "Forgot Password";
 }
 
 if (type === "CHANGE_PHONE") {

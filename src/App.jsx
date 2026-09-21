@@ -26,7 +26,8 @@ import Notifications from "./pages/Notifications";
 import PhoneVerification from "./pages/PhoneVerification";
 import AddAdmin from "./pages/AddAdmin";
 import Invoice from "./pages/Invoice";
-
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import DeleteAccount from "./pages/DeleteAccount";
 // LAYOUT
 import AdminLayout from "./layouts/AdminLayout";
 
@@ -174,6 +175,15 @@ function App() {
         {/* DEFAULT / UNKNOWN */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route
+  path="/privacy-policy"
+  element={<PrivacyPolicy />}
+/>
+
+<Route
+  path="/delete-account"
+  element={<DeleteAccount />}
+/>
       </Routes>
     </BrowserRouter>
   );

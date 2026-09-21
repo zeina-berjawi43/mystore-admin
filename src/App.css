@@ -3927,3 +3927,222 @@ button[class*="refresh"].is-refreshing::before,
 button[class*="Refresh"].is-refreshing::before {
   animation: bstore-spin 0.6s linear infinite !important;
 }
+/* ============================================================
+   DEPARTMENTS & CATEGORIES — EXTRA STYLING
+   Add at the END of App.css
+============================================================ */
+
+/* Loading */
+
+.management-loading {
+  min-height: 45vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.management-loading p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.management-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: bstore-spin 0.75s linear infinite;
+}
+
+/* Category / department name and image */
+
+.management-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.management-name strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+
+.management-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  font-size: 21px;
+}
+
+.management-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Filters */
+
+.management-toolbar select {
+  min-width: 170px;
+  max-width: 240px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.management-toolbar select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(227, 91, 63, 0.07);
+}
+
+/* Department selector inside modal */
+
+.management-form-group select {
+  cursor: pointer;
+}
+
+.management-form-group small {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Tables */
+
+.management-table th,
+.management-table td {
+  vertical-align: middle;
+}
+
+.management-table td {
+  overflow-wrap: anywhere;
+}
+
+.management-actions {
+  justify-content: flex-start;
+}
+
+/* Error message */
+
+.management-error {
+  flex-wrap: wrap;
+}
+
+.management-error span {
+  flex: 1;
+  min-width: 160px;
+}
+
+.management-error button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--danger-border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Modal */
+
+.management-modal {
+  width: min(100%, 620px);
+}
+
+.management-form-group input[type="file"] {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.management-form-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .management-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .management-search {
+    flex: 1 1 100%;
+  }
+
+  .management-toolbar select {
+    flex: 1 1 160px;
+    max-width: none;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .management-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .management-header .management-add-button {
+    width: 100%;
+  }
+
+  .management-toolbar select,
+  .management-toolbar .management-clear-button {
+    width: 100%;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .management-table {
+    min-width: 650px;
+  }
+
+  .management-modal {
+    width: 100%;
+  }
+
+  .management-form {
+    padding: 16px;
+  }
+
+  .management-name {
+    gap: 9px;
+  }
+
+  .management-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .management-spinner {
+    animation: none;
+  }
+}

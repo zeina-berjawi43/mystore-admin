@@ -7,6 +7,10 @@ const API_URL =
 "https://mystore-backend-u6ey.onrender.com";
 
 function Categories() {
+const [departments, setDepartments] = useState([]);
+const [departmentId, setDepartmentId] = useState("");
+const [departmentFilter, setDepartmentFilter] = useState("");
+
 
 const [
 categories,
@@ -141,7 +145,11 @@ useEffect(() => {
 
 
 fetchCategories();
-
+fetch(`${API_URL}/departments`).then(async response => {
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || "Failed to load departments");
+  setDepartments(data.departments || []);
+}).catch(error => setError(error.message));
 
 }, []);
 
@@ -199,6 +207,7 @@ const openAddModal = () => {
 
 
 setEditingCategory(null);
+setDepartmentId("");
 
 setName("");
 
@@ -226,6 +235,7 @@ const openEditModal =
   setName(
     category.name || ""
   );
+  setDepartmentId(typeof category.department === "object" ? category.department?._id || "" : category.department || "");
 
   setImage(null);
 
@@ -368,6 +378,7 @@ if (
 setShowModal(false);
 
 setEditingCategory(null);
+setDepartmentId("");
 
 setName("");
 
@@ -403,6 +414,8 @@ async (event) => {
 
   }
 
+
+  if (!departmentId) { alert("Please select a department."); return; }
 
   try {
 
@@ -452,6 +465,8 @@ async (event) => {
       trimmedName
     );
 
+
+    formData.append("department", departmentId);
 
     // ======================================================
     // SEND REAL FILE
@@ -672,11 +687,8 @@ async (category) => {
 const filteredCategories =
 categories.filter(
 (category) =>
-category.name
-?.toLowerCase()
-.includes(
-search.toLowerCase()
-)
+(category.name || "").toLowerCase().includes(search.toLowerCase()) &&
+(!departmentFilter || (typeof category.department === "object" ? category.department?._id : category.department) === departmentFilter)
 );
 
 // ============================================================
@@ -770,6 +782,8 @@ return (
     </div>
 
 
+    <select aria-label="Filter by department" value={departmentFilter} onChange={event => setDepartmentFilter(event.target.value)}><option value="">All departments</option>{departments.map(dept => <option key={dept._id} value={dept._id}>{dept.name}</option>)}</select>
+
     {search && (
 
       <button
@@ -848,6 +862,8 @@ return (
             Category
           </th>
 
+          <th>Department</th>
+
           <th>
             Created
           </th>
@@ -868,7 +884,7 @@ return (
           <tr>
 
             <td
-              colSpan="4"
+              colSpan="5"
               className="management-empty"
             >
 
@@ -966,6 +982,8 @@ return (
                   </div>
 
                 </td>
+                <td>{departments.find(dept => dept._id === (typeof category.department === "object" ? category.department?._id : category.department))?.name || category.department?.name || "Unassigned"}</td>
+
 
 
                 <td>
@@ -1125,6 +1143,8 @@ return (
 
           </div>
 
+
+          <div className="management-form-group"><label htmlFor="category-department">Department *</label><select id="category-department" value={departmentId} onChange={event => setDepartmentId(event.target.value)} required><option value="">Select department</option>{departments.map(dept => <option key={dept._id} value={dept._id}>{dept.name}</option>)}</select></div>
 
           {/* IMAGE */}
 

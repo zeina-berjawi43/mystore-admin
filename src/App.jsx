@@ -28,6 +28,7 @@ import AddAdmin from "./pages/AddAdmin";
 import Invoice from "./pages/Invoice";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DeleteAccount from "./pages/DeleteAccount";
+import Departments from "./pages/Departments";
 // LAYOUT
 import AdminLayout from "./layouts/AdminLayout";
 
@@ -166,7 +167,8 @@ function App() {
             element={<PhoneVerification />}
           />
           <Route path="/add-admin" element={<AddAdmin />} />
-          <Route path="/categories" element={<Categories />} />
+          <Route path="/departments" element={<Departments />} />
+<Route path="/categories" element={<Categories />} />
           <Route path="/brands" element={<Brands />} />
           <Route path="/slideshow" element={<Slideshow />} />
           <Route path="/notifications" element={<Notifications />} />

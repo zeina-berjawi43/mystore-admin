@@ -46,9 +46,9 @@ export default function PrivacyPolicy() {
 
             <li>
               Authentication information used to
-              register, sign in, verify your phone
-              number, and recover access to your
-              account.
+              register, sign in, and verify your phone
+              number through one-time verification
+              codes (OTP).
             </li>
 
             <li>
@@ -77,11 +77,12 @@ export default function PrivacyPolicy() {
           </ul>
 
           <p>
-            Passwords are used for account
-            authentication. We do not need your
-            password when you contact customer
-            support, and you should never send it
-            to us by email.
+            BStore customer accounts use phone
+            verification codes (OTP) instead of
+            passwords. You should never share
+            your verification code with anyone
+            other than the person responsible
+            for completing your verification.
           </p>
         </section>
 
@@ -98,8 +99,9 @@ export default function PrivacyPolicy() {
             </li>
 
             <li>
-              Authenticate users, verify phone
-              numbers, and support password recovery.
+              Authenticate users and verify phone
+              numbers using one-time verification
+              codes (OTP).
             </li>
 
             <li>
@@ -205,25 +207,40 @@ export default function PrivacyPolicy() {
 
           <p>
             We retain personal information for as
-            long as necessary to provide our
-            services and meet applicable legal,
-            accounting, and legitimate business
-            requirements.
+            long as necessary to provide our services
+            and meet applicable legal, accounting,
+            and legitimate business requirements.
           </p>
 
           <p>
-            Historical orders and invoices may
-            remain after account deletion when
-            retention is necessary for these
-            purposes. Invoices may contain customer
-            information recorded at the time of
-            the transaction.
+            Invoices and related accounting records
+            are retained for 10 years from the end
+            of the year to which they relate, in
+            accordance with applicable Lebanese
+            tax and accounting requirements.
           </p>
 
           <p>
-            When retention is no longer necessary,
-            we delete or anonymize personal
-            information, where appropriate.
+            If you delete your account, invoices
+            and related transaction records may
+            remain for the applicable retention
+            period. These records may contain
+            customer information recorded at the
+            time of the transaction.
+          </p>
+
+          <p>
+            Account information that is not required
+            for continued retention will be deleted
+            in accordance with our account deletion
+            procedures.
+          </p>
+
+          <p>
+            When the applicable retention period
+            expires, personal information will be
+            deleted or anonymized unless further
+            retention is required by law.
           </p>
 
           <p>

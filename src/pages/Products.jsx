@@ -95,21 +95,65 @@ const firstFilterRender = useRef(true);
 // TOKEN
 // ============================================================
 
-const getToken = () => {
-return localStorage.getItem("accessToken");
+const refreshAdminAccessToken = async () => {
+const refreshToken = localStorage.getItem("refreshToken");
+
+if (!refreshToken) {
+  throw new Error("Session expired. Please log in again.");
+}
+
+const response = await fetch(`${API_URL}/auth/refresh-token`, {
+  method: "POST",
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ refreshToken }),
+});
+
+const data = await response.json();
+
+if (!response.ok || !data?.accessToken) {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("user");
+  localStorage.removeItem("isLoggedIn");
+  throw new Error("Session expired. Please log in again.");
+}
+
+localStorage.setItem("accessToken", data.accessToken);
+return data.accessToken;
+};
+
+const getValidAdminToken = async () => {
+const token = localStorage.getItem("accessToken");
+return token || refreshAdminAccessToken();
 };
 
 // ============================================================
-// HEADERS
+// AUTHORIZED FETCH
 // ============================================================
 
-const getHeaders = () => {
-const token = getToken();
+const authorizedFetch = async (url, options = {}) => {
+let token = await getValidAdminToken();
 
-return {
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${token}`,
-};
+const makeRequest = (accessToken) =>
+  fetch(url, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+let response = await makeRequest(token);
+
+if (response.status === 401) {
+  token = await refreshAdminAccessToken();
+  response = await makeRequest(token);
+}
+
+return response;
 };
 
 // ============================================================
@@ -214,9 +258,8 @@ setLoading(true);
 
   const url = `${API_URL}/products/admin/all?${params.toString()}`;
 
-  const response = await fetch(url, {
+  const response = await authorizedFetch(url, {
     method: "GET",
-    headers: getHeaders(),
   });
 
   const data = await response.json();
@@ -426,13 +469,8 @@ try {
   // Product images must use "products".
   formData.append("type", "products");
 
-  const token = getToken();
-
-  const response = await fetch(`${API_URL}/upload/image`, {
+  const response = await authorizedFetch(`${API_URL}/upload/image`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
     body: formData,
   });
 
@@ -614,9 +652,11 @@ try {
     method = "POST";
   }
 
-  const response = await fetch(url, {
+  const response = await authorizedFetch(url, {
     method,
-    headers: getHeaders(),
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(body),
   });
 
@@ -667,11 +707,11 @@ try {
     [product._id]: true,
   }));
 
-  const response = await fetch(
+  const response = await authorizedFetch(
     `${API_URL}/products/${product._id}`,
     {
       method: "PUT",
-      headers: getHeaders(),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ price }),
     }
   );
@@ -727,11 +767,11 @@ try {
     [product._id]: true,
   }));
 
-  const response = await fetch(
+  const response = await authorizedFetch(
     `${API_URL}/products/${product._id}`,
     {
       method: "PUT",
-      headers: getHeaders(),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ discount }),
     }
   );
@@ -772,11 +812,11 @@ try {
     [product._id]: true,
   }));
 
-  const response = await fetch(
+  const response = await authorizedFetch(
     `${API_URL}/products/${product._id}`,
     {
       method: "PUT",
-      headers: getHeaders(),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ availability: newAvailability }),
     }
   );
@@ -821,11 +861,11 @@ if (!confirmed) {
 }
 
 try {
-  const response = await fetch(
+  const response = await authorizedFetch(
     `${API_URL}/products/${product._id}`,
     {
       method: "DELETE",
-      headers: getHeaders(),
+      headers: { "Content-Type": "application/json" },
     }
   );
 

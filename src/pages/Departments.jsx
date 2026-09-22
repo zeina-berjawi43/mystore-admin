@@ -15,7 +15,9 @@ export default function Departments() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [saving, setSaving] = useState(false);
+  const [draggingImage, setDraggingImage] = useState(false);
   const previewUrl = useRef(null);
+  const fileInputRef = useRef(null);
 
   const clearPreview = () => {
     if (previewUrl.current) {
@@ -76,17 +78,14 @@ export default function Departments() {
     setShowModal(true);
   };
 
-  const chooseImage = (event) => {
-    const file = event.target.files?.[0];
+  const setSelectedImage = (file) => {
     if (!file) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       alert("Choose a JPG, PNG or WEBP image.");
-      event.target.value = "";
       return;
     }
     if (file.size > MAX_IMAGE_SIZE) {
       alert("Image must be smaller than 5 MB.");
-      event.target.value = "";
       return;
     }
     clearPreview();
@@ -96,16 +95,72 @@ export default function Departments() {
     setImagePreview(url);
   };
 
-  const uploadImage = async (file, token) => {
+  const chooseImage = (event) => {
+    setSelectedImage(event.target.files?.[0]);
+    event.target.value = "";
+  };
+
+  const dropImage = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDraggingImage(false);
+    setSelectedImage(event.dataTransfer.files?.[0]);
+  };
+
+  const refreshAdminAccessToken = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (!refreshToken) throw new Error("Session expired. Please log in again.");
+
+    const response = await fetch(`${API_URL}/auth/refresh-token`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    });
+    const data = await response.json();
+
+    if (!response.ok || !data?.accessToken) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      localStorage.removeItem("isLoggedIn");
+      throw new Error("Session expired. Please log in again.");
+    }
+
+    localStorage.setItem("accessToken", data.accessToken);
+    return data.accessToken;
+  };
+
+  const getValidAdminToken = async () => {
+    const token = localStorage.getItem("accessToken");
+    return token || refreshAdminAccessToken();
+  };
+
+  const authorizedFetch = async (url, options = {}) => {
+    let token = await getValidAdminToken();
+
+    const makeRequest = (accessToken) =>
+      fetch(url, {
+        ...options,
+        headers: { ...(options.headers || {}), Authorization: `Bearer ${accessToken}` },
+      });
+
+    let response = await makeRequest(token);
+    if (response.status === 401) {
+      token = await refreshAdminAccessToken();
+      response = await makeRequest(token);
+    }
+    return response;
+  };
+
+  const uploadImage = async (file) => {
     const payload = new FormData();
     payload.append("image", file);
     // Existing backend image validation recognizes "categories".
     // If the upload endpoint has a dedicated "departments" type, change this value there and here.
     payload.append("type", "categories");
 
-    const response = await fetch(`${API_URL}/upload/image`, {
+    const response = await authorizedFetch(`${API_URL}/upload/image`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
       body: payload,
     });
     const data = await response.json();
@@ -127,19 +182,15 @@ export default function Departments() {
     if (!form.order.trim() || !Number.isFinite(order) || !Number.isInteger(order)) {
       return alert("Enter a valid whole-number order.");
     }
-    const token = localStorage.getItem("accessToken");
-    if (!token) return alert("Session expired. Please log in again.");
-
     try {
       setSaving(true);
       // Upload first; only save the department once a public image URL is available.
-      const image = imageFile ? await uploadImage(imageFile, token) : form.image;
-      const response = await fetch(
+      const image = imageFile ? await uploadImage(imageFile) : form.image;
+      const response = await authorizedFetch(
         editing ? `${API_URL}/departments/${editing._id}` : `${API_URL}/departments`,
         {
           method: editing ? "PUT" : "POST",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -167,9 +218,8 @@ export default function Departments() {
   const remove = async (department) => {
     if (!window.confirm(`Delete "${department.name}"? Departments with categories cannot be deleted.`)) return;
     try {
-      const response = await fetch(`${API_URL}/departments/${department._id}`, {
+      const response = await authorizedFetch(`${API_URL}/departments/${department._id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Failed to delete department");
@@ -221,9 +271,51 @@ export default function Departments() {
           <form className="management-form" onSubmit={save}>
             <div className="management-form-group"><label htmlFor="department-name">Department Name *</label><input id="department-name" required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></div>
             <div className="management-form-group">
-              <label htmlFor="department-image">Department Image (optional)</label>
-              <input id="department-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={saving} onChange={chooseImage} />
-              {imagePreview && <img src={imagePreview} alt="Department preview" style={{ width: 90, height: 90, objectFit: "cover", marginTop: 12, borderRadius: 12 }} />}
+              <label>Department Image (optional)</label>
+              <input ref={fileInputRef} id="department-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={saving} onChange={chooseImage} style={{ display: "none" }} />
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => !saving && fileInputRef.current?.click()}
+                onKeyDown={(event) => {
+                  if (!saving && (event.key === "Enter" || event.key === " ")) {
+                    event.preventDefault();
+                    fileInputRef.current?.click();
+                  }
+                }}
+                onDragEnter={(event) => { event.preventDefault(); event.stopPropagation(); if (!saving) setDraggingImage(true); }}
+                onDragOver={(event) => { event.preventDefault(); event.stopPropagation(); }}
+                onDragLeave={(event) => { event.preventDefault(); event.stopPropagation(); if (event.currentTarget === event.target) setDraggingImage(false); }}
+                onDrop={dropImage}
+                style={{
+                  minHeight: 150,
+                  border: `2px dashed ${draggingImage ? "#E35B3F" : "#D8CFC3"}`,
+                  borderRadius: 16,
+                  background: draggingImage ? "#FFF7F3" : "#FAF7F2",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  padding: 18,
+                  cursor: saving ? "not-allowed" : "pointer",
+                  textAlign: "center",
+                }}
+              >
+                {imagePreview ? (
+                  <>
+                    <img src={imagePreview} alt="Department preview" style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 14 }} />
+                    <strong>{draggingImage ? "Drop image here" : "Drop another image to replace"}</strong>
+                    <span style={{ fontSize: 12, color: "#817B71" }}>JPG, PNG or WEBP · max 5 MB</span>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontSize: 34 }}>🖼️</span>
+                    <strong>{draggingImage ? "Drop image here" : "Drag & drop image here"}</strong>
+                    <span style={{ fontSize: 12, color: "#817B71" }}>or click this area to browse · JPG, PNG or WEBP · max 5 MB</span>
+                  </>
+                )}
+              </div>
               {(imageFile || form.image) && <button type="button" disabled={saving} className="management-cancel-button" onClick={() => { clearPreview(); setImageFile(null); setImagePreview(""); setForm((previous) => ({ ...previous, image: "" })); }}>Remove image</button>}
             </div>
             <div className="management-form-group"><label htmlFor="department-order">Display Order *</label><input id="department-order" type="number" required step="1" value={form.order} onChange={(event) => setForm({ ...form, order: event.target.value })} /></div>

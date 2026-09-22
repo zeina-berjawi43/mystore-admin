@@ -166,7 +166,12 @@ export default function Departments() {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || "Failed to upload image");
 
-    const url = data.url || data.imageUrl || data.image?.url || data.data?.url;
+    const imageUrl =
+  data.image ||
+  data.url ||
+  data.imageUrl ||
+  data.image?.url ||
+  data.data?.url;
     if (typeof url !== "string" || !/^https?:\/\//i.test(url)) {
       throw new Error("Image uploaded but the server did not return a recognized URL. Check /upload/image response format.");
     }

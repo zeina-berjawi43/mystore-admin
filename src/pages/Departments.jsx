@@ -80,8 +80,8 @@ export default function Departments() {
 
   const setSelectedImage = (file) => {
     if (!file) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      alert("Choose a JPG, PNG or WEBP image.");
+    if (!["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
+      alert("Choose a JPG, JPEG or PNG image.");
       return;
     }
     if (file.size > MAX_IMAGE_SIZE) {
@@ -172,10 +172,16 @@ export default function Departments() {
   data.imageUrl ||
   data.image?.url ||
   data.data?.url;
-    if (typeof url !== "string" || !/^https?:\/\//i.test(url)) {
-      throw new Error("Image uploaded but the server did not return a recognized URL. Check /upload/image response format.");
+    if (
+      typeof imageUrl !== "string" ||
+      !/^https?:\/\//i.test(imageUrl)
+    ) {
+      throw new Error(
+        "Image uploaded but the server did not return a recognized URL."
+      );
     }
-    return url;
+
+    return imageUrl;
   };
 
   const save = async (event) => {
@@ -277,7 +283,7 @@ export default function Departments() {
             <div className="management-form-group"><label htmlFor="department-name">Department Name *</label><input id="department-name" required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></div>
             <div className="management-form-group">
               <label>Department Image (optional)</label>
-              <input ref={fileInputRef} id="department-image" type="file" accept="image/jpeg,image/png,image/webp" disabled={saving} onChange={chooseImage} style={{ display: "none" }} />
+              <input ref={fileInputRef} id="department-image" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" disabled={saving} onChange={chooseImage} style={{ display: "none" }} />
               <div
                 role="button"
                 tabIndex={0}
@@ -311,13 +317,13 @@ export default function Departments() {
                   <>
                     <img src={imagePreview} alt="Department preview" style={{ width: 120, height: 120, objectFit: "cover", borderRadius: 14 }} />
                     <strong>{draggingImage ? "Drop image here" : "Drop another image to replace"}</strong>
-                    <span style={{ fontSize: 12, color: "#817B71" }}>JPG, PNG or WEBP · max 5 MB</span>
+                    <span style={{ fontSize: 12, color: "#817B71" }}>JPG, JPEG or PNG · max 5 MB</span>
                   </>
                 ) : (
                   <>
                     <span style={{ fontSize: 34 }}>🖼️</span>
                     <strong>{draggingImage ? "Drop image here" : "Drag & drop image here"}</strong>
-                    <span style={{ fontSize: 12, color: "#817B71" }}>or click this area to browse · JPG, PNG or WEBP · max 5 MB</span>
+                    <span style={{ fontSize: 12, color: "#817B71" }}>or click this area to browse · JPG, JPEG or PNG · max 5 MB</span>
                   </>
                 )}
               </div>

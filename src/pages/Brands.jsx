@@ -21,22 +21,74 @@ function Brands() {
   const [name, setName] = useState("");
 
   // ============================================================
-  // TOKEN
+  // AUTH / TOKEN REFRESH
   // ============================================================
 
-  const getToken = () => {
-    return localStorage.getItem("accessToken");
+  const clearAdminSession = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("isLoggedIn");
   };
 
-  // ============================================================
-  // HEADERS
-  // ============================================================
+  const refreshAdminAccessToken = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
 
-  const getHeaders = () => {
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`
-    };
+    if (!refreshToken) {
+      clearAdminSession();
+      throw new Error("Session expired. Please log in again.");
+    }
+
+    const response = await fetch(`${API_URL}/auth/refresh-token`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ refreshToken })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data?.accessToken) {
+      clearAdminSession();
+      throw new Error("Session expired. Please log in again.");
+    }
+
+    localStorage.setItem("accessToken", data.accessToken);
+
+    if (data.refreshToken) {
+      localStorage.setItem("refreshToken", data.refreshToken);
+    }
+
+    return data.accessToken;
+  };
+
+  const getValidAdminToken = async () => {
+    const token = localStorage.getItem("accessToken");
+    return token || refreshAdminAccessToken();
+  };
+
+  const authorizedFetch = async (url, options = {}) => {
+    let token = await getValidAdminToken();
+
+    const makeRequest = (accessToken) =>
+      fetch(url, {
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+
+    let response = await makeRequest(token);
+
+    if (response.status === 401) {
+      token = await refreshAdminAccessToken();
+      response = await makeRequest(token);
+    }
+
+    return response;
   };
 
   // ============================================================
@@ -150,11 +202,11 @@ function Brands() {
         method = "POST";
       }
 
-      const response = await fetch(
+      const response = await authorizedFetch(
         url,
         {
           method,
-          headers: getHeaders(),
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: trimmedName
           })
@@ -206,11 +258,10 @@ function Brands() {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(
+      const response = await authorizedFetch(
         `${API_URL}/brands/${brand._id}`,
         {
-          method: "DELETE",
-          headers: getHeaders()
+          method: "DELETE"
         }
       );
 

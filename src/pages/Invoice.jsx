@@ -1,3 +1,4 @@
+import { sessionStorageAdapter } from '../utils/session-storage';
 import {
   useCallback,
   useEffect,
@@ -10,7 +11,7 @@ import {
   useParams,
 } from "react-router-dom";
 
-import axios from "axios";
+import axios from "../utils/admin-api";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -31,9 +32,9 @@ const INVOICE_LOGO = "/logo.png";
 
 const getToken = () => {
   const token =
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("adminToken") ||
-    localStorage.getItem("token") ||
+    sessionStorageAdapter.getItem("accessToken") ||
+    sessionStorageAdapter.getItem("adminToken") ||
+    sessionStorageAdapter.getItem("token") ||
     "";
 
   return token.replace(/^Bearer\s+/i, "").trim();

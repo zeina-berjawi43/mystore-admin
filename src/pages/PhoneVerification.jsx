@@ -1,3 +1,6 @@
+import { whatsappPhone as normalizeWhatsAppPhone } from '../utils/whatsapp-phone';
+import { authorizedFetch as fetch } from '../utils/admin-api';
+import { sessionStorageAdapter } from '../utils/session-storage';
 import { useEffect, useState } from "react";
 
 const API_URL =
@@ -13,7 +16,7 @@ const [error, setError] = useState("");
 // ============================================================
 
 const getToken = () => {
-return localStorage.getItem(
+return sessionStorageAdapter.getItem(
 "accessToken"
 );
 };
@@ -233,7 +236,6 @@ request
 return (
 request?.pendingPhone ||
 request?.newPhone ||
-request?.phone ||
 ""
 );
 }
@@ -257,14 +259,11 @@ return;
 }
 
 const cleanPhone =
-  String(phone).replace(
-    /[^0-9]/g,
-    ""
-  );
+  normalizeWhatsAppPhone(phone);
 
 if (!cleanPhone) {
   alert(
-    "Invalid phone number."
+    "This phone record is malformed or ambiguous. Review the stored number before opening WhatsApp."
   );
 
   return;

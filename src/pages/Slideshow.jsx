@@ -1,3 +1,5 @@
+import { authorizedFetch as fetch } from '../utils/admin-api';
+import { sessionStorageAdapter } from '../utils/session-storage';
 import React, {
   useEffect,
   useState,
@@ -69,7 +71,7 @@ function Slideshow() {
   // ============================================================
 
   const getToken = () => {
-    return localStorage.getItem("accessToken");
+    return sessionStorageAdapter.getItem("accessToken");
   };
 
   // ============================================================

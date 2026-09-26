@@ -1,3 +1,4 @@
+import { authorizedFetch as fetch } from './admin-api';
 
 // ============================================================
 // BStore Admin - Web Push

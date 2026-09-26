@@ -1,3 +1,5 @@
+import { authorizedFetch as fetch } from '../utils/admin-api';
+import { sessionStorageAdapter } from '../utils/session-storage';
 import React, { useEffect, useState } from "react";
 import {
   subscribeToWebPush,
@@ -114,7 +116,7 @@ function Notifications() {
       setSuccessMessage("");
 
       const accessToken =
-        localStorage.getItem("accessToken");
+        sessionStorageAdapter.getItem("accessToken");
 
       if (!accessToken) {
         setErrorMessage(
@@ -199,7 +201,7 @@ function Notifications() {
       }
 
       const accessToken =
-        localStorage.getItem("accessToken");
+        sessionStorageAdapter.getItem("accessToken");
 
       if (!accessToken) {
         setErrorMessage(

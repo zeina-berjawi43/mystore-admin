@@ -1,6 +1,7 @@
+import { saveSession } from '../utils/session-storage';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../utils/admin-api";
 
 const API_URL =
   "https://mystore-backend-u6ey.onrender.com";
@@ -60,22 +61,7 @@ function Login() {
       // SAVE AUTH DATA
       // ========================================================
       //
-      // Tokens are always written to localStorage so every other
-      // page (which reads localStorage directly) keeps working
-      // unchanged. "Remember me" is implemented separately via the
-      // "rememberMe" flag below + the one-time check at the top of
-      // App.jsx: if this is a brand new browser session and
-      // rememberMe was "false", the app wipes the saved session
-      // before rendering, effectively logging the user out once
-      // they close and reopen the browser (but NOT on a simple
-      // page refresh, since sessionStorage survives refreshes).
-      // ========================================================
-
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("rememberMe", rememberMe ? "true" : "false");
+      await saveSession({ accessToken, refreshToken, user: JSON.stringify(user) }, rememberMe);
 
       navigate("/dashboard");
     } catch (error) {

@@ -33,38 +33,6 @@ import Departments from "./pages/Departments";
 import AdminLayout from "./layouts/AdminLayout";
 
 // ============================================================
-// "REMEMBER ME" ENFORCEMENT
-// ============================================================
-//
-// Runs once, the moment this module is first loaded (i.e. once
-// per browser tab). sessionStorage survives page refreshes but is
-// cleared when the tab/browser is closed - so if this is a brand
-// new session AND the user didn't check "remember me" at login,
-// we clear the saved auth data now, before anything renders.
-// A normal refresh within the same tab is unaffected.
-// ============================================================
-
-(function enforceRememberMe() {
-  const alreadyRanThisSession = sessionStorage.getItem(
-    "bstoreSessionActive"
-  );
-
-  if (!alreadyRanThisSession) {
-    sessionStorage.setItem("bstoreSessionActive", "true");
-
-    const rememberMe = localStorage.getItem("rememberMe");
-
-    if (rememberMe === "false") {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("rememberMe");
-    }
-  }
-})();
-
-// ============================================================
 // AUTO SYNC WEB PUSH
 // ============================================================
 
@@ -120,7 +88,7 @@ function AutoSyncWebPush() {
 //
 // NOTE: this check only controls what renders in the browser.
 // It does not (and cannot) replace real authorization checks on
-// the backend - anyone can edit localStorage and bypass this.
+// the backend - anyone can edit browser storage and bypass this.
 // Make sure every admin API route independently verifies the
 // token + role server-side.
 // ============================================================

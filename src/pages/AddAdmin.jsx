@@ -1,6 +1,7 @@
+import { sessionStorageAdapter } from '../utils/session-storage';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../utils/admin-api";
 
 const API_URL =
   "https://mystore-backend-u6ey.onrender.com";
@@ -47,7 +48,7 @@ function AddAdmin() {
     }
 
     const accessToken =
-      localStorage.getItem("accessToken");
+      sessionStorageAdapter.getItem("accessToken");
 
     if (!accessToken) {
       setError(

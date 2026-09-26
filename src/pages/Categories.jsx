@@ -1,3 +1,5 @@
+import { authorizedFetch as fetch } from '../utils/admin-api';
+import { sessionStorageAdapter } from '../utils/session-storage';
 import {
 useEffect,
 useState
@@ -69,7 +71,7 @@ setImagePreview
 const getToken = () => {
 
 
-return localStorage.getItem(
+return sessionStorageAdapter.getItem(
   "accessToken"
 );
 

@@ -1,3 +1,5 @@
+import { authorizedFetch as fetch } from '../utils/admin-api';
+import { sessionStorageAdapter } from '../utils/session-storage';
 import React, {
 useEffect,
 useRef,
@@ -95,66 +97,7 @@ const firstFilterRender = useRef(true);
 // TOKEN
 // ============================================================
 
-const refreshAdminAccessToken = async () => {
-const refreshToken = localStorage.getItem("refreshToken");
-
-if (!refreshToken) {
-  throw new Error("Session expired. Please log in again.");
-}
-
-const response = await fetch(`${API_URL}/auth/refresh-token`, {
-  method: "POST",
-  headers: {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ refreshToken }),
-});
-
-const data = await response.json();
-
-if (!response.ok || !data?.accessToken) {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user");
-  localStorage.removeItem("isLoggedIn");
-  throw new Error("Session expired. Please log in again.");
-}
-
-localStorage.setItem("accessToken", data.accessToken);
-return data.accessToken;
-};
-
-const getValidAdminToken = async () => {
-const token = localStorage.getItem("accessToken");
-return token || refreshAdminAccessToken();
-};
-
-// ============================================================
-// AUTHORIZED FETCH
-// ============================================================
-
-const authorizedFetch = async (url, options = {}) => {
-let token = await getValidAdminToken();
-
-const makeRequest = (accessToken) =>
-  fetch(url, {
-    ...options,
-    headers: {
-      ...(options.headers || {}),
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-let response = await makeRequest(token);
-
-if (response.status === 401) {
-  token = await refreshAdminAccessToken();
-  response = await makeRequest(token);
-}
-
-return response;
-};
+const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers: { ...options.headers, Authorization: `Bearer ${sessionStorageAdapter.getItem("accessToken") || ""}` } });
 
 // ============================================================
 // IMAGE URL

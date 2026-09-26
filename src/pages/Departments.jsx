@@ -1,3 +1,5 @@
+import { authorizedFetch as fetch } from '../utils/admin-api';
+import { sessionStorageAdapter } from '../utils/session-storage';
 import { useEffect, useRef, useState } from "react";
 
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
@@ -107,50 +109,7 @@ export default function Departments() {
     setSelectedImage(event.dataTransfer.files?.[0]);
   };
 
-  const refreshAdminAccessToken = async () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) throw new Error("Session expired. Please log in again.");
-
-    const response = await fetch(`${API_URL}/auth/refresh-token`, {
-      method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
-    });
-    const data = await response.json();
-
-    if (!response.ok || !data?.accessToken) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
-      localStorage.removeItem("isLoggedIn");
-      throw new Error("Session expired. Please log in again.");
-    }
-
-    localStorage.setItem("accessToken", data.accessToken);
-    return data.accessToken;
-  };
-
-  const getValidAdminToken = async () => {
-    const token = localStorage.getItem("accessToken");
-    return token || refreshAdminAccessToken();
-  };
-
-  const authorizedFetch = async (url, options = {}) => {
-    let token = await getValidAdminToken();
-
-    const makeRequest = (accessToken) =>
-      fetch(url, {
-        ...options,
-        headers: { ...(options.headers || {}), Authorization: `Bearer ${accessToken}` },
-      });
-
-    let response = await makeRequest(token);
-    if (response.status === 401) {
-      token = await refreshAdminAccessToken();
-      response = await makeRequest(token);
-    }
-    return response;
-  };
+  const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers: { ...options.headers, Authorization: `Bearer ${sessionStorageAdapter.getItem("accessToken") || ""}` } });
 
   const uploadImage = async (file) => {
     const payload = new FormData();

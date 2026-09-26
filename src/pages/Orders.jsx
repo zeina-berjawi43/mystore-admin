@@ -1,9 +1,10 @@
+import { sessionStorageAdapter } from '../utils/session-storage';
 import {
   useEffect,
   useState,
 } from "react";
 
-import axios from "axios";
+import axios from "../utils/admin-api";
 import Pagination from "../components/Pagination";
 
 
@@ -27,9 +28,9 @@ const ORDER_STATUSES = [
 
 const getToken = () => {
   const storedToken =
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("adminToken") ||
-    localStorage.getItem("token") ||
+    sessionStorageAdapter.getItem("accessToken") ||
+    sessionStorageAdapter.getItem("adminToken") ||
+    sessionStorageAdapter.getItem("token") ||
     "";
 
   return storedToken

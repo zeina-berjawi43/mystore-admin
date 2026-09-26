@@ -1,5 +1,6 @@
+import { sessionStorageAdapter } from '../utils/session-storage';
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/admin-api";
 
 const API_URL =
   "https://mystore-backend-u6ey.onrender.com";
@@ -39,7 +40,7 @@ function Dashboard() {
       setError("");
 
       const token =
-        localStorage.getItem(
+        sessionStorageAdapter.getItem(
           "accessToken"
         );
 
@@ -81,7 +82,7 @@ function Dashboard() {
         error.response?.status === 403
       ) {
 
-        localStorage.clear();
+        sessionStorageAdapter.clear();
 
         window.location.href =
           "/login";
@@ -148,7 +149,7 @@ function Dashboard() {
 
 
         const token =
-          localStorage.getItem(
+          sessionStorageAdapter.getItem(
             "accessToken"
           );
 
@@ -230,7 +231,7 @@ function Dashboard() {
           error.response?.status === 403
         ) {
 
-          localStorage.clear();
+          sessionStorageAdapter.clear();
 
           window.location.href =
             "/login";

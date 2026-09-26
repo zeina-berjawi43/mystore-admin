@@ -1,3 +1,5 @@
+import { authTransport } from "./admin-api";
+import { sessionStorageAdapter } from './session-storage';
 // ============================================================
 // SHARED AUTH HELPERS
 // ============================================================
@@ -9,9 +11,9 @@
 
 export const getToken = () => {
   const token =
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("adminToken") ||
-    localStorage.getItem("token") ||
+    sessionStorageAdapter.getItem("accessToken") ||
+    sessionStorageAdapter.getItem("adminToken") ||
+    sessionStorageAdapter.getItem("token") ||
     "";
 
   return token.replace(/^Bearer\s+/i, "").trim();
@@ -39,7 +41,7 @@ export const getJsonHeaders = () => ({
 
 export const getCurrentUser = () => {
   try {
-    return JSON.parse(localStorage.getItem("user") || "null");
+    return JSON.parse(sessionStorageAdapter.getItem("user") || "null");
   } catch {
     return null;
   }
@@ -52,9 +54,6 @@ export const isAdminLoggedIn = () => {
   return Boolean(token && user && user.role === "admin");
 };
 
-export const clearAuth = () => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user");
-  localStorage.removeItem("isLoggedIn");
-};
+export const clearAuth = () => authTransport.logout().catch(() => {
+  console.warn('Server logout unavailable; local credentials cleared.');
+});

@@ -1,6 +1,7 @@
+import { sessionStorageAdapter } from '../utils/session-storage';
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/admin-api";
 import Pagination from "../components/Pagination";
 
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
@@ -34,7 +35,7 @@ function Users() {
   // ============================================================
 
   const getToken = () => {
-    return localStorage.getItem("accessToken");
+    return sessionStorageAdapter.getItem("accessToken");
   };
 
   // ============================================================
@@ -64,7 +65,7 @@ function Users() {
         error.response?.status === 401 ||
         error.response?.status === 403
       ) {
-        localStorage.clear();
+        sessionStorageAdapter.clear();
         window.location.href = "/login";
         return;
       }

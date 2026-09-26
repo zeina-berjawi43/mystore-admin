@@ -6,6 +6,16 @@ import Pagination from "../components/Pagination";
 
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
 
+// /users/admin/all returns customer firstName/lastName and admin/legacy name.
+const getUserName = (user) => {
+  const fullName = [user.firstName, user.lastName]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(" ");
+  const name = user.name?.trim() || "";
+  return user.role === "admin" ? name || fullName : fullName || name;
+};
+
 function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -108,7 +118,7 @@ function Users() {
     setEditingUser(user);
 
     setForm({
-      name: user.name || "",
+      name: getUserName(user),
       email: user.email || "",
       password: "",
       phone: user.phone || "",
@@ -202,7 +212,7 @@ function Users() {
 
   const handleDelete = async (user) => {
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${user.name}"?`
+      `Are you sure you want to delete "${getUserName(user)}"?`
     );
 
     if (!confirmed) return;
@@ -244,6 +254,9 @@ function Users() {
 
     const matchesSearch =
       !searchText ||
+      getUserName(user)
+        .toLowerCase()
+        .includes(searchText) ||
       user.name
         ?.toLowerCase()
         .includes(searchText) ||
@@ -414,13 +427,11 @@ function Users() {
                   <td>
                     <div className="user-cell">
                       <div className="user-avatar">
-                        {user.name
-                          ?.charAt(0)
-                          ?.toUpperCase() || "U"}
+                        {getUserName(user).charAt(0).toUpperCase() || "U"}
                       </div>
 
                       <div>
-                        <strong>{user.name}</strong>
+                        <strong>{getUserName(user) || "—"}</strong>
                         <small>{user.email || "—"}</small>
                       </div>
                     </div>

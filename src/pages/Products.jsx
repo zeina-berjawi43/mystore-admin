@@ -1,3 +1,5 @@
+import ProductImage from "../components/ProductImage";
+import ImageFrameEditor from "../components/ImageFrameEditor";
 import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
 import React, {
@@ -326,6 +328,7 @@ if (imagePreview && imagePreview.startsWith("blob:")) {
 }
 
 setImageFile(file);
+setForm(previous => ({ ...previous, imageFrame: { zoom: 1, x: 0, y: 0 } }));
 
 const preview = URL.createObjectURL(file);
 
@@ -493,6 +496,7 @@ setForm({
   price: product.price ?? "",
   discount: product.discount ?? 0,
   image: product.image || "",
+  imageFrame: product.imageFrame,
   category: product.category?._id || product.category || "",
   brand: product.brand?._id || product.brand || "",
   availability: product.availability !== false,
@@ -579,6 +583,7 @@ try {
     price,
     discount,
     image: imageURL,
+    ...(form.imageFrame !== undefined ? { imageFrame: form.imageFrame } : {}),
     category: form.category,
     brand: form.brand,
     availability: form.availability,
@@ -1025,7 +1030,7 @@ return ( <div className="products-page"> <div className="products-header"> <div>
                   <div className="product-cell">
                     <div className="product-image">
                       {product.image ? (
-                        <img
+                        <ProductImage imageFrame={product.imageFrame}
                           src={getImageUrl(product.image)}
                           alt={product.name}
                           onError={(event) => {
@@ -1302,34 +1307,10 @@ return ( <div className="products-page"> <div className="products-header"> <div>
               onDragLeave={handleImageDragLeave}
               onDrop={handleImageDrop}
             >
-              {imagePreview ? (
-                <div className="image-upload-preview-wrapper">
-                  <img
-                    src={imagePreview}
-                    alt="Product preview"
-                    className="image-upload-preview"
-                  />
-
-                  <div className="image-upload-overlay">
-                    <strong>
-                      Drop another image or click to replace
-                    </strong>
-                  </div>
-                </div>
-              ) : (
-                <div className="image-upload-placeholder">
-                  <div className="upload-icon">📷</div>
-
-                  <strong>Drag & Drop your image here</strong>
-                  <span>or click to browse</span>
-
-                  <small>
-                    JPG, PNG, WEBP or GIF
-                    <br />
-                    Maximum 5 MB
-                  </small>
-                </div>
-              )}
+              <div className="image-upload-placeholder">
+                <strong>{imagePreview ? 'Choose or drop a replacement image' : 'Choose or drop a product image'}</strong>
+                <small>JPG, PNG, WEBP or GIF - Maximum 5 MB</small>
+              </div>
             </label>
 
             <input
@@ -1340,6 +1321,10 @@ return ( <div className="products-page"> <div className="products-header"> <div>
               onChange={handleImageChange}
               disabled={saving || uploadingImage}
             />
+
+            {imagePreview && <ImageFrameEditor src={imagePreview} value={form.imageFrame}
+              disabled={saving || uploadingImage}
+              onChange={imageFrame => setForm(previous => ({ ...previous, imageFrame }))} />}
 
             {imageFile && (
               <div className="selected-image-info">

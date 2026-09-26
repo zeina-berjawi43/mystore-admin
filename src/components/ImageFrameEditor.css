@@ -1,0 +1,10 @@
+.frame-editor { margin: 12px 0; }
+.frame-editor-preview { width: 100%; max-width: 320px; aspect-ratio: 1; position: relative; overflow: hidden; background: #faf7f2; border-radius: 12px; touch-action: none; cursor: grab; user-select: none; }
+.frame-editor-preview:active { cursor: grabbing; }
+.frame-editor-preview img { pointer-events: none; display: block; }
+.frame-editor p { font-size: 12px; color: #655c50; margin: 8px 0; }
+.frame-editor-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.frame-editor-controls input { flex: 1; min-width: 100px; max-width: 180px; }
+.frame-editor-controls button { min-height: 40px; padding: 6px 12px; cursor: pointer; }
+.image-upload-box.has-image { min-height: 64px; }
+.image-upload-box.has-image .image-upload-placeholder { padding: 12px; }

@@ -27,6 +27,21 @@ for (const [index, label] of ['physical thermal', 'thermal preview', 'A4 preview
 }
 const restoreSource = readFileSync(new URL('../src/utils/restore-session.js', import.meta.url), 'utf8')
   .replace(/^import[^\n]+\n/gm, '').replace('export async function', 'async function') + '\nglobalThis.restore = restoreAdminSession;';
+test('thermal preview is the exact print template, including optional email and real logo asset', () => {
+  const props = { invoice: { invoiceNumber: 'CONSISTENCY', createdAt: '2026-09-27', customer: { name: 'Customer', email: 'customer@example.com' }, items: [] }, totals: { subtotal: 1, discount: 0, total: 1 }, notes: '', copyType: 'Store' };
+  const print = renderToStaticMarkup(React.createElement(context.layouts[0], props));
+  assert.equal(renderToStaticMarkup(React.createElement(context.layouts[1], props)), print);
+  assert.ok(print.includes('customer@example.com'));
+  const logoPath = print.match(/src="([^"]+)"/)[1];
+  assert.ok(readFileSync(new URL('../public' + logoPath, import.meta.url)).length > 0);
+});
+test('A4 printing uses the same document as preview rather than the editable screen', () => {
+  const invoice = readFileSync(new URL('../src/pages/Invoice.jsx', import.meta.url), 'utf8');
+  assert.match(invoice, /className="invoice-a4-print">\s*<A4Preview/);
+  const css = readFileSync(new URL('../src/pages/Invoice.css', import.meta.url), 'utf8');
+  assert.match(css, /\.invoice-page-a4 > \.invoice-paper \{ display: none !important;/);
+  assert.match(css, /\.a4-preview-summary[^}]*break-inside: avoid/);
+});
 function setup(status = 200) {
   const data = new Map([['refreshToken', 'valid-refresh'], ['accessToken', 'expired'], ['user', '{"role":"admin"}']]);
   const storage = { getItem: key => data.get(key) ?? null, commitAccess: async (expected, value) => { if (data.get('refreshToken') !== expected) return false; data.set('accessToken', value); return true; },

@@ -2666,3 +2666,109 @@
 }
 
 @media print { .invoice-zero-discount { display: none !important; } }
+
+/* Invoice acceptance: preview and print use the same read-only templates.
+   80mm BORDER BOX = 4mm + 72mm content + 4mm. No scaling or overflow mask. */
+.invoice-a4-print { display: none; }
+@media screen { .invoice-page > .invoice-thermal-print { display: none; } }
+.invoice-preview-paper, .invoice-preview-modal.a4 .invoice-preview-paper { overflow: visible; }
+.invoice-preview-modal .invoice-thermal-print,
+.invoice-page-80mm > .invoice-thermal-print {
+  display: block; box-sizing: border-box !important;
+  width: 80mm !important; min-width: 80mm !important; max-width: 80mm !important;
+  padding: 6mm 4mm 16mm !important; margin: 0 auto !important;
+  background: #fff; color: #171717; font: 11px/1.4 Arial, sans-serif !important;
+}
+.invoice-thermal-print *, .a4-preview-content * { box-sizing: border-box; min-width: 0; }
+.invoice-thermal-print .thermal-print-header {
+  display: grid !important; grid-template-columns: 26mm minmax(0, 1fr); gap: 2mm;
+  align-items: center; width: 100%; padding-bottom: 3mm;
+}
+.invoice-thermal-print .thermal-print-logo {
+  display: block !important; width: 26mm !important; max-width: 26mm !important;
+  height: 26mm !important; max-height: 26mm !important; object-fit: contain !important;
+}
+.invoice-thermal-print .thermal-print-brand { display: flex; flex-direction: column; gap: 1mm; overflow: visible; }
+.invoice-thermal-print .thermal-print-brand strong { font-size: 18px; line-height: 1.2; }
+.invoice-thermal-print .thermal-print-brand span { font-size: 12px; letter-spacing: .5px; text-transform: uppercase; }
+.invoice-thermal-print .thermal-print-number {
+  grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start;
+  text-align: left; gap: 1mm; overflow: visible; width: 100%;
+}
+.invoice-thermal-print .thermal-print-number strong,
+.invoice-thermal-print .thermal-print-number span { font-size: 11px; white-space: normal; overflow-wrap: anywhere; }
+.invoice-thermal-print .thermal-print-divider { border-top: 1px dashed #666; width: 100%; margin: 0; }
+.invoice-thermal-print .thermal-print-customer { padding: 3mm 0; }
+.invoice-thermal-print .thermal-print-section-title { font-size: 11px; font-weight: 800; margin-bottom: 2mm; }
+.invoice-thermal-print .thermal-print-customer-row { display: grid; grid-template-columns: 13mm minmax(0,1fr); gap: 1mm; margin: 1mm 0; }
+.invoice-thermal-print .thermal-print-customer-row span,
+.invoice-thermal-print .thermal-print-customer-row strong { font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
+.invoice-thermal-print .thermal-print-products { padding: 3mm 0; width: 100%; }
+.invoice-thermal-print .thermal-print-products-head,
+.invoice-thermal-print .thermal-print-product-row {
+  display: grid !important; grid-template-columns: minmax(0,1fr) 8mm 17mm 21mm;
+  column-gap: 1mm; width: 100%; align-items: start; padding: 2mm 0;
+  break-inside: avoid; font-size: 11px; line-height: 1.4;
+}
+.invoice-thermal-print .thermal-print-products-head { font-weight: 800; border-bottom: 1px solid #171717; text-transform: uppercase; letter-spacing: 0; }
+.invoice-thermal-print .thermal-print-product-row { border-bottom: 1px dotted #ccc; }
+.invoice-thermal-print .thermal-print-products-head > *,
+.invoice-thermal-print .thermal-print-product-row > * { font-size: 11px; line-height: 1.4; min-width: 0; overflow-wrap: anywhere; white-space: normal; }
+.invoice-thermal-print .thermal-print-products-head > :nth-child(2),
+.invoice-thermal-print .thermal-print-product-qty { white-space: nowrap; text-align: right; }
+.invoice-thermal-print .thermal-print-products-head > :nth-child(n+3),
+.invoice-thermal-print .thermal-print-product-price,
+.invoice-thermal-print .thermal-print-product-total { text-align: right; font-variant-numeric: tabular-nums; }
+.invoice-thermal-print .thermal-print-summary { padding: 3mm 0; break-inside: avoid; }
+.invoice-thermal-print .thermal-print-summary-row,
+.invoice-thermal-print .thermal-print-total { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 2mm; padding: 1mm 0; font-size: 12px; }
+.invoice-thermal-print .thermal-print-summary strong,
+.invoice-thermal-print .thermal-print-summary span { white-space: normal; overflow-wrap: anywhere; font-size: inherit; }
+.invoice-thermal-print .thermal-print-summary strong { text-align: right; }
+.invoice-thermal-print .thermal-print-total { margin-top: 2mm; border-top: 1px solid #171717; padding-top: 2mm; font-size: 15px; font-weight: 800; }
+.invoice-thermal-print .thermal-print-notes { display: flex; flex-direction: column; gap: 1mm; padding: 3mm 0; }
+.invoice-thermal-print .thermal-print-notes strong,
+.invoice-thermal-print .thermal-print-notes span { font-size: 11px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.invoice-thermal-print .thermal-print-footer { display: flex; flex-direction: column; gap: 1mm; text-align: center; padding-top: 3mm; break-inside: avoid; }
+.invoice-thermal-print .thermal-print-footer strong,
+.invoice-thermal-print .thermal-print-footer span { font-size: 11px; }
+
+.a4-preview-content { width: 210mm; padding: 12mm 14mm; color: #171717; background: #fff; font: 14px/1.4 Arial, sans-serif; }
+.a4-preview-header { align-items: center; gap: 8mm; padding-bottom: 5mm; }
+.a4-preview-header > div:first-child { gap: 1mm; flex: 1; }
+.a4-preview-logo { width: 40mm; height: 40mm; object-fit: contain; margin: -4mm 0 -2mm; }
+.a4-preview-header > div:first-child > strong { font-size: 26px; }
+.a4-preview-header > div:first-child > span { font-size: 15px; margin-top: 0; }
+.a4-preview-number { max-width: 85mm; gap: 2mm; }
+.a4-preview-number > strong { font-size: 18px; overflow-wrap: anywhere; }
+.a4-preview-number > span { font-size: 13px; overflow-wrap: anywhere; }
+.a4-preview-customer { padding: 4mm 0; }
+.a4-preview-title { font-size: 13px; margin-bottom: 3mm; color: #444; }
+.a4-preview-customer-grid { gap: 3mm 10mm; }
+.a4-preview-customer-grid > div { gap: 1mm; }
+.a4-preview-customer-grid > div > span { font-size: 12px; color: #555; }
+.a4-preview-customer-grid > div > strong { font-size: 14px; }
+.a4-preview-products { padding: 4mm 0 0; }
+.a4-preview-products-head, .a4-preview-product-row { grid-template-columns: 8mm minmax(0,1fr) 14mm 28mm 32mm; gap: 2mm; padding: 2.5mm 2mm; align-items: start; break-inside: avoid; }
+.a4-preview-products-head { font-size: 12px; color: #444; }
+.a4-preview-product-row { font-size: 14px; min-height: 10mm; padding-top: 2mm; padding-bottom: 2mm; }
+.a4-preview-product-row > span:nth-child(2) { font-weight: 500; }
+.a4-preview-product-row > :nth-child(4), .a4-preview-product-row > strong { white-space: normal; overflow-wrap: anywhere; }
+.a4-preview-summary { display: block; clear: both; width: 100mm; padding-top: 5mm; break-inside: avoid; }
+.a4-preview-summary > div { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); align-items: baseline; gap: 4mm; padding: 2mm 0; font-size: 14px; color: #333; }
+.a4-preview-summary > div > strong { text-align: right; white-space: normal; overflow-wrap: anywhere; }
+.a4-preview-grand-total { font-size: 20px !important; margin-top: 2mm; padding-top: 3mm !important; }
+.a4-preview-grand-total strong { font-size: 20px; }
+.a4-preview-notes { margin-top: 5mm; padding: 3mm; }
+.a4-preview-notes > strong, .a4-preview-notes > span, .a4-preview-footer { font-size: 12px; color: #444; }
+.a4-preview-footer { margin-top: 4mm; padding-top: 2mm; break-inside: avoid; }
+@media print {
+  /* A valid explicit sheet size: `80mm auto` is not a supported CSS page size. */
+  @page invoice80 { size: 80mm 297mm; margin: 0; }
+  @page invoiceA4 { size: A4; margin: 12mm 14mm; }
+  .invoice-page-a4 { width: 182mm !important; min-width: 0 !important; max-width: 182mm !important; }
+  .invoice-page-a4 > .invoice-paper { display: none !important; }
+  .invoice-page-a4 > .invoice-a4-print { display: block !important; }
+  .invoice-a4-print .a4-preview-content { width: 182mm; min-height: 0; padding: 0; }
+  .invoice-page-80mm > .invoice-thermal-print { padding: 6mm 4mm 16mm !important; }
+}

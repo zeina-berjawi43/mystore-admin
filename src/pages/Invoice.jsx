@@ -24,7 +24,7 @@ const API_URL =
    INVOICE LOGO
    ============================================================ */
 
-const INVOICE_LOGO = "/logo.png";
+const INVOICE_LOGO = "/splash-logo-removebg-preview.png";
 
 /* ============================================================
    AUTH
@@ -317,7 +317,7 @@ function ThermalPrintLayout({
         </div>)}
 
         <div className="thermal-print-total">
-          <span>Total</span>
+          <span>Grand Total</span>
 
           <strong>
             {formatPrice(totals.total)}
@@ -354,190 +354,9 @@ function ThermalPrintLayout({
    80MM SCREEN PREVIEW
 ============================================================ */
 
-function ThermalPreview({
-  invoice,
-  totals,
-  notes,
-  copyType,
-}) {
-  if (!invoice) {
-    return null;
-  }
-
-  const items = invoice.items || [];
-
-  return (
-    <div className="thermal-preview-content">
-      <div className="thermal-preview-header">
-        <img
-          src={INVOICE_LOGO}
-          alt="BStore logo"
-          className="thermal-preview-logo"
-        />
-
-        <strong>BStore</strong>
-
-        <span>Invoice</span>
-
-        <small>
-          {invoice.invoiceNumber}
-        </small>
-
-        <small>
-          {formatDate(invoice.createdAt)}
-        </small>
-      </div>
-
-      <div className="thermal-preview-divider" />
-
-      <div className="thermal-preview-customer">
-        <strong className="thermal-preview-title">
-          CUSTOMER
-        </strong>
-
-        <div className="thermal-preview-customer-row">
-          <span>Name</span>
-
-          <strong>
-            {getCustomerName(invoice.customer)}
-          </strong>
-        </div>
-
-        {invoice.customer?.phone && (
-          <div className="thermal-preview-customer-row">
-            <span>Phone</span>
-
-            <strong>
-              {invoice.customer.phone}
-            </strong>
-          </div>
-        )}
-
-        {invoice.customer?.address && (
-          <div className="thermal-preview-customer-row">
-            <span>Address</span>
-
-            <strong>
-              {invoice.customer.address}
-            </strong>
-          </div>
-        )}
-      </div>
-
-      <div className="thermal-preview-divider" />
-
-      <div className="thermal-preview-products">
-        <div className="thermal-preview-products-head">
-          <span>Product</span>
-          <span>Qty</span>
-          <span>Price</span>
-          <span>Total</span>
-        </div>
-
-        {items.length > 0 ? (
-          items.map((item, index) => {
-            const quantity =
-              Number(item.quantity) || 0;
-
-            const price =
-              Number(item.price) || 0;
-
-            const lineTotal =
-              quantity * price;
-
-            return (
-              <div
-                className="thermal-preview-product-row"
-                key={
-                  item._id ||
-                  `${item.product?._id || item.product || "product"}-${index}`
-                }
-              >
-                <span className="thermal-preview-product-name">
-                  {item.productName || "Product"}
-                </span>
-
-                <span className="thermal-preview-qty">
-                  {quantity}
-                </span>
-
-                <span className="thermal-preview-price">
-                  {formatPrice(price)}
-                </span>
-
-                <strong className="thermal-preview-total">
-                  {formatPrice(lineTotal)}
-                </strong>
-              </div>
-            );
-          })
-        ) : (
-          <div className="thermal-preview-empty">
-            No products
-          </div>
-        )}
-      </div>
-
-      <div className="thermal-preview-divider" />
-
-      <div className="thermal-preview-summary">
-        <div>
-          <span>Subtotal</span>
-
-          <strong>
-            {formatPrice(totals.subtotal)}
-          </strong>
-        </div>
-
-        {Number(totals.discount) > 0 && (<div>
-          <span>
-            Discount ({totals.discount}%)
-          </span>
-
-          <strong>
-            -{formatPrice(totals.discountAmount)}
-          </strong>
-        </div>)}
-
-        <div className="thermal-preview-grand-total">
-          <span>Total</span>
-
-          <strong>
-            {formatPrice(totals.total)}
-          </strong>
-        </div>
-      </div>
-
-      {notes && (
-        <>
-          <div className="thermal-preview-divider" />
-
-          <div className="thermal-preview-notes">
-            <strong>Notes</strong>
-
-            <span>{notes}</span>
-          </div>
-        </>
-      )}
-
-      <div className="thermal-preview-divider" />
-
-      <div className="thermal-preview-footer">
-        <strong>
-          {copyType} Copy
-        </strong>
-
-        <span>
-          Thank you for your business
-        </span>
-      </div>
-    </div>
-  );
+function ThermalPreview(props) {
+  return <ThermalPrintLayout {...props} />;
 }
-
-/* ============================================================
-   A4 PREVIEW
-============================================================ */
 
 function A4Preview({
   invoice,
@@ -702,7 +521,7 @@ function A4Preview({
         </div>)}
 
         <div className="a4-preview-grand-total">
-          <span>Total</span>
+          <span>Grand Total</span>
 
           <strong>
             {formatPrice(
@@ -2464,7 +2283,7 @@ function Invoice() {
           </div>}
 
           <div className="invoice-summary-total">
-            <span>Total</span>
+            <span>Grand Total</span>
 
             <strong>
               {formatPrice(
@@ -2523,6 +2342,10 @@ function Invoice() {
       {/* ======================================================
           DEDICATED 80MM PRINT LAYOUT
       ====================================================== */}
+
+      <div className="invoice-a4-print">
+        <A4Preview invoice={invoice} totals={calculatedTotals} notes={notes || invoice.notes || ""} copyType={copyType} />
+      </div>
 
       <ThermalPrintLayout
         invoice={invoice}

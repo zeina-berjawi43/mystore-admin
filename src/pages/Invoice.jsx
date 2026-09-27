@@ -306,7 +306,7 @@ function ThermalPrintLayout({
           </strong>
         </div>
 
-        <div className="thermal-print-summary-row">
+        {Number(totals.discount) > 0 && (<div className="thermal-print-summary-row">
           <span>
             Discount ({totals.discount}%)
           </span>
@@ -314,7 +314,7 @@ function ThermalPrintLayout({
           <strong>
             -{formatPrice(totals.discountAmount)}
           </strong>
-        </div>
+        </div>)}
 
         <div className="thermal-print-total">
           <span>Total</span>
@@ -489,7 +489,7 @@ function ThermalPreview({
           </strong>
         </div>
 
-        <div>
+        {Number(totals.discount) > 0 && (<div>
           <span>
             Discount ({totals.discount}%)
           </span>
@@ -497,7 +497,7 @@ function ThermalPreview({
           <strong>
             -{formatPrice(totals.discountAmount)}
           </strong>
-        </div>
+        </div>)}
 
         <div className="thermal-preview-grand-total">
           <span>Total</span>
@@ -689,7 +689,7 @@ function A4Preview({
           </strong>
         </div>
 
-        <div>
+        {Number(totals.discount) > 0 && (<div>
           <span>
             Discount ({totals.discount}%)
           </span>
@@ -699,7 +699,7 @@ function A4Preview({
               totals.discountAmount
             )}
           </strong>
-        </div>
+        </div>)}
 
         <div className="a4-preview-grand-total">
           <span>Total</span>
@@ -2422,7 +2422,7 @@ function Invoice() {
             </strong>
           </div>
 
-          <div className="invoice-summary-row invoice-discount-row">
+          {(canEdit || Number(calculatedTotals.discount) > 0) && <div className={`invoice-summary-row invoice-discount-row ${Number(calculatedTotals.discount) > 0 ? "" : "invoice-zero-discount"}`}>
             <div>
               <span>Discount</span>
 
@@ -2461,7 +2461,7 @@ function Invoice() {
                 calculatedTotals.discountAmount
               )}
             </strong>
-          </div>
+          </div>}
 
           <div className="invoice-summary-total">
             <span>Total</span>

@@ -2627,3 +2627,42 @@
     display: none !important;
   }
 }
+
+/* 80mm paper: 4mm margins leave the XP-P801A's 72mm printable area. */
+.thermal-preview-content { padding: 6mm 4mm 16mm; font-size: 11px; }
+.thermal-preview-products-head, .thermal-preview-product-row {
+  grid-template-columns: minmax(0, 19fr) minmax(0, 3fr) minmax(0, 8fr) minmax(0, 9fr);
+  column-gap: .8mm;
+}
+.thermal-preview-products-head, .thermal-preview-product-name,
+.thermal-preview-qty, .thermal-preview-price, .thermal-preview-total {
+  font-size: 10px; white-space: normal; overflow-wrap: anywhere; min-width: 0;
+}
+.thermal-preview-summary > div { gap: 2mm; flex-wrap: wrap; font-size: 11px; }
+.thermal-preview-summary > div > strong { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
+.thermal-preview-grand-total, .thermal-preview-grand-total strong { font-size: 14px !important; }
+.thermal-preview-notes > span { height: auto; max-height: none; overflow: visible; }
+@media print {
+  .invoice-page-80mm > .invoice-thermal-print {
+    padding: 6mm 4mm 16mm !important;
+    font-size: 11px !important;
+  }
+  .thermal-print-products-head, .thermal-print-product-row {
+    grid-template-columns: minmax(0, 19fr) minmax(0, 3fr) minmax(0, 8fr) minmax(0, 9fr);
+    column-gap: .8mm;
+    break-inside: avoid;
+  }
+  .thermal-print-products-head, .thermal-print-product-name,
+  .thermal-print-product-qty, .thermal-print-product-price, .thermal-print-product-total {
+    font-size: 10px; white-space: normal; overflow-wrap: anywhere; min-width: 0;
+  }
+  .thermal-print-summary-row, .thermal-print-total { gap: 2mm; flex-wrap: wrap; font-size: 11px; break-inside: avoid; }
+  .thermal-print-summary-row strong, .thermal-print-total strong, .thermal-print-total span {
+    white-space: normal; overflow-wrap: anywhere; max-width: 100%;
+  }
+  .thermal-print-total { font-size: 14px; font-weight: 800; }
+  .thermal-print-brand, .thermal-print-number { overflow: visible; }
+  .thermal-print-footer { break-inside: avoid; }
+}
+
+@media print { .invoice-zero-discount { display: none !important; } }

@@ -1,3 +1,4 @@
+import SessionGate from "./components/SessionGate";
 import React, { useEffect } from "react";
 
 import {
@@ -94,14 +95,7 @@ function AutoSyncWebPush() {
 // ============================================================
 
 function ProtectedRoute({ children }) {
-  const token = getToken();
-  const user = getCurrentUser();
-
-  if (!token || !user || user.role !== "admin") {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
+  return <SessionGate>{children}</SessionGate>;
 }
 
 // ============================================================
@@ -115,7 +109,7 @@ function App() {
 
       <Routes>
         {/* PUBLIC */}
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<SessionGate login><Login /></SessionGate>} />
 
         {/* PROTECTED ADMIN AREA */}
         <Route

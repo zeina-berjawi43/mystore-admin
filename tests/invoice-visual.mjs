@@ -48,6 +48,7 @@ const ast = ts.createSourceFile('invoice.tsx', appSource, ts.ScriptTarget.Latest
 const helpers = new Set(['formatPrice','formatDate','getCustomerName','getItemQuantity','getItemPrice','escapeHtml','getLogoUri','buildInvoiceHtml','THERMAL_PREVIEW_COLUMNS']);
 const selected = ast.statements.filter(n => ts.isVariableStatement(n) && n.declarationList.declarations.some(d => helpers.has(d.name.getText(ast))));
 const app = { exports: {}, ...thermal, Image: { resolveAssetSource: () => ({ uri: appLogo }) }, LOGO: 1, console };
+const receiptPage = harness('src/services/receipt-page.ts').exports;
 vm.runInNewContext(ts.transpileModule(selected.map(n => n.getText(ast)).join('\n') + '\nexports.build = buildInvoiceHtml;', { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, app);
 const css = ['admin-panel/src/App.css','admin-panel/src/pages/Invoice.css'].map(read).join('\n');
 const cases = [];
@@ -91,6 +92,19 @@ try {
   await send('Page.navigate',{url:pathToFileURL(file).href});
   for(let i=0;i<80;i++) { const ready=await send('Runtime.evaluate',{expression:`location.href === ${JSON.stringify(pathToFileURL(file).href)} && document.readyState === 'complete'`,returnByValue:true}); if(ready.result.value)break;await new Promise(r=>setTimeout(r,50)); }
   await send('Runtime.evaluate',{expression:'Promise.all([document.fonts.ready, ...[...document.images].map(i=>i.decode().catch(()=>{}))])',awaitPromise:true});
+  if(c.mode==='print' && c.format==='80mm') {
+    if(c.name.startsWith('panel-')) {
+      const sizing=read('admin-panel/src/utils/receipt-page.js').replaceAll('export ', '');
+      await send('Runtime.evaluate',{expression:sizing+'; sizeReceiptPage();'});
+    } else {
+      const measured=await send('Runtime.evaluate',{expression:`new Promise(resolve=>{window.ReactNativeWebView={postMessage:message=>resolve(JSON.parse(message))};${receiptPage.RECEIPT_MEASURE_SCRIPT}})`,returnByValue:true,awaitPromise:true});
+      assert.ok(!measured.result.value.error,c.name+' WebView measurement script');
+      assert.ok(Math.abs(measured.result.value.width-72*96/25.4)<2,c.name+' measured printable width');
+      const page=receiptPage.receiptPage(c.html,measured.result.value.height);
+      const rule=page.html.match(/@page \{ size: 80mm [^}]+\}/)[0];
+      await send('Runtime.evaluate',{expression:`document.head.appendChild(document.createElement('style')).textContent=${JSON.stringify(rule)}`});
+    }
+  }
   const metrics=await send('Runtime.evaluate',{expression:`JSON.stringify([...document.querySelectorAll('[class*="product"],[class*="number"],[class*="summary"],[class*="total"],[class*="header"]')].filter(e=>e.getBoundingClientRect().width).map(e=>({cls:e.className,text:e.innerText?.slice(0,90),x:e.getBoundingClientRect().x,right:e.getBoundingClientRect().right,width:e.getBoundingClientRect().width,scroll:e.scrollWidth,client:e.clientWidth,font:getComputedStyle(e).fontSize,columns:getComputedStyle(e).gridTemplateColumns})))`,returnByValue:true});
   results.push({name:c.name,metrics:JSON.parse(metrics.result.value)});
   if(process.argv[2]!=='before') {
@@ -105,10 +119,11 @@ try {
      let qtyLines=0;if(qty){const range=document.createRange();range.selectNodeContents(qty);qtyLines=[...range.getClientRects()].filter(r=>r.width).length;}
      const summary=surface.querySelector('.thermal-print-summary,.totals,.a4-preview-summary,.a4-summary');
      const rows=surface.querySelectorAll('.thermal-print-product-row,.thermal-product-row,.a4-preview-product-row,.a4-table-row');
-     return {bad,qtyLines,summaryAfterProducts:!rows.length||summary.getBoundingClientRect().top>=rows[rows.length-1].getBoundingClientRect().bottom-1,images:[...surface.querySelectorAll('img')].every(i=>i.complete&&i.naturalWidth>0)};
+     const logo=surface.querySelector('img').getBoundingClientRect();
+     return {bad,qtyLines,logoCentered:Math.abs((logo.left+logo.right)-(bounds.left+bounds.right))<2,dateOnce:(surface.innerText.match(/05:30 PM/g)||[]).length===1,shortFooter:surface.innerText.includes('Thank you')&&!surface.innerText.includes('for your business'),summaryAfterProducts:!rows.length||summary.getBoundingClientRect().top>=rows[rows.length-1].getBoundingClientRect().bottom-1,images:[...surface.querySelectorAll('img')].every(i=>i.complete&&i.naturalWidth>0)};
    })())`,returnByValue:true});
    const checks=JSON.parse(validation.result.value);results.at(-1).checks=checks;
-   if(checks.bad){assert.deepEqual(checks.bad,[],c.name+' text beyond document edges');assert.equal(checks.qtyLines,1,c.name+' QTY must fit one line');assert.equal(checks.summaryAfterProducts,true,c.name+' totals must follow final product');assert.equal(checks.images,true,c.name+' missing logo');}
+   if(checks.bad){assert.deepEqual(checks.bad,[],c.name+' text beyond document edges');assert.equal(checks.qtyLines,1,c.name+' QTY must fit one line');assert.equal(checks.summaryAfterProducts,true,c.name+' totals must follow final product');assert.equal(checks.images,true,c.name+' missing logo');for(const key of ['logoCentered','dateOnce','shortFooter'])assert.equal(checks[key],true,c.name+' '+key);}
   }
   const layout=await send('Page.getLayoutMetrics');const height=Math.min(16000,Math.ceil(layout.cssContentSize.height));
   const shot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip:{x:0,y:0,width:c.format==='A4'?794:303,height,scale:1}});

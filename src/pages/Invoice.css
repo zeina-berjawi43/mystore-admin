@@ -2191,7 +2191,7 @@
   }
 
   @page invoice80 {
-    size: 80mm auto;
+    size: auto; /* content-sized paper supplied by receipt-page.js */
     margin: 0;
   }
 
@@ -2764,11 +2764,32 @@
 .a4-preview-footer { margin-top: 4mm; padding-top: 2mm; break-inside: avoid; }
 @media print {
   /* A valid explicit sheet size: `80mm auto` is not a supported CSS page size. */
-  @page invoice80 { size: 80mm 297mm; margin: 0; }
+  @page invoice80 { size: auto; margin: 0; } /* exact roll length supplied by receipt-page.js */
   @page invoiceA4 { size: A4; margin: 12mm 14mm; }
   .invoice-page-a4 { width: 182mm !important; min-width: 0 !important; max-width: 182mm !important; }
   .invoice-page-a4 > .invoice-paper { display: none !important; }
   .invoice-page-a4 > .invoice-a4-print { display: block !important; }
   .invoice-a4-print .a4-preview-content { width: 182mm; min-height: 0; padding: 0; }
   .invoice-page-80mm > .invoice-thermal-print { padding: 6mm 4mm 16mm !important; }
+}
+
+/* Screen documents belong exclusively to the existing Preview modal. Keep this
+   after the shared template rules so their display:block cannot expose a copy. */
+@media screen {
+  .invoice-page > .invoice-thermal-print,
+  .invoice-page > .invoice-a4-print { display: none !important; }
+}
+.invoice-thermal-print .thermal-print-header { display: flex !important; flex-direction: column; gap: 2mm; }
+.invoice-thermal-print .thermal-print-logo { width: 34mm !important; height: 34mm !important; max-width: 34mm !important; max-height: 34mm !important; align-self: center; }
+.invoice-thermal-print .thermal-print-number { align-items: stretch; text-align: left; }
+.a4-preview-header { flex-direction: column; gap: 3mm; }
+.a4-preview-header > div:first-child { align-items: center; flex: none; width: 100%; }
+.a4-preview-logo { width: 48mm; height: 48mm; margin: -4mm 0; }
+.a4-preview-number { width: 100%; max-width: none; flex-direction: row; align-items: baseline; justify-content: space-between; gap: 8mm; }
+.a4-preview-number > * { max-width: 50%; }
+.a4-preview-footer { flex-direction: column; align-items: center; gap: 1mm; text-align: center; }
+@media print {
+  .invoice-page-80mm .thermal-print-product-row,
+  .invoice-page-80mm .thermal-print-summary,
+  .invoice-page-80mm .thermal-print-footer { break-inside: auto; }
 }

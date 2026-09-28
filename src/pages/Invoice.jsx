@@ -1,3 +1,5 @@
+import { printInvoice, sizeReceiptPage } from "../utils/receipt-page";
+import { addA4Pages } from "../utils/invoice-pdf";
 import { sessionStorageAdapter } from '../utils/session-storage';
 import {
   useCallback,
@@ -79,10 +81,11 @@ const formatDate = (value) => {
     return "—";
   }
 
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
+    hour: "2-digit", minute: "2-digit",
   });
 };
 
@@ -179,14 +182,9 @@ function ThermalPrintLayout({
           className="thermal-print-logo"
         />
 
-        <div className="thermal-print-brand">
-          <strong>BStore</strong>
-          <span>Invoice</span>
-        </div>
-
         <div className="thermal-print-number">
           <strong>
-            {invoice.invoiceNumber}
+            Invoice #: {invoice.invoiceNumber}
           </strong>
 
           <span>
@@ -343,7 +341,7 @@ function ThermalPrintLayout({
         <strong>{copyType} Copy</strong>
 
         <span>
-          Thank you for your business
+          Thank you
         </span>
       </div>
     </div>
@@ -377,15 +375,11 @@ function A4Preview({
             alt="BStore logo"
             className="a4-preview-logo"
           />
-
-          <strong>BStore</strong>
-
-          <span>Invoice</span>
         </div>
 
         <div className="a4-preview-number">
           <strong>
-            {invoice.invoiceNumber}
+            Invoice #: {invoice.invoiceNumber}
           </strong>
 
           <span>
@@ -545,7 +539,7 @@ function A4Preview({
         </span>
 
         <span>
-          Thank you for your business
+          Thank you
         </span>
       </div>
     </div>
@@ -590,6 +584,11 @@ const sanitizeFileName = (value) => {
 ============================================================ */
 
 function Invoice() {
+  useEffect(() => {
+    const prepare = () => { try { sizeReceiptPage(); } catch (error) { console.error(error); } };
+    window.addEventListener("beforeprint", prepare);
+    return () => { window.removeEventListener("beforeprint", prepare); document.getElementById("receipt-page-size")?.remove(); };
+  }, []);
   const { invoiceId } = useParams();
   const navigate = useNavigate();
 
@@ -1214,7 +1213,7 @@ function Invoice() {
   const handlePrint = () => {
     clearMessages();
 
-    window.print();
+    void printInvoice().catch(error => setError(error.message));
   };
 
   /* ==========================================================
@@ -1371,7 +1370,8 @@ function Invoice() {
           compress: true,
         });
 
-      pdf.addImage(
+      if (isA4) addA4Pages(pdf, canvas, previewElement);
+      else pdf.addImage(
         imageData,
         "PNG",
         0,
@@ -1978,15 +1978,11 @@ function Invoice() {
               className="invoice-brand-logo"
             />
 
-            <div className="invoice-brand-text">
-              <strong>BStore</strong>
-              <span>Invoice</span>
-            </div>
           </div>
 
           <div className="invoice-number-block">
             <strong>
-              {invoice.invoiceNumber}
+              Invoice #: {invoice.invoiceNumber}
             </strong>
 
             <span>
@@ -2334,7 +2330,7 @@ function Invoice() {
           </span>
 
           <span>
-            Thank you for your business
+            Thank you
           </span>
         </div>
       </div>
@@ -2344,17 +2340,13 @@ function Invoice() {
       ====================================================== */}
 
       <div className="invoice-a4-print">
-        <A4Preview invoice={invoice} totals={calculatedTotals} notes={notes || invoice.notes || ""} copyType={copyType} />
+        <A4Preview invoice={invoice} totals={calculatedTotals} notes={notes} copyType={copyType} />
       </div>
 
       <ThermalPrintLayout
         invoice={invoice}
         totals={calculatedTotals}
-        notes={
-          notes ||
-          invoice.notes ||
-          ""
-        }
+        notes={notes}
         copyType={copyType}
       />
 
@@ -2530,7 +2522,7 @@ function Invoice() {
                 </h2>
 
                 <span>
-                  {invoice.invoiceNumber}
+                  Invoice #: {invoice.invoiceNumber}
                   {" · "}
                   {format}
                 </span>
@@ -2538,6 +2530,7 @@ function Invoice() {
 
               <button
                 type="button"
+                aria-label="Close invoice preview"
                 onClick={() =>
                   setPreviewOpen(false)
                 }
@@ -2552,11 +2545,7 @@ function Invoice() {
                   <ThermalPreview
                     invoice={invoice}
                     totals={calculatedTotals}
-                    notes={
-                      notes ||
-                      invoice.notes ||
-                      ""
-                    }
+                    notes={notes}
                     copyType={copyType}
                   />
                 </div>
@@ -2565,11 +2554,7 @@ function Invoice() {
                   <A4Preview
                     invoice={invoice}
                     totals={calculatedTotals}
-                    notes={
-                      notes ||
-                      invoice.notes ||
-                      ""
-                    }
+                    notes={notes}
                     copyType={copyType}
                   />
                 </div>
@@ -2608,7 +2593,7 @@ function Invoice() {
 
                   setTimeout(
                     () =>
-                      window.print(),
+                      handlePrint(),
                     100
                   );
                 }}

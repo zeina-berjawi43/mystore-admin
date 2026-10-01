@@ -38,7 +38,7 @@ function Editor({ src, value, onChange, disabled }) {
         onLoad={event => { setFailed(false); setSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight }); }}
         onError={() => { setFailed(true); setSize(null); }} />
     </div>
-    <p>{failed ? 'Unable to load image. Choose another image or try again.' : active ? 'Drag to position. Square preview matches Recent and Cart; other cards adapt to their shape.' : 'Original fit preserved. Drag or zoom to set framing.'}</p>
+    <p>{failed ? 'Unable to load image. Choose another image or try again.' : active ? 'Drag to position. Customer App cards use this centered square crop.' : 'Original fit preserved. Drag or zoom to set framing.'}</p>
     <div className="frame-editor-controls">
       <button type="button" disabled={unavailable || frame.zoom <= 1} aria-label="Zoom out" onClick={() => onChange({ ...frame, zoom: clamp(frame.zoom - .1, 1, MAX_ZOOM) })}>−</button>
       <input aria-label="Image zoom" type="range" min="1" max={MAX_ZOOM} step="0.01" value={frame.zoom} disabled={unavailable}
@@ -46,6 +46,12 @@ function Editor({ src, value, onChange, disabled }) {
       <button type="button" disabled={unavailable || frame.zoom >= MAX_ZOOM} aria-label="Zoom in" onClick={() => onChange({ ...frame, zoom: clamp(frame.zoom + .1, 1, MAX_ZOOM) })}>+</button>
       <span>{frame.zoom.toFixed(1)}×</span>
       <button type="button" disabled={unavailable} onClick={() => onChange({ ...DEFAULT_FRAME })}>Reset / Center</button>
+    </div>
+    <div className="frame-editor-customer">
+      <p className="frame-editor-customer-label">Customer App Preview</p>
+      <div className="frame-editor-customer-preview">
+        <img src={src} alt="Customer App product image preview" draggable={false} style={imageStyle} />
+      </div>
     </div>
     <p>Product Details keeps the full original image.</p>
   </div>;

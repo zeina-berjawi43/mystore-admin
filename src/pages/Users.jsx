@@ -1,3 +1,4 @@
+import CustomerClass from "../components/CustomerClass";
 import { sessionStorageAdapter } from '../utils/session-storage';
 
 import { useEffect, useState } from "react";
@@ -404,7 +405,7 @@ function Users() {
               <th>OTP</th>
               <th>OTP Expires</th>
               <th>Address</th>
-              <th>Role</th>
+              <th>Price class</th><th>Role</th>
               <th>Joined</th>
               <th>Actions</th>
             </tr>
@@ -413,7 +414,7 @@ function Users() {
           <tbody>
             {paginatedUsers.length === 0 ? (
               <tr>
-                <td colSpan="8" className="users-empty">
+                <td colSpan="9" className="users-empty">
                   <div>
                     <span>👥</span>
                     <h3>No users found</h3>
@@ -458,6 +459,7 @@ function Users() {
                   </td>
 
                   <td>{user.address || "—"}</td>
+                  <td>{user.role === "user" ? <CustomerClass key={`${user._id}:${user.priceClass}`} user={user} /> : "—"}</td>
 
                   <td>
                     <span

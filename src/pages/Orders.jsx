@@ -920,7 +920,7 @@ function Orders() {
                     const quantity = Number(item.quantity) || 0;
 
                     const price = Number(
-                      item.price || item.product?.price || 0
+                      item.price ?? 0
                     );
 
                     const lineTotal = price * quantity;

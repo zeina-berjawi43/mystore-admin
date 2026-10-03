@@ -1,3 +1,4 @@
+import PricingSettings from "./pages/PricingSettings";
 import SessionGate from "./components/SessionGate";
 import React, { useEffect } from "react";
 
@@ -123,6 +124,7 @@ function App() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/invoices/:invoiceId" element={<Invoice />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/pricing" element={<PricingSettings />} />
           <Route path="/users" element={<Users />} />
           <Route
             path="/phone-verification"

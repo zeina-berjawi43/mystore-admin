@@ -56,7 +56,7 @@ async function page(users = records) {
     assert.ok(url.startsWith(`${API_URL}/users/admin/all`)); requests++;
     return new Response(JSON.stringify(body), { status: init.headers.get('Authorization') === 'Bearer fresh' ? 200 : 401 });
   }, () => assert.fail('Unexpected logout'));
-  const context = { React, axios: axios.create({ adapter: 'fetch', env: { fetch: transport.fetch, Request: null, Response: null } }),
+  const context = { CustomerClass: ({ user }) => React.createElement("span", null, user.priceClass || "B"), React, axios: axios.create({ adapter: 'fetch', env: { fetch: transport.fetch, Request: null, Response: null } }),
     sessionStorageAdapter: storage,
     useEffect: () => {},
     useState: initial => { const index = cursor++; if (!(index in states)) states[index] = initial; return [states[index], value => { states[index] = typeof value === 'function' ? value(states[index]) : value; }]; },

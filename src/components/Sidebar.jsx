@@ -64,6 +64,7 @@ function Sidebar({ isOpen, setIsOpen }) {
   // ==========================================================
 
   const menuItems = [
+    { name: "Pricing Settings", path: "/pricing", icon: "$" },
     {
       name: "Dashboard",
       path: "/dashboard",

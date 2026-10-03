@@ -17,7 +17,7 @@ export default function CustomerClass({ user }) {
     } catch (error) { setMessage(error.response?.data?.message || 'Could not save class'); }
     finally { busy.current = false; setSaving(false); }
   }
-  return <div><select aria-label="Customer price class" disabled={saving} value={value} onChange={event => { setValue(event.target.value); setMessage(''); }}>
+  return <div className="customer-class" aria-busy={saving}><label className="customer-class-label">Price class<select aria-label="Customer price class" disabled={saving} value={value} onChange={event => { setValue(event.target.value); setMessage(''); }}>
     {['A', 'B', 'C'].map(key => <option key={key}>{key}</option>)}
-  </select><button type="button" disabled={saving || value === saved} onClick={save}>{saving ? 'Saving…' : 'Save'}</button><span role="status">{message}</span></div>;
+  </select></label><button className="customer-class-save" type="button" disabled={saving || value === saved} onClick={save}>{saving ? 'Saving...' : 'Save'}</button><span className="customer-class-status" role="status">{message || `Current: ${saved}`}</span></div>;
 }

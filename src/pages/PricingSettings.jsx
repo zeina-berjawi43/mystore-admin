@@ -24,13 +24,17 @@ export default function PricingSettings() {
     } catch (error) { setMessage(error.response?.data?.message || 'Could not save pricing settings'); }
     finally { busy.current = false; setSaving(false); }
   }
-  return <div className="page"><h1>Pricing Settings</h1><p>Adjustments apply to the product base price before product discounts. Minimums use the final merchandise total.</p>
-    <p role="status">{message}</p>{classes && <form onSubmit={save}>
-      {['A', 'B', 'C'].map(key => <fieldset key={key} disabled={saving}><legend>Class {key}</legend>
-        <label>Adjustment (%) <input required type="number" min="-90" max="200" step="any" value={classes[key].adjustment}
+  return <div className="management-page pricing-page">
+    <div className="management-header"><div><h1>Pricing Settings</h1><p>Adjustments apply to the product base price before product discounts. Minimums use the final merchandise total.</p></div></div>
+    {message && <p className="pricing-status" role="status">{message}</p>}
+    {!classes && !message && <p className="pricing-status" role="status">Loading pricing settings...</p>}
+    {classes && <form onSubmit={save} aria-busy={saving}>
+      <div className="pricing-grid">
+      {['A', 'B', 'C'].map(key => <fieldset className="pricing-card" key={key} disabled={saving}><legend>Class {key}</legend>
+        <label className="management-form-group">Adjustment (%) <input required type="number" min="-90" max="200" step="any" value={classes[key].adjustment}
           onChange={event => setClasses(previous => ({ ...previous, [key]: { ...previous[key], adjustment: event.target.value } }))} /></label>
-        <label> Minimum order ($) <input required type="number" min="0" max="1000000" step="0.01" value={classes[key].minimum}
+        <label className="management-form-group">Minimum order ($) <input required type="number" min="0" max="1000000" step="0.01" value={classes[key].minimum}
           onChange={event => setClasses(previous => ({ ...previous, [key]: { ...previous[key], minimum: event.target.value } }))} /></label>
-      </fieldset>)}<button disabled={saving}>{saving ? 'Saving…' : 'Save pricing settings'}</button>
+      </fieldset>)}</div><div className="pricing-actions"><button className="management-add-button" disabled={saving}>{saving ? 'Saving...' : 'Save pricing settings'}</button></div>
     </form>}</div>;
 }

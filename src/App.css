@@ -39,6 +39,101 @@
   --content-max: 1500px;
 }
 
+/* Pricing controls use the existing management page and form palette. */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 18px;
+}
+
+.pricing-card {
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.pricing-card legend {
+  padding: 0 8px;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.pricing-card .management-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 18px;
+  color: var(--text-dark);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pricing-card .management-form-group:last-child { margin-bottom: 0; }
+.pricing-card input { min-width: 0; min-height: 44px; }
+.pricing-card:disabled { opacity: 0.65; }
+.pricing-actions { margin-top: 20px; }
+.pricing-actions button { min-height: 44px; max-width: 100%; white-space: normal; }
+.pricing-status {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-dark);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.customer-class {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 180px;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.customer-class-label {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 80px;
+  color: var(--text-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.customer-class select, .customer-class-save {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.customer-class select { width: 100%; }
+.customer-class-save { font-weight: 700; cursor: pointer; }
+.customer-class-save:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+.customer-class-status {
+  flex-basis: 100%;
+  color: var(--text-dark);
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
 *,
 *::before,
 *::after {

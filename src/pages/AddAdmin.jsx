@@ -1,4 +1,5 @@
 import { sessionStorageAdapter } from '../utils/session-storage';
+import PasswordInput from '../components/PasswordInput';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/admin-api";
@@ -171,7 +172,7 @@ function AddAdmin() {
               Password
             </label>
 
-            <input
+            <PasswordInput
               id="admin-password"
               type="password"
               placeholder="Enter password"
@@ -188,7 +189,7 @@ function AddAdmin() {
               Confirm Password
             </label>
 
-            <input
+            <PasswordInput
               id="admin-confirm-password"
               type="password"
               placeholder="Confirm password"

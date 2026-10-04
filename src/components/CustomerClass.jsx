@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import api from '../utils/admin-api';
 import { getToken } from '../utils/auth';
-export default function CustomerClass({ user }) {
+export default function CustomerClass({ user, onSaved }) {
   const initialClass = ['A', 'B', 'C'].includes(user.priceClass) ? user.priceClass : 'B';
   const [value, setValue] = useState(initialClass);
   const [saved, setSaved] = useState(initialClass);
@@ -14,6 +14,7 @@ export default function CustomerClass({ user }) {
     try {
       await api.put(`https://mystore-backend-u6ey.onrender.com/pricing/customers/${user._id}`, { priceClass: value }, { headers: { Authorization: `Bearer ${getToken()}` } });
       setSaved(value); setMessage('Saved');
+      onSaved?.(value);
     } catch (error) { setMessage(error.response?.data?.message || 'Could not save class'); }
     finally { busy.current = false; setSaving(false); }
   }

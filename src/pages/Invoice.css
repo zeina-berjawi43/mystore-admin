@@ -2711,7 +2711,8 @@
   break-inside: avoid; font-size: 11px; line-height: 1.4;
 }
 .invoice-thermal-print .thermal-print-products-head { font-weight: 800; border-bottom: 1px solid #171717; text-transform: uppercase; letter-spacing: 0; }
-.invoice-thermal-print .thermal-print-product-row { border-bottom: 1px dotted #ccc; }
+.invoice-thermal-print .thermal-print-product-row { border-bottom: none; }
+.invoice-thermal-print .thermal-print-product-row + .thermal-print-product-row { border-top: 1px solid #777; }
 .invoice-thermal-print .thermal-print-products-head > *,
 .invoice-thermal-print .thermal-print-product-row > * { font-size: 11px; line-height: 1.4; min-width: 0; overflow-wrap: anywhere; white-space: normal; }
 .invoice-thermal-print .thermal-print-products-head > :nth-child(2),

@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -559,15 +560,7 @@ const waitForImages = async (element) => {
   await Promise.all(
     images.map(
       (image) =>
-        new Promise((resolve) => {
-          if (image.complete) {
-            resolve();
-            return;
-          }
-
-          image.onload = resolve;
-          image.onerror = resolve;
-        })
+        image.decode()
     )
   );
 };
@@ -584,6 +577,7 @@ const sanitizeFileName = (value) => {
 ============================================================ */
 
 function Invoice() {
+  const printExportBusy = useRef(false);
   useEffect(() => {
     const prepare = () => { try { sizeReceiptPage(); } catch (error) { console.error(error); } };
     window.addEventListener("beforeprint", prepare);
@@ -1211,9 +1205,12 @@ function Invoice() {
   ========================================================== */
 
   const handlePrint = () => {
+    if (printExportBusy.current) return;
+    printExportBusy.current = true;
     clearMessages();
-
-    void printInvoice().catch(error => setError(error.message));
+    if (format === 'A4') setSuccess('A4: turn off "Headers and footers" in the browser print dialog to remove date/time, title, URL and page numbers. The saved PDF contains no browser metadata.');
+    setActionLoading('print');
+    void printInvoice().catch(error => setError(error.message)).finally(() => { printExportBusy.current = false; setActionLoading(null); });
   };
 
   /* ==========================================================
@@ -1221,10 +1218,11 @@ function Invoice() {
   ========================================================== */
 
   const handleSaveAsPdf = async () => {
-    if (!invoice) {
+    if (!invoice || printExportBusy.current) {
       return;
     }
-
+    printExportBusy.current = true;
+    let shouldClosePreview = false;
     try {
       clearMessages();
 
@@ -1244,8 +1242,6 @@ function Invoice() {
        * If Preview is not already open, we temporarily
        * open it so its real DOM exists and can be captured.
        */
-
-      let shouldClosePreview = false;
 
       if (!previewOpen) {
         shouldClosePreview = true;
@@ -1291,6 +1287,7 @@ function Invoice() {
       await waitForImages(
         previewElement
       );
+      await document.fonts.ready;
 
       await new Promise((resolve) =>
         setTimeout(resolve, 100)
@@ -1459,7 +1456,6 @@ function Invoice() {
         err?.name ===
         "AbortError"
       ) {
-        setPreviewOpen(false);
         return;
       }
 
@@ -1473,6 +1469,8 @@ function Invoice() {
           "Failed to create PDF."
       );
     } finally {
+      if (shouldClosePreview) setPreviewOpen(false);
+      printExportBusy.current = false;
       setActionLoading(null);
     }
   };

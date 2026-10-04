@@ -1,4 +1,5 @@
 import CustomerClass from "../components/CustomerClass";
+import PasswordInput from '../components/PasswordInput';
 import { sessionStorageAdapter } from '../utils/session-storage';
 
 import { useEffect, useState } from "react";
@@ -24,6 +25,7 @@ function Users() {
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [priceClassFilter, setPriceClassFilter] = useState("");
 
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -272,7 +274,8 @@ function Users() {
       !roleFilter ||
       user.role === roleFilter;
 
-    return matchesSearch && matchesRole;
+    const effectiveClass = ['A', 'B', 'C'].includes(user.priceClass) ? user.priceClass : 'B';
+    return matchesSearch && matchesRole && (!priceClassFilter || (user.role === 'user' && effectiveClass === priceClassFilter));
   });
 
   // ============================================================
@@ -281,7 +284,7 @@ function Users() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, roleFilter]);
+  }, [search, roleFilter, priceClassFilter]);
 
   const totalPages = Math.max(
     1,
@@ -373,13 +376,18 @@ function Users() {
           <option value="admin">Admins</option>
         </select>
 
-        {(search || roleFilter) && (
+        <select aria-label="Filter customers by price class" value={priceClassFilter} onChange={event => setPriceClassFilter(event.target.value)}>
+          <option value="">All Price Classes</option>
+          {['A', 'B', 'C'].map(value => <option key={value} value={value}>{value}</option>)}
+        </select>
+        {(search || roleFilter || priceClassFilter) && (
           <button
             type="button"
             className="users-clear-button"
             onClick={() => {
               setSearch("");
               setRoleFilter("");
+              setPriceClassFilter("");
             }}
           >
             Clear
@@ -459,7 +467,7 @@ function Users() {
                   </td>
 
                   <td>{user.address || "—"}</td>
-                  <td>{user.role === "user" ? <CustomerClass key={`${user._id}:${user.priceClass}`} user={user} /> : "—"}</td>
+                  <td>{user.role === "user" ? <CustomerClass key={`${user._id}:${user.priceClass}`} user={user} onSaved={priceClass => setUsers(previous => previous.map(item => item._id === user._id ? { ...item, priceClass } : item))} /> : "—"}</td>
 
                   <td>
                     <span
@@ -573,7 +581,7 @@ function Users() {
 
               <div className="user-form-group">
                 <label>New Password</label>
-                <input
+                <PasswordInput
                   type="password"
                   name="password"
                   value={form.password}

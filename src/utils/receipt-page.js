@@ -21,7 +21,7 @@ export function sizeReceiptPage() {
 
 export async function printInvoice() {
   await document.fonts.ready;
-  await Promise.all([...document.querySelectorAll('.invoice-page img')].map(image => image.decode().catch(() => {})));
+  await Promise.all([...document.querySelectorAll('.invoice-page img')].map(image => image.decode()));
   sizeReceiptPage();
   window.print();
 }

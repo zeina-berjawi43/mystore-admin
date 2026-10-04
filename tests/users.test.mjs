@@ -41,13 +41,13 @@ async function backendResponse(users = records) {
 
 const source = readFileSync(new URL('../src/pages/Users.jsx', import.meta.url), 'utf8')
   .replace(/^import[\s\S]*?;\s*/gm, '')
-  .replace('  if (loading) {', '  globalThis.handlers = { fetchUsers, setSearch, setRoleFilter, setCurrentPage, setPageSize, openEditModal, handleDelete, form, filteredUsers, paginatedUsers };\n  if (loading) {')
+  .replace('  if (loading) {', '  globalThis.handlers = { fetchUsers, setSearch, setRoleFilter, setPriceClassFilter, setCurrentPage, setPageSize, openEditModal, handleDelete, form, filteredUsers, paginatedUsers };\n  if (loading) {')
   .replace('export default Users;', 'globalThis.Users = Users; globalThis.getUserName = getUserName;');
 const { code } = await transformWithOxc(source, 'Users.jsx', { jsx: { runtime: 'classic' } });
 
 async function page(users = records) {
   const body = await backendResponse(users);
-  const states = []; let cursor = 0, refreshes = 0, requests = 0, confirmation, pagination;
+  const states = [], effects = [], effectDeps = new Map(); let cursor = 0, refreshes = 0, requests = 0, confirmation, pagination;
   let access = 'expired';
   const storage = { getItem: key => key === 'refreshToken' ? 'session' : access,
     commitAccess: (_expected, value) => { access = value; return true; }, clearSession: () => false };
@@ -56,15 +56,23 @@ async function page(users = records) {
     assert.ok(url.startsWith(`${API_URL}/users/admin/all`)); requests++;
     return new Response(JSON.stringify(body), { status: init.headers.get('Authorization') === 'Bearer fresh' ? 200 : 401 });
   }, () => assert.fail('Unexpected logout'));
-  const context = { CustomerClass: ({ user }) => React.createElement("span", null, user.priceClass || "B"), React, axios: axios.create({ adapter: 'fetch', env: { fetch: transport.fetch, Request: null, Response: null } }),
+  const context = { PasswordInput: props => React.createElement('input', { ...props, type: 'password' }), CustomerClass: ({ user }) => React.createElement("span", null, user.priceClass || "B"), React, axios: axios.create({ adapter: 'fetch', env: { fetch: transport.fetch, Request: null, Response: null } }),
     sessionStorageAdapter: storage,
-    useEffect: () => {},
+    useEffect: (fn, deps) => {
+      if (!deps?.length) return; // Initial fetching is explicitly awaited below.
+      const index = cursor++, previous = effectDeps.get(index);
+      if (!previous || deps.some((value, i) => value !== previous[i])) { effects.push(fn); effectDeps.set(index, deps); }
+    },
     useState: initial => { const index = cursor++; if (!(index in states)) states[index] = initial; return [states[index], value => { states[index] = typeof value === 'function' ? value(states[index]) : value; }]; },
     Pagination: props => { pagination = props; return null; },
     window: { confirm: message => { confirmation = message; return false; } },
   };
   vm.createContext(context); vm.runInContext(code, context);
-  const render = () => { cursor = 0; return renderToStaticMarkup(context.Users()); };
+  const render = () => {
+    cursor = 0; let html = renderToStaticMarkup(context.Users());
+    if (effects.length) { effects.splice(0).forEach(fn => fn()); cursor = 0; html = renderToStaticMarkup(context.Users()); }
+    return html;
+  };
   render(); await context.handlers.fetchUsers();
   return { context, render, body, refreshes: () => refreshes, requests: () => requests, confirmation: () => confirmation, pagination: () => pagination };
 }
@@ -91,7 +99,7 @@ test('search matches first, last, full and legacy names, email and phone', async
 });
 
 test('role filtering and pagination still operate on the matched customers', async () => {
-  const p = await page(); p.render(); p.context.handlers.setRoleFilter('user');
+  const p = await page(); p.render(); p.context.handlers.setRoleFilter('user'); p.render();
   p.context.handlers.setPageSize(1); p.context.handlers.setCurrentPage(2); p.render();
   assert.equal(p.pagination().totalItems, 2); assert.equal(p.pagination().currentPage, 2);
   assert.equal(p.context.handlers.paginatedUsers[0]._id, 'legacy');
@@ -115,4 +123,24 @@ test('partial, missing and legacy names render safely', async () => {
   assert.equal(name({ lastName: ' Haddad ' }), 'Haddad');
   assert.equal(name({ firstName: ' ', lastName: '', name: ' Legacy ' }), 'Legacy');
   assert.equal(name({}), '');
+});
+
+test('All/A/B/C filter combines with search, preserves records and resets pagination', async () => {
+  const customers = [
+    { ...records[0], _id: 'A', priceClass: 'A' },
+    { ...records[0], _id: 'B', priceClass: 'B' },
+    { ...records[0], _id: 'C', priceClass: 'C' },
+    records[1], records[2],
+  ];
+  const p = await page(customers); p.render();
+  const ids = () => Array.from(p.context.handlers.filteredUsers, user => user._id);
+  assert.equal(ids().length, 5);
+  p.context.handlers.setPageSize(1); p.context.handlers.setCurrentPage(2); p.render();
+  p.context.handlers.setPriceClassFilter('B'); p.render();
+  assert.deepEqual(ids(), ['B', 'legacy']); assert.equal(p.pagination().currentPage, 1);
+  p.context.handlers.setSearch('Maya'); p.render(); assert.deepEqual(ids(), ['B']);
+  p.context.handlers.setPriceClassFilter('A'); p.render(); assert.deepEqual(ids(), ['A']);
+  p.context.handlers.setPriceClassFilter('C'); p.render(); assert.deepEqual(ids(), ['C']);
+  p.context.handlers.setPriceClassFilter(''); p.render(); assert.deepEqual(ids(), ['A', 'B', 'C']);
+  assert.deepEqual(p.body.users, customers);
 });

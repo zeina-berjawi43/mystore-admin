@@ -1,4 +1,5 @@
 import { saveSession } from '../utils/session-storage';
+import PasswordInput from '../components/PasswordInput';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../utils/admin-api";
@@ -117,7 +118,7 @@ function Login() {
           <div className="login-form-group">
             <label htmlFor="password">Password</label>
 
-            <input
+            <PasswordInput
               id="password"
               type="password"
               value={password}

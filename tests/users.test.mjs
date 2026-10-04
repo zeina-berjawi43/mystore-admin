@@ -41,23 +41,25 @@ async function backendResponse(users = records) {
 
 const source = readFileSync(new URL('../src/pages/Users.jsx', import.meta.url), 'utf8')
   .replace(/^import[\s\S]*?;\s*/gm, '')
-  .replace('  if (loading) {', '  globalThis.handlers = { fetchUsers, setSearch, setRoleFilter, setPriceClassFilter, setCurrentPage, setPageSize, openEditModal, handleDelete, form, filteredUsers, paginatedUsers };\n  if (loading) {')
+  .replace('  if (loading) {', '  globalThis.handlers = { fetchUsers, setSearch, setRoleFilter, setPriceClassFilter, setCurrentPage, setPageSize, openEditModal, handleDelete, handleSubmit, setForm, form, filteredUsers, paginatedUsers };\n  if (loading) {')
   .replace('export default Users;', 'globalThis.Users = Users; globalThis.getUserName = getUserName;');
 const { code } = await transformWithOxc(source, 'Users.jsx', { jsx: { runtime: 'classic' } });
 
 async function page(users = records) {
   const body = await backendResponse(users);
   const states = [], effects = [], effectDeps = new Map(); let cursor = 0, refreshes = 0, requests = 0, confirmation, pagination;
-  let access = 'expired';
+  let access = 'expired'; const writes = [], messages = [];
   const storage = { getItem: key => key === 'refreshToken' ? 'session' : access,
     commitAccess: (_expected, value) => { access = value; return true; }, clearSession: () => false };
   const transport = createAuthTransport(storage, async (url, init) => {
     if (url.endsWith('/refresh-token')) { refreshes++; return new Response('{"accessToken":"fresh"}'); }
+    if (init.method === 'PUT') { writes.push({ url, body: JSON.parse(init.body) }); return new Response('{"message":"Customer updated"}'); }
     assert.ok(url.startsWith(`${API_URL}/users/admin/all`)); requests++;
     return new Response(JSON.stringify(body), { status: init.headers.get('Authorization') === 'Bearer fresh' ? 200 : 401 });
   }, () => assert.fail('Unexpected logout'));
   const context = { PasswordInput: props => React.createElement('input', { ...props, type: 'password' }), CustomerClass: ({ user }) => React.createElement("span", null, user.priceClass || "B"), React, axios: axios.create({ adapter: 'fetch', env: { fetch: transport.fetch, Request: null, Response: null } }),
     sessionStorageAdapter: storage,
+    alert: message => messages.push(message),
     useEffect: (fn, deps) => {
       if (!deps?.length) return; // Initial fetching is explicitly awaited below.
       const index = cursor++, previous = effectDeps.get(index);
@@ -74,8 +76,22 @@ async function page(users = records) {
     return html;
   };
   render(); await context.handlers.fetchUsers();
-  return { context, render, body, refreshes: () => refreshes, requests: () => requests, confirmation: () => confirmation, pagination: () => pagination };
+  return { context, render, body, writes, messages, refreshes: () => refreshes, requests: () => requests, confirmation: () => confirmation, pagination: () => pagination };
 }
+
+test('customer with no email saves an address edit without a placeholder; admin email remains required', async () => {
+  const p = await page(); p.render(); p.context.handlers.openEditModal(records[1]);
+  let html = p.render(); assert.match(html, /Email \(optional\)/);
+  assert.doesNotMatch(html.match(/<input[^>]*type="email"[^>]*>/)[0], /required/);
+  p.context.handlers.setForm(previous => ({ ...previous, address: 'New address' })); p.render();
+  await p.context.handlers.handleSubmit({ preventDefault() {} });
+  assert.equal(p.writes.length, 1); assert.equal(p.writes[0].body.email, ''); assert.equal(p.writes[0].body.address, 'New address');
+  p.render(); p.context.handlers.openEditModal(records[2]); html = p.render();
+  assert.match(html.match(/<input[^>]*type="email"[^>]*>/)[0], /required/);
+  p.context.handlers.setForm(previous => ({ ...previous, email: '' })); p.render();
+  await p.context.handlers.handleSubmit({ preventDefault() {} });
+  assert.equal(p.writes.length, 1); assert.match(p.messages.at(-1), /email are required/);
+});
 
 test('customer name renders from the real list response through Axios refresh/retry', async () => {
   const p = await page(); const html = p.render();

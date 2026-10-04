@@ -49,6 +49,15 @@ test('actual Login, Add Admin and customer edit: four independent eyes, values/f
     await evaluate(`window.remount('${page}')`);
     if(page==='users'){await until(`!!document.querySelector('.user-edit-button')`);await evaluate(`document.querySelector('.user-edit-button').click()`);}
     await until(`document.querySelectorAll('.bstore-password-field').length===${count}`);
+    if(page==='users') {
+      assert.equal(await evaluate(`document.querySelector('input[name="email"]').required`),false);
+      await evaluate(`document.querySelector('input[name="email"]').value='';`);
+      assert.equal(await evaluate(`document.querySelector('input[name="email"]').checkValidity()`),true);
+      await evaluate(`document.querySelector('input[name="email"]').value='invalid-address';`);
+      assert.equal(await evaluate(`document.querySelector('input[name="email"]').checkValidity()`),false);
+      await evaluate(`document.querySelector('input[name="email"]').value='valid@example.test';`);
+      assert.equal(await evaluate(`document.querySelector('input[name="email"]').checkValidity()`),true);
+    }
     await evaluate(`window.fields=()=>[...document.querySelectorAll('.bstore-password-field input')];window.eyes=()=>[...document.querySelectorAll('.bstore-password-eye')];window.fields().forEach((input,i)=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'fixture-'+i);input.dispatchEvent(new Event('input',{bubbles:true}));});`);
     assert.equal(await evaluate(`window.fields().every(input=>input.type==='password')`),true);
     const values=await evaluate(`window.fields().map(input=>input.value)`), autocomplete=await evaluate(`window.fields().map(input=>input.autocomplete)`);

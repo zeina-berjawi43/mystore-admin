@@ -159,8 +159,8 @@ function Users() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!form.name.trim() || !form.email.trim()) {
-      alert("Name and email are required.");
+    if (!form.name.trim() || (form.role === "admin" && !form.email.trim())) {
+      alert(form.role === "admin" ? "Name and email are required." : "Name is required.");
       return;
     }
 
@@ -569,13 +569,13 @@ function Users() {
               </div>
 
               <div className="user-form-group">
-                <label>Email *</label>
+                <label>{form.role === "admin" ? "Email *" : "Email (optional)"}</label>
                 <input
                   type="email"
                   name="email"
                   value={form.email}
                   onChange={handleChange}
-                  required
+                  required={form.role === "admin"}
                 />
               </div>
 

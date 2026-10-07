@@ -13,6 +13,14 @@ const source = readFileSync(new URL('../src/pages/Invoice.jsx', import.meta.url)
 const { code } = await transformWithOxc(source, 'Invoice.jsx', { jsx: { runtime: 'classic' } });
 const context = { React };
 vm.runInNewContext(code, context);
+for(const [index,label] of ['80mm print','80mm preview','A4/PDF'].entries())test(`${label}: paid/free historical delivery remains visible with unchanged grand total`,()=>{
+  for(const deliveryFee of [5,0]) {
+    const props={invoice:{invoiceNumber:'HISTORY',createdAt:'2026-10-07',customer:{name:'Maya'},items:[{productName:'Almonds',quantity:1,price:80}]},
+      totals:{subtotal:80,discount:0,discountAmount:0,deliveryFee,showDelivery:true,total:80+deliveryFee},notes:'',copyType:'Customer'};
+    const html=renderToStaticMarkup(React.createElement(context.layouts[index],props));
+    assert.ok(html.includes('Delivery'));assert.ok(html.includes(deliveryFee?'$5.00':'FREE'));assert.ok(html.includes(deliveryFee?'$85.00':'$80.00'));assert.ok(!html.includes('Discount ('));
+  }
+});
 for (const [index, label] of ['physical thermal', 'thermal preview', 'A4 preview'].entries()) {
   test(`${label}: all data and copies survive; discount hidden only at zero`, () => {
     for (const discount of [0, '0', null, undefined, 10]) for (const copyType of ['Customer', 'Store']) {

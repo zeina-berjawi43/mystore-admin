@@ -315,6 +315,7 @@ function ThermalPrintLayout({
           </strong>
         </div>)}
 
+        {totals.showDelivery && <div className="thermal-print-summary-row"><span>Delivery</span><strong>{totals.deliveryFee === 0 ? 'FREE' : formatPrice(totals.deliveryFee)}</strong></div>}
         <div className="thermal-print-total">
           <span>Grand Total</span>
 
@@ -515,6 +516,7 @@ function A4Preview({
           </strong>
         </div>)}
 
+        {totals.showDelivery && <div><span>Delivery</span><strong>{totals.deliveryFee === 0 ? 'FREE' : formatPrice(totals.deliveryFee)}</strong></div>}
         <div className="a4-preview-grand-total">
           <span>Grand Total</span>
 
@@ -1050,19 +1052,27 @@ function Invoice() {
         );
 
       const discountAmount =
-        subtotal * (discount / 100);
+        Math.round(subtotal * discount) / 100;
 
       const total =
         subtotal - discountAmount;
+      const rules = invoice?.deliveryRules;
+      const showDelivery = rules?.priceClass === 'C';
+      const eligible = Math.round(total * 100) / 100;
+      const deliveryFee = showDelivery && eligible >= rules.minimumCheckoutAmount && eligible < rules.freeDeliveryThreshold ? rules.deliveryFeeBelowThreshold : 0;
+      if (invoice?.status === 'Saved') return { subtotal: invoice.subtotal ?? subtotal, discount: invoice.discountPercent || 0,
+        discountAmount: invoice.discountAmount ?? discountAmount, total: invoice.total ?? total, deliveryFee: invoice.deliveryFee ?? 0, showDelivery };
 
       return {
         subtotal,
         discount,
         discountAmount,
-        total,
+        total: Math.round((eligible + deliveryFee) * 100) / 100,
+        deliveryFee, showDelivery,
       };
     }, [
       invoice?.items,
+      invoice?.status, invoice?.subtotal, invoice?.discountAmount, invoice?.discountPercent, invoice?.total, invoice?.deliveryFee, invoice?.deliveryRules,
       discountPercent,
     ]);
 
@@ -2276,6 +2286,7 @@ function Invoice() {
             </strong>
           </div>}
 
+          {calculatedTotals.showDelivery && <div className="invoice-summary-row"><span>Delivery</span><strong>{calculatedTotals.deliveryFee === 0 ? 'FREE' : formatPrice(calculatedTotals.deliveryFee)}</strong></div>}
           <div className="invoice-summary-total">
             <span>Grand Total</span>
 

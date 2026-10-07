@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { test } from 'node:test';
 import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { transformWithOxc } from 'vite';
 
 test('sidebar preserves pricing route/icon directly below Customers', () => {
@@ -14,20 +15,22 @@ test('sidebar preserves pricing route/icon directly below Customers', () => {
   assert.equal(items.filter(item => item.path === '/pricing').length, 1);
 });
 
-test('unchanged panel pricing loads authoritative values and saves six fields, guarding concurrent saves', async () => {
+test('panel pricing loads authoritative Class C delivery values and saves all fields, guarding concurrent saves', async () => {
   const source = readFileSync('src/pages/PricingSettings.jsx', 'utf8').replace(/^import.*;\s*$/gm, '')
     .replace('  return <div', '  globalThis.handlers={classes,setClasses,save,message,saving};\n  return <div');
   const { code } = await transformWithOxc(source.replace('export default function', 'function') + '\nglobalThis.Screen=PricingSettings;', 'Pricing.jsx', { jsx: { runtime: 'classic' } });
   const slots = []; let cursor = 0, effect, finish; const writes = [];
-  const classes = { A: { adjustment: -4, minimum: 200 }, B: { adjustment: 1, minimum: 150 }, C: { adjustment: 25, minimum: 80 } };
+  const classes = { A: { adjustment: -4, minimum: 200 }, B: { adjustment: 1, minimum: 150 }, C: { adjustment: 25, minimum: 30, freeDeliveryThreshold: 100, deliveryFeeBelowThreshold: 5 } };
   const context = { React, useState: initial => { const i = cursor++; if (!(i in slots)) slots[i] = initial; return [slots[i], value => { slots[i] = typeof value === 'function' ? value(slots[i]) : value; }]; },
     useRef: initial => { const i = cursor++; return slots[i] ||= { current: initial }; }, useEffect: fn => { effect ||= fn; }, getToken: () => 'fixture',
     api: { get: async (url, config) => { assert.ok(url.endsWith('/pricing')); assert.equal(config.headers.Authorization, 'Bearer fixture'); return { data: { classes } }; },
       put: async (url, body) => { writes.push({ url, body }); await new Promise(resolve => { finish = resolve; }); return { data: { classes: body.classes } }; } } };
   vm.createContext(context); vm.runInContext(code, context);
-  const render = () => { cursor = 0; context.Screen(); return context.handlers; };
+  let tree;const render = () => { cursor = 0; tree=context.Screen(); return context.handlers; };
   render(); effect(); await new Promise(resolve => setImmediate(resolve));
-  assert.deepEqual(render().classes, classes);
+  assert.deepEqual(JSON.parse(JSON.stringify(render().classes)), classes);
+  const labels=[];const walk=node=>{if(!node||typeof node!=='object')return;if(Array.isArray(node)){node.forEach(walk);return;}if(node.type==='label')labels.push(node.props.children);walk(node.props?.children);};walk(tree);
+  const displayed=JSON.stringify(labels);for(const label of ['Minimum Checkout Amount','Free Delivery Threshold','Delivery Fee Below Free Delivery Threshold'])assert.ok(displayed.includes(label));
   const first = render().save({ preventDefault() {} }); await render().save({ preventDefault() {} });
   assert.equal(writes.length, 1); assert.deepEqual(JSON.parse(JSON.stringify(writes[0].body)), { classes });
   assert.equal(render().saving, true); finish(); await first; assert.match(render().message, /saved/);
@@ -51,4 +54,15 @@ test('actual backend customer update accepts omitted/empty email, normalizes pro
   }
   assert.equal((await update('user', { email: ' CUSTOMER@EXAMPLE.TEST ' })).status, 200); assert.equal(user.email, 'customer@example.test');
   assert.equal((await update('admin', { email: '' })).status, 400); assert.equal(saved, false);
+});
+
+test('Panel Orders renders saved paid/FREE delivery and grand total without consulting settings',async()=>{
+  const source=readFileSync('src/pages/Orders.jsx','utf8').replace(/^import[\s\S]*?;\s*/gm,'').replace('export default Orders;','globalThis.Screen=Orders;');
+  const {code}=await transformWithOxc(source,'Orders.jsx',{jsx:{runtime:'classic'}});
+  for(const fee of [5,0]) {
+    const order={_id:'fixture',items:[],user:{name:'Maya'},status:'Pending',subtotal:80,discountAmount:0,totalPrice:80+fee,deliveryFee:fee,deliveryRules:{priceClass:'C'}};
+    const context={React,useState:initial=>[Array.isArray(initial)?[order]:initial===null?order:initial===true?false:initial,()=>{}],useEffect:()=>{},Pagination:()=>null};
+    vm.runInNewContext(code,context);const html=renderToStaticMarkup(React.createElement(context.Screen));
+    assert.ok(html.includes('Delivery'));assert.ok(html.includes(fee?'$5.00':'FREE'));assert.ok(html.includes(fee?'$85.00':'$80.00'));
+  }
 });

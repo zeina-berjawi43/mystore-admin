@@ -768,6 +768,7 @@ function Orders() {
 
                     <td>
                       <strong>{formatPrice(order.totalPrice)}</strong>
+                      {order.deliveryRules?.priceClass === 'C' && <small>Delivery: {order.deliveryFee === 0 ? 'FREE' : formatPrice(order.deliveryFee)}</small>}
                     </td>
 
                     <td>
@@ -948,6 +949,11 @@ function Orders() {
               </div>
             </div>
 
+            {selectedOrder.deliveryRules && <>
+              <div className="order-total-row"><span>Subtotal</span><strong>{formatPrice(selectedOrder.subtotal)}</strong></div>
+              {!!selectedOrder.discountAmount && <div className="order-total-row"><span>Discount</span><strong>-{formatPrice(selectedOrder.discountAmount)}</strong></div>}
+              {selectedOrder.deliveryRules.priceClass === 'C' && <div className="order-total-row"><span>Delivery</span><strong>{selectedOrder.deliveryFee === 0 ? 'FREE' : formatPrice(selectedOrder.deliveryFee)}</strong></div>}
+            </>}
             <div className="order-total-row">
               <span>Order Total</span>
               <strong>{formatPrice(selectedOrder.totalPrice)}</strong>

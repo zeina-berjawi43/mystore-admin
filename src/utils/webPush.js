@@ -48,24 +48,18 @@ export async function registerServiceWorker() {
 
   // Register only if one does not already exist.
   if (!registration) {
-    registration =
-      await navigator.serviceWorker.register(
+    await navigator.serviceWorker.register(
         "/service-worker.js"
       );
   }
 
-  console.log(
-    "✅ Service Worker registered:",
-    registration
-  );
+
 
   // Wait until the Service Worker is ready.
   registration =
     await navigator.serviceWorker.ready;
 
-  console.log(
-    "✅ Service Worker is ready."
-  );
+
 
   return registration;
 }
@@ -101,9 +95,7 @@ async function getVapidPublicKey() {
     );
   }
 
-  console.log(
-    "✅ VAPID public key received."
-  );
+
 
   return data.publicKey;
 }
@@ -157,20 +149,14 @@ export async function subscribeToWebPush(token) {
     let permission =
       Notification.permission;
 
-    console.log(
-      "🔔 Current notification permission:",
-      permission
-    );
+
 
     if (permission === "default") {
       permission =
         await Notification.requestPermission();
     }
 
-    console.log(
-      "🔔 Notification permission:",
-      permission
-    );
+
 
     if (permission !== "granted") {
       throw new Error(
@@ -185,9 +171,7 @@ export async function subscribeToWebPush(token) {
     const publicKey =
       await getVapidPublicKey();
 
-    console.log(
-      "✅ Got VAPID public key."
-    );
+
 
     // ----------------------------------------------------------
     // 4. GET EXISTING SUBSCRIPTION
@@ -196,12 +180,7 @@ export async function subscribeToWebPush(token) {
     let subscription =
       await registration.pushManager.getSubscription();
 
-    console.log(
-      "🔎 Existing Web Push subscription:",
-      subscription
-        ? subscription.toJSON()
-        : null
-    );
+
 
     // ----------------------------------------------------------
     // 5. VALIDATE EXISTING SUBSCRIPTION
@@ -220,17 +199,12 @@ export async function subscribeToWebPush(token) {
         !existingJson.keys.auth
       ) {
 
-        console.log(
-          "⚠️ Existing subscription is invalid. Unsubscribing..."
-        );
+
 
         try {
           await subscription.unsubscribe();
-        } catch (unsubscribeError) {
-          console.log(
-            "⚠️ Failed to remove invalid subscription:",
-            unsubscribeError
-          );
+        } catch {
+          // Continue by creating a fresh subscription when the stale one cannot be removed.
         }
 
         subscription = null;
@@ -243,9 +217,7 @@ export async function subscribeToWebPush(token) {
 
     if (!subscription) {
 
-      console.log(
-        "🔔 Creating new Web Push subscription..."
-      );
+
 
       subscription =
         await registration.pushManager.subscribe({
@@ -257,15 +229,8 @@ export async function subscribeToWebPush(token) {
             ),
         });
 
-      console.log(
-        "✅ New Web Push subscription created."
-      );
 
-    } else {
 
-      console.log(
-        "✅ Using existing Web Push subscription."
-      );
     }
 
     // ----------------------------------------------------------
@@ -275,40 +240,19 @@ export async function subscribeToWebPush(token) {
     const subscriptionJSON =
       subscription.toJSON();
 
-    console.log(
-      "========================================"
-    );
 
-    console.log(
-      "WEB PUSH SUBSCRIPTION JSON:"
-    );
 
-    console.log(
-      subscriptionJSON
-    );
 
-    console.log(
-      "WEB PUSH ENDPOINT:",
-      subscriptionJSON?.endpoint
-    );
 
-    console.log(
-      "WEB PUSH P256DH:",
-      subscriptionJSON?.keys?.p256dh
-        ? "EXISTS"
-        : "MISSING"
-    );
 
-    console.log(
-      "WEB PUSH AUTH:",
-      subscriptionJSON?.keys?.auth
-        ? "EXISTS"
-        : "MISSING"
-    );
 
-    console.log(
-      "========================================"
-    );
+
+
+
+
+
+
+
 
     // ----------------------------------------------------------
     // 8. FINAL VALIDATION
@@ -337,9 +281,7 @@ export async function subscribeToWebPush(token) {
     // 9. SEND SUBSCRIPTION TO BACKEND
     // ----------------------------------------------------------
 
-    console.log(
-      "📤 Sending Web Push subscription to backend..."
-    );
+
 
     const response =
       await fetch(
@@ -367,10 +309,7 @@ export async function subscribeToWebPush(token) {
         () => ({})
       );
 
-    console.log(
-      "📥 Backend subscription response:",
-      result
-    );
+
 
     if (!response.ok) {
       throw new Error(
@@ -379,9 +318,7 @@ export async function subscribeToWebPush(token) {
       );
     }
 
-    console.log(
-      "✅ Web Push subscription saved successfully."
-    );
+
 
     return subscriptionJSON;
 
@@ -389,7 +326,7 @@ export async function subscribeToWebPush(token) {
 
     console.error(
       "❌ Web Push Error:",
-      error
+      error instanceof Error ? error.name : 'Error'
     );
 
     throw error;
@@ -407,9 +344,7 @@ export async function unsubscribeFromWebPush() {
       await navigator.serviceWorker.ready;
 
     if (!registration) {
-      console.log(
-        "ℹ️ No Service Worker registration found."
-      );
+
 
       return false;
     }
@@ -418,18 +353,14 @@ export async function unsubscribeFromWebPush() {
       await registration.pushManager.getSubscription();
 
     if (!subscription) {
-      console.log(
-        "ℹ️ No Web Push subscription found."
-      );
+
 
       return false;
     }
 
     await subscription.unsubscribe();
 
-    console.log(
-      "✅ Web Push subscription removed."
-    );
+
 
     return true;
 
@@ -437,7 +368,7 @@ export async function unsubscribeFromWebPush() {
 
     console.error(
       "❌ Unsubscribe Web Push Error:",
-      error
+      error instanceof Error ? error.name : 'Error'
     );
 
     throw error;

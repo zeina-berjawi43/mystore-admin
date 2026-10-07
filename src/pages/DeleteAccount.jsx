@@ -1,4 +1,3 @@
-import React from "react";
 import "./PublicLegal.css";
 
 const EMAIL = "b.storelb@gmail.com";

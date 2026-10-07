@@ -581,7 +581,7 @@ const sanitizeFileName = (value) => {
 function Invoice() {
   const printExportBusy = useRef(false);
   useEffect(() => {
-    const prepare = () => { try { sizeReceiptPage(); } catch (error) { console.error(error); } };
+    const prepare = () => { try { sizeReceiptPage(); } catch (error) { console.error(error instanceof Error ? error.name : 'Error'); } };
     window.addEventListener("beforeprint", prepare);
     return () => { window.removeEventListener("beforeprint", prepare); document.getElementById("receipt-page-size")?.remove(); };
   }, []);
@@ -647,10 +647,7 @@ function Invoice() {
   const isDraft =
     status === "Draft";
 
-  const isSaved =
-    status === "Saved";
-
-  const isCancelled =
+const isCancelled =
     status === "Cancelled";
 
   const canEdit =
@@ -714,7 +711,7 @@ function Invoice() {
       } catch (err) {
         console.error(
           "Fetch invoice error:",
-          err
+          err instanceof Error ? err.name : 'Error'
         );
 
         setError(
@@ -730,7 +727,9 @@ function Invoice() {
   );
 
   useEffect(() => {
-    fetchInvoice();
+    // Cancel a pending initial request on unmount/Strict Mode replay.
+    const initialRequest = setTimeout(() => { fetchInvoice(); }, 0);
+    return () => clearTimeout(initialRequest);
   }, [fetchInvoice]);
 
   /* ==========================================================
@@ -764,7 +763,7 @@ function Invoice() {
       } catch (err) {
         console.error(
           "Fetch products error:",
-          err
+          err instanceof Error ? err.name : 'Error'
         );
 
         setError(
@@ -1187,7 +1186,7 @@ function Invoice() {
     } catch (err) {
       console.error(
         "Save invoice error:",
-        err
+        err instanceof Error ? err.name : 'Error'
       );
 
       setError(
@@ -1471,7 +1470,7 @@ function Invoice() {
 
       console.error(
         "Save PDF error:",
-        err
+        err instanceof Error ? err.name : 'Error'
       );
 
       setError(
@@ -1537,7 +1536,7 @@ function Invoice() {
       } catch (err) {
         console.error(
           "Duplicate invoice error:",
-          err
+          err instanceof Error ? err.name : 'Error'
         );
 
         setError(
@@ -1631,7 +1630,7 @@ function Invoice() {
       } catch (err) {
         console.error(
           "Cancel invoice error:",
-          err
+          err instanceof Error ? err.name : 'Error'
         );
 
         setError(

@@ -54,7 +54,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
     } catch (error) {
       console.log(
         "GET BRANDS ERROR:",
-        error
+        error instanceof Error ? error.name : 'Error'
       );
 
       setError(
@@ -71,7 +71,9 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
   // ============================================================
 
   useEffect(() => {
-    fetchBrands();
+    // Cancel a pending initial request on unmount/Strict Mode replay.
+    const initialRequest = setTimeout(() => { fetchBrands(); }, 0);
+    return () => clearTimeout(initialRequest);
   }, []);
 
   // ============================================================
@@ -171,7 +173,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
     } catch (error) {
       console.log(
         "SAVE BRAND ERROR:",
-        error
+        error instanceof Error ? error.name : 'Error'
       );
 
       alert(
@@ -219,7 +221,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
     } catch (error) {
       console.log(
         "DELETE BRAND ERROR:",
-        error
+        error instanceof Error ? error.name : 'Error'
       );
 
       alert(

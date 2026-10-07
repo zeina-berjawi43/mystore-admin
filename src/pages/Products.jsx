@@ -2,7 +2,7 @@ import ProductImage from "../components/ProductImage";
 import ImageFrameEditor from "../components/ImageFrameEditor";
 import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
-import React, {
+import {
 useEffect,
 useRef,
 useState,
@@ -142,7 +142,7 @@ const data = await response.json();
 
   setCategories(data.categories || []);
 } catch (error) {
-  console.log("CATEGORIES ERROR:", error);
+  console.log("CATEGORIES ERROR:", error instanceof Error ? error.name : 'Error');
 }
 
 };
@@ -164,7 +164,7 @@ const data = await response.json();
 
   setBrands(data.brands || []);
 } catch (error) {
-  console.log("BRANDS ERROR:", error);
+  console.log("BRANDS ERROR:", error instanceof Error ? error.name : 'Error');
 }
 
 };
@@ -233,9 +233,12 @@ setLoading(true);
 // ============================================================
 
 useEffect(() => {
-fetchCategories();
-fetchBrands();
-fetchProducts(true);
+const initialRequest = setTimeout(() => {
+  fetchCategories();
+  fetchBrands();
+  fetchProducts(true);
+}, 0);
+return () => clearTimeout(initialRequest);
 }, []);
 
 // ============================================================
@@ -248,9 +251,8 @@ firstFilterRender.current = false;
 return;
 }
 
-setCurrentPage(1);
-
 const timer = setTimeout(() => {
+  setCurrentPage(1);
   fetchProducts(false);
 }, 500);
 
@@ -435,8 +437,6 @@ try {
   }
 
   return data.image;
-} catch (error) {
-  throw error;
 } finally {
   setUploadingImage(false);
 }

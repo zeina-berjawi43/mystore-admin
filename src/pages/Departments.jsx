@@ -47,7 +47,11 @@ export default function Departments() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    // Cancel a pending initial request on unmount/Strict Mode replay.
+    const initialRequest = setTimeout(() => { load(); }, 0);
+    return () => clearTimeout(initialRequest);
+  }, []);
 
   const closeModal = () => {
     if (saving) return;

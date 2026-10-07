@@ -57,10 +57,7 @@ function Dashboard() {
         );
 
 
-      console.log(
-        "DASHBOARD RESPONSE:",
-        response.data
-      );
+
 
 
       setStatistics(
@@ -73,7 +70,7 @@ function Dashboard() {
 
       console.log(
         "DASHBOARD ERROR:",
-        error
+        error instanceof Error ? error.name : 'Error'
       );
 
 
@@ -84,8 +81,7 @@ function Dashboard() {
 
         sessionStorageAdapter.clear();
 
-        window.location.href =
-          "/login";
+        window.location.assign("/login");
 
         return;
       }
@@ -110,9 +106,9 @@ function Dashboard() {
   // ============================================================
 
   useEffect(() => {
-
-    fetchDashboard();
-
+    // Cancel a pending initial request on unmount/Strict Mode replay.
+    const initialRequest = setTimeout(() => { fetchDashboard(); }, 0);
+    return () => clearTimeout(initialRequest);
   }, []);
 
 
@@ -222,7 +218,7 @@ function Dashboard() {
 
         console.log(
           "CHECK PRODUCT ERROR:",
-          error
+          error instanceof Error ? error.name : 'Error'
         );
 
 
@@ -233,8 +229,7 @@ function Dashboard() {
 
           sessionStorageAdapter.clear();
 
-          window.location.href =
-            "/login";
+          window.location.assign("/login");
 
           return;
         }

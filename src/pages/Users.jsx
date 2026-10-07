@@ -23,15 +23,18 @@ function Users() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
-  const [priceClassFilter, setPriceClassFilter] = useState("");
+  const [search, setSearchValue] = useState("");
+  const [roleFilter, setRoleFilterValue] = useState("");
+  const [priceClassFilter, setPriceClassFilterValue] = useState("");
 
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const setSearch = value => { setSearchValue(value); setCurrentPage(1); };
+  const setRoleFilter = value => { setRoleFilterValue(value); setCurrentPage(1); };
+  const setPriceClassFilter = value => { setPriceClassFilterValue(value); setCurrentPage(1); };
   const [pageSize, setPageSize] = useState(25);
 
   const [form, setForm] = useState({
@@ -79,7 +82,7 @@ function Users() {
         error.response?.status === 403
       ) {
         sessionStorageAdapter.clear();
-        window.location.href = "/login";
+        window.location.assign("/login");
         return;
       }
 
@@ -97,7 +100,9 @@ function Users() {
   // ============================================================
 
   useEffect(() => {
-    fetchUsers();
+    // Cancel a pending initial request on unmount/Strict Mode replay.
+    const initialRequest = setTimeout(() => { fetchUsers(); }, 0);
+    return () => clearTimeout(initialRequest);
   }, []);
 
   // ============================================================
@@ -282,9 +287,7 @@ function Users() {
   // PAGINATION
   // ============================================================
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, roleFilter, priceClassFilter]);
+
 
   const totalPages = Math.max(
     1,

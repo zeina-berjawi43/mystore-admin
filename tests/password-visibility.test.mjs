@@ -87,7 +87,13 @@ test('actual Login, Add Admin and customer edit: four independent eyes, values/f
     assert.deepEqual(errors,[]);console.log('PASS: all four panel password fields, independent visibility, unchanged values/autocomplete, mouse focus/cursor, non-submit eyes, hidden remount and CSS at 320/375/1440px.');
   } finally {
     if(socket?.readyState===WebSocket.OPEN && send) await Promise.race([send('Browser.close').catch(()=>{}),wait(1000)]);
-    socket?.close();chrome.kill();await server.close();await wait(300);
-    if(path.dirname(profile)===path.resolve(os.tmpdir()) && path.basename(profile).startsWith('bstore-password-')) fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});
+    socket?.close();
+    if (chrome.exitCode === null) {
+      const exited = new Promise(resolve => chrome.once('exit', resolve));
+      chrome.kill();
+      await Promise.race([exited, wait(5000)]);
+    }
+    await server.close();
+    if(path.dirname(profile)===path.resolve(os.tmpdir()) && path.basename(profile).startsWith('bstore-password-')) await fs.promises.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:300});
   }
 });

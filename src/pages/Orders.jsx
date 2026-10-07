@@ -172,9 +172,9 @@ function Orders() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
 
-  const [search, setSearch] = useState("");
-  const [invoiceDate, setInvoiceDate] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [search, setSearchValue] = useState("");
+  const [invoiceDate, setInvoiceDateValue] = useState("");
+  const [statusFilter, setStatusFilterValue] = useState("All");
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
@@ -183,6 +183,9 @@ function Orders() {
   const [creatingInvoice, setCreatingInvoice] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const setSearch = value => { setSearchValue(value); setCurrentPage(1); };
+  const setInvoiceDate = value => { setInvoiceDateValue(value); setCurrentPage(1); };
+  const setStatusFilter = value => { setStatusFilterValue(value); setCurrentPage(1); };
   const [pageSize, setPageSize] = useState(25);
 
 
@@ -205,7 +208,6 @@ function Orders() {
           // Cache-buster: guarantees this request is never served
           // from a cached response (browser cache, a CDN in front
           // of the API, etc.) so "Refresh" always shows live data.
-          params: { _t: Date.now() },
         }
       );
 
@@ -215,7 +217,7 @@ function Orders() {
 
       setOrders(receivedOrders);
     } catch (err) {
-      console.error("Fetch orders error:", err);
+      console.error("Fetch orders error:", err instanceof Error ? err.name : 'Error');
 
       setError(
         err.response?.data?.message ||
@@ -230,7 +232,9 @@ function Orders() {
 
 
   useEffect(() => {
-    fetchOrders();
+    // Cancel a pending initial request on unmount/Strict Mode replay.
+    const initialRequest = setTimeout(() => { fetchOrders(); }, 0);
+    return () => clearTimeout(initialRequest);
   }, []);
 
 
@@ -327,9 +331,7 @@ function Orders() {
 
   // Reset to page 1 whenever the filters change, so the user
   // never lands on an empty page 4 after narrowing the results.
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, invoiceDate, statusFilter]);
+
 
   const totalPages = Math.max(
     1,
@@ -378,7 +380,6 @@ function Orders() {
         `${API_URL}/orders/admin/${orderId}`,
         {
           headers: getAuthHeaders(),
-          params: { _t: Date.now() },
         }
       );
 
@@ -386,7 +387,7 @@ function Orders() {
 
       setSelectedOrder(order);
     } catch (err) {
-      console.error("Open order error:", err);
+      console.error("Open order error:", err instanceof Error ? err.name : 'Error');
 
       setError(
         err.response?.data?.message ||
@@ -453,7 +454,7 @@ function Orders() {
         );
       }
     } catch (err) {
-      console.error("Update order status error:", err);
+      console.error("Update order status error:", err instanceof Error ? err.name : 'Error');
 
       setError(
         err.response?.data?.message ||
@@ -495,7 +496,7 @@ function Orders() {
         setSelectedOrder(null);
       }
     } catch (err) {
-      console.error("Delete order error:", err);
+      console.error("Delete order error:", err instanceof Error ? err.name : 'Error');
 
       setError(
         err.response?.data?.message ||
@@ -556,9 +557,9 @@ function Orders() {
           : previousOrder
       );
 
-      window.location.href = `/invoices/${invoiceId}`;
+      window.location.assign(`/invoices/${invoiceId}`);
     } catch (err) {
-      console.error("Create invoice error:", err);
+      console.error("Create invoice error:", err instanceof Error ? err.name : 'Error');
 
       setError(
         err.response?.data?.message ||
@@ -578,7 +579,7 @@ function Orders() {
   const handleViewInvoice = (invoiceId) => {
     if (!invoiceId) return;
 
-    window.location.href = `/invoices/${invoiceId}`;
+    window.location.assign(`/invoices/${invoiceId}`);
   };
 
 

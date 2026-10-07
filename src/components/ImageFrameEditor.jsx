@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { DEFAULT_FRAME, MAX_ZOOM, clamp, frameGeometry, panFrame, validFrame } from '../utils/image-frame';
 import './ImageFrameEditor.css';
 

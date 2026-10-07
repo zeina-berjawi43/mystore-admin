@@ -12,7 +12,7 @@ self.addEventListener("push", (event) => {
 
   try {
     data = event.data.json();
-  } catch (error) {
+  } catch {
     data = {
       title: "BStore",
       body: event.data.text(),
@@ -41,7 +41,7 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
   event.waitUntil(
-    clients.matchAll({
+    self.clients.matchAll({
       type: "window",
       includeUncontrolled: true,
     }).then((clientList) => {
@@ -51,8 +51,8 @@ self.addEventListener("notificationclick", (event) => {
         }
       }
 
-      if (clients.openWindow) {
-        return clients.openWindow("/");
+      if (self.clients.openWindow) {
+        return self.clients.openWindow("/");
       }
 
       return null;

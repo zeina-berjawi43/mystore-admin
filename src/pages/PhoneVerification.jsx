@@ -77,10 +77,7 @@ setLoading(true);
     );
   }
 
-  console.log(
-    "PHONE VERIFICATION REQUESTS:",
-    data.requests
-  );
+
 
   setRequests(
     Array.isArray(
@@ -92,7 +89,7 @@ setLoading(true);
 } catch (err) {
   console.log(
     "PHONE VERIFICATION ERROR:",
-    err
+    err instanceof Error ? err.name : 'Error'
   );
 
   if (showLoading) {
@@ -115,7 +112,7 @@ setLoading(true);
 // ============================================================
 
 useEffect(() => {
-fetchRequests(true);
+const initialRequest = setTimeout(() => { fetchRequests(true); }, 0);
 
 
 const interval =
@@ -124,6 +121,7 @@ const interval =
   }, 5 * 60 * 1000);
 
 return () => {
+  clearTimeout(initialRequest);
   clearInterval(interval);
 };
 
@@ -367,7 +365,7 @@ getToken();
 } catch (err) {
   console.log(
     "MARK COMPLETED ERROR:",
-    err
+    err instanceof Error ? err.name : 'Error'
   );
 
   alert(

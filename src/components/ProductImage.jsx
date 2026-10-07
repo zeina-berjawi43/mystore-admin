@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { frameGeometry, validFrame } from '../utils/image-frame';
 
 export default function ProductImage(props) {

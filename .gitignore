@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+.release-check/
 dist-ssr
 *.local
 
@@ -24,6 +25,8 @@ dist-ssr
 *.sw?
 
 .env
+.env.*
+!.env.example
 .env.local
 .env.development
 .env.production

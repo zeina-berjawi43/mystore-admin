@@ -76,10 +76,7 @@ function AddAdmin() {
         }
       );
 
-      console.log(
-        "ADD ADMIN RESPONSE:",
-        response.data
-      );
+
 
       setMessage(
         response.data?.message ||
@@ -93,7 +90,7 @@ function AddAdmin() {
     } catch (error) {
       console.log(
         "ADD ADMIN ERROR:",
-        error
+        error instanceof Error ? error.name : 'Error'
       );
 
       if (

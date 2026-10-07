@@ -1,6 +1,6 @@
 import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   subscribeToWebPush,
 } from "../utils/webPush";
@@ -88,7 +88,7 @@ function Notifications() {
     } catch (error) {
       console.error(
         "WEB PUSH CHECK ERROR:",
-        error
+        error instanceof Error ? error.name : 'Error'
       );
 
       setPushSubscribed(false);
@@ -102,7 +102,9 @@ function Notifications() {
   // ============================================================
 
   useEffect(() => {
-    checkPushSubscription();
+    // Cancel a pending initial request on unmount/Strict Mode replay.
+    const initialRequest = setTimeout(() => { checkPushSubscription(); }, 0);
+    return () => clearTimeout(initialRequest);
   }, []);
 
   // ============================================================
@@ -156,7 +158,7 @@ function Notifications() {
       } catch (error) {
         console.error(
           "ENABLE NOTIFICATIONS ERROR:",
-          error
+          error instanceof Error ? error.name : 'Error'
         );
 
         setNotificationPermission(
@@ -254,7 +256,7 @@ function Notifications() {
       } catch (error) {
         console.error(
           "SEND NOTIFICATION ERROR:",
-          error
+          error instanceof Error ? error.name : 'Error'
         );
 
         setErrorMessage(

@@ -121,7 +121,7 @@ async () => {
 
     console.log(
       "GET CATEGORIES ERROR:",
-      error
+      error instanceof Error ? error.name : 'Error'
     );
 
 
@@ -144,14 +144,13 @@ async () => {
 // ============================================================
 
 useEffect(() => {
-
-
-fetchCategories();
+const initialRequest = setTimeout(() => { fetchCategories(); }, 0);
 fetch(`${API_URL}/departments`).then(async response => {
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to load departments");
   setDepartments(data.departments || []);
 }).catch(error => setError(error.message));
+return () => clearTimeout(initialRequest);
 
 }, []);
 
@@ -583,7 +582,7 @@ async (event) => {
 
     console.log(
       "SAVE CATEGORY ERROR:",
-      error
+      error instanceof Error ? error.name : 'Error'
     );
 
 
@@ -668,7 +667,7 @@ async (category) => {
 
     console.log(
       "DELETE CATEGORY ERROR:",
-      error
+      error instanceof Error ? error.name : 'Error'
     );
 
 

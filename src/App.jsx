@@ -1,6 +1,6 @@
 import PricingSettings from "./pages/PricingSettings";
 import SessionGate from "./components/SessionGate";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import {
   BrowserRouter,
@@ -74,7 +74,7 @@ function AutoSyncWebPush() {
           console.log("WEB PUSH AUTO SYNC: No valid subscription returned.");
         }
       } catch (error) {
-        console.error("WEB PUSH AUTO SYNC ERROR:", error);
+        console.error("WEB PUSH AUTO SYNC ERROR:", error instanceof Error ? error.name : 'Error');
       }
     };
 

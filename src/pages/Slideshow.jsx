@@ -1,7 +1,7 @@
 import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
 import {
-  useEffect,
+  useRef, useEffect,
   useState,
 } from "react";
 
@@ -126,9 +126,11 @@ function Slideshow() {
   // INITIAL
   // ============================================================
 
-  useEffect(() => {
+  const latestLoader = useRef(fetchSlides);
+useEffect(() => { latestLoader.current = fetchSlides; });
+useEffect(() => {
     // Cancel a pending initial request on unmount/Strict Mode replay.
-    const initialRequest = setTimeout(() => { fetchSlides(); }, 0);
+    const initialRequest = setTimeout(() => { latestLoader.current(); }, 0);
     return () => clearTimeout(initialRequest);
   }, []);
 

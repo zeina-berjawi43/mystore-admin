@@ -232,11 +232,13 @@ setLoading(true);
 // INITIAL LOAD
 // ============================================================
 
+const latestLoader = useRef(fetchProducts);
+useEffect(() => { latestLoader.current = fetchProducts; });
 useEffect(() => {
 const initialRequest = setTimeout(() => {
   fetchCategories();
   fetchBrands();
-  fetchProducts(true);
+  latestLoader.current(true);
 }, 0);
 return () => clearTimeout(initialRequest);
 }, []);
@@ -253,7 +255,7 @@ return;
 
 const timer = setTimeout(() => {
   setCurrentPage(1);
-  fetchProducts(false);
+  latestLoader.current(false);
 }, 500);
 
 return () => clearTimeout(timer);

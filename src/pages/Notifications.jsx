@@ -229,8 +229,8 @@ function Notifications() {
             },
 
             body: JSON.stringify({
-              title: cleanTitle,
-              body: cleanBody,
+              title,
+              body,
             }),
           }
         );
@@ -372,6 +372,8 @@ function Notifications() {
           </label>
 
           <input
+            dir="auto"
+            style={{ textAlign: 'start', unicodeBidi: 'plaintext' }}
             type="text"
             value={title}
             onChange={(event) => {
@@ -390,6 +392,8 @@ function Notifications() {
           </label>
 
           <textarea
+            dir="auto"
+            style={{ textAlign: 'start', unicodeBidi: 'plaintext' }}
             value={body}
             onChange={(event) => {
               setBody(event.target.value);
@@ -402,6 +406,10 @@ function Notifications() {
           />
         </div>
 
+        <section aria-label="Notification preview" style={{ marginBlock: 16 }}>
+          <strong dir="auto" style={{ display: 'block', textAlign: 'start', unicodeBidi: 'plaintext', whiteSpace: 'pre-wrap' }}>{title}</strong>
+          <div dir="auto" style={{ textAlign: 'start', unicodeBidi: 'plaintext', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{body}</div>
+        </section>
         {errorMessage && (
           <div className="notification-error">
             {errorMessage}

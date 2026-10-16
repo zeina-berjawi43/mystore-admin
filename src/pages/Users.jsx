@@ -2,7 +2,7 @@ import CustomerClass from "../components/CustomerClass";
 import PasswordInput from '../components/PasswordInput';
 import { sessionStorageAdapter } from '../utils/session-storage';
 
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import axios from "../utils/admin-api";
 import Pagination from "../components/Pagination";
 
@@ -99,9 +99,11 @@ function Users() {
   // INITIAL LOAD
   // ============================================================
 
-  useEffect(() => {
+  const latestLoader = useRef(fetchUsers);
+useEffect(() => { latestLoader.current = fetchUsers; });
+useEffect(() => {
     // Cancel a pending initial request on unmount/Strict Mode replay.
-    const initialRequest = setTimeout(() => { fetchUsers(); }, 0);
+    const initialRequest = setTimeout(() => { latestLoader.current(); }, 0);
     return () => clearTimeout(initialRequest);
   }, []);
 

@@ -15,8 +15,6 @@ import {
 } from "react-router-dom";
 
 import axios from "../utils/admin-api";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
 import "./Invoice.css";
 
@@ -1236,6 +1234,9 @@ const isCancelled =
       clearMessages();
 
       setActionLoading("pdf");
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'), import('jspdf'),
+      ]);
 
       /*
        * IMPORTANT:

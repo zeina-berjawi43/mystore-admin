@@ -60,8 +60,10 @@ async function page(users = records) {
   const context = { PasswordInput: props => React.createElement('input', { ...props, type: 'password' }), CustomerClass: ({ user }) => React.createElement("span", null, user.priceClass || "B"), React, axios: axios.create({ adapter: 'fetch', env: { fetch: transport.fetch, Request: null, Response: null } }),
     sessionStorageAdapter: storage,
     alert: message => messages.push(message),
+    useRef: initial => { const index = cursor++; return states[index] ||= { current: initial }; },
     useEffect: (fn, deps) => {
-      if (!deps?.length) return; // Initial fetching is explicitly awaited below.
+      if (deps?.length === 0) return; // Initial fetching is explicitly awaited below.
+      if (!deps) { effects.push(fn); return; }
       const index = cursor++, previous = effectDeps.get(index);
       if (!previous || deps.some((value, i) => value !== previous[i])) { effects.push(fn); effectDeps.set(index, deps); }
     },

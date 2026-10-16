@@ -1,6 +1,6 @@
 import PricingSettings from "./pages/PricingSettings";
 import SessionGate from "./components/SessionGate";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 
 import {
   BrowserRouter,
@@ -27,7 +27,7 @@ import Slideshow from "./pages/Slideshow";
 import Notifications from "./pages/Notifications";
 import PhoneVerification from "./pages/PhoneVerification";
 import AddAdmin from "./pages/AddAdmin";
-import Invoice from "./pages/Invoice";
+const Invoice = lazy(() => import("./pages/Invoice"));
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DeleteAccount from "./pages/DeleteAccount";
 import Departments from "./pages/Departments";
@@ -122,7 +122,7 @@ function App() {
         >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/orders" element={<Orders />} />
-          <Route path="/invoices/:invoiceId" element={<Invoice />} />
+          <Route path="/invoices/:invoiceId" element={<Suspense fallback={<div className="loading">Loading...</div>}><Invoice /></Suspense>} />
           <Route path="/products" element={<Products />} />
           <Route path="/pricing" element={<PricingSettings />} />
           <Route path="/users" element={<Users />} />

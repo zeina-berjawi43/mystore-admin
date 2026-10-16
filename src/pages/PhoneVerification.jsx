@@ -1,7 +1,7 @@
 import { whatsappPhone as normalizeWhatsAppPhone } from '../utils/whatsapp-phone';
 import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 
 const API_URL =
 "https://mystore-backend-u6ey.onrender.com";
@@ -111,13 +111,15 @@ setLoading(true);
 // INITIAL LOAD + AUTO REFRESH
 // ============================================================
 
+const latestLoader = useRef(fetchRequests);
+useEffect(() => { latestLoader.current = fetchRequests; });
 useEffect(() => {
-const initialRequest = setTimeout(() => { fetchRequests(true); }, 0);
+const initialRequest = setTimeout(() => { latestLoader.current(true); }, 0);
 
 
 const interval =
   setInterval(() => {
-    fetchRequests(false);
+    latestLoader.current(false);
   }, 5 * 60 * 1000);
 
 return () => {

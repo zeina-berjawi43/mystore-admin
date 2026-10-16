@@ -16,6 +16,30 @@ function Dashboard() {
 
   const [error, setError] =
     useState("");
+  const [shareBusy, setShareBusy] = useState(false);
+  const [shareMessage, setShareMessage] = useState('');
+  const [shareText, setShareText] = useState('');
+  const shareConfirmedProducts = async () => {
+    if (shareBusy) return;
+    // Reserve a browsing context during the click so popup blockers do not swallow async sharing.
+    const destination = window.open('about:blank', '_blank');
+    if (destination) destination.opener = null;
+    setShareBusy(true); setShareMessage(''); setShareText('');
+    try {
+      const token = sessionStorageAdapter.getItem('accessToken');
+      const { data } = await axios.get(`${API_URL}/dashboard/confirmed-products/share`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!data.text) { destination?.close(); setShareMessage('No products in confirmed orders.'); return; }
+      const url = `https://wa.me/?text=${encodeURIComponent(data.text)}`;
+      if (url.length > 8000) {
+        destination?.close(); setShareText(data.text);
+        setShareMessage('Large list: copy the complete text below and paste it into WhatsApp.');
+        return;
+      }
+      if (destination) destination.location.replace(url);
+      else setShareMessage(url);
+    } catch { destination?.close(); setShareMessage('Unable to share confirmed products. Please retry.'); }
+    finally { setShareBusy(false); }
+  };
 
   const [
     selectedOrderId,
@@ -608,6 +632,9 @@ function Dashboard() {
 
 
           <div className="confirmed-products-summary">
+            <button className="refresh-button" type="button" onClick={shareConfirmedProducts} disabled={shareBusy}>WhatsApp Share</button>
+            {shareText && <><textarea aria-label="Complete WhatsApp product list" dir="auto" readOnly value={shareText} onFocus={event => event.target.select()} /><a href="https://wa.me/" target="_blank" rel="noopener noreferrer">Open WhatsApp</a></>}
+            {shareMessage && (shareMessage.startsWith('https://wa.me/') ? <a href={shareMessage} target="_blank" rel="noopener noreferrer">Open WhatsApp Share</a> : <span role="status">{shareMessage}</span>)}
 
             <span>
               {preparedProductsCount}

@@ -32,7 +32,7 @@ test('panel pricing loads authoritative Class C delivery values and saves all fi
   const labels=[];const walk=node=>{if(!node||typeof node!=='object')return;if(Array.isArray(node)){node.forEach(walk);return;}if(node.type==='label')labels.push(node.props.children);walk(node.props?.children);};walk(tree);
   const displayed=JSON.stringify(labels);for(const label of ['Minimum Checkout Amount','Free Delivery Threshold','Delivery Fee Below Free Delivery Threshold'])assert.ok(displayed.includes(label));
   const first = render().save({ preventDefault() {} }); await render().save({ preventDefault() {} });
-  assert.equal(writes.length, 1); assert.deepEqual(JSON.parse(JSON.stringify(writes[0].body)), { classes });
+  assert.equal(writes.length, 1); assert.deepEqual(JSON.parse(JSON.stringify(writes[0].body)), { classes: Object.fromEntries(Object.entries(classes).map(([key,value]) => [key, { ...value, name: key }])) });
   assert.equal(render().saving, true); finish(); await first; assert.match(render().message, /saved/);
 });
 
@@ -41,6 +41,7 @@ test('actual backend customer update accepts omitted/empty email, normalizes pro
   const router = Object.fromEntries(['get','put','post','delete'].map(method => [method, (route, ...handlers) => routes.set(`${method} ${route}`, handlers.at(-1))]));
   const dependencies = { express: { Router: () => router }, mongoose: { Types: { ObjectId: { isValid: () => true } } }, bcryptjs: {},
     '../models/User': { findById: async () => user, findOne: async () => null },
+    '../services/pricingManagement': { transaction: async work => work({ classes: { A: {}, B: {}, C: {} } }, {}) },
     '../middleware/authMiddleware': () => {}, '../middleware/adminMiddleware': () => {}, '../services/accountDeletionService': {} };
   vm.runInNewContext(readFileSync('../backend/routes/userRoutes.js', 'utf8'), { module: { exports: {} }, console, require: name => dependencies[name] });
   async function update(role, body) {

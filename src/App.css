@@ -4506,3 +4506,5 @@ button[class*="Refresh"].is-refreshing::before {
   }
 
 }
+
+.whatsapp-share-button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 1px solid #ddd; border-radius: 12px; background: white; cursor: pointer; }

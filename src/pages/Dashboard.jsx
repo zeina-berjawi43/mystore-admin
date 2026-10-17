@@ -632,7 +632,7 @@ function Dashboard() {
 
 
           <div className="confirmed-products-summary">
-            <button className="refresh-button" type="button" onClick={shareConfirmedProducts} disabled={shareBusy}>WhatsApp Share</button>
+            <button className="whatsapp-share-button" type="button" onClick={shareConfirmedProducts} disabled={shareBusy}><img alt="" width="22" height="22" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%2325D366%22%20d%3D%22M12%201a11%2011%200%200%200-9.5%2016.5L1%2023l5.6-1.5A11%2011%200%201%200%2012%201z%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M8%206c-.5%200-1.5%201-1.5%202.5%200%203.5%205%208.5%208.5%208.5%201.5%200%203-1%203-2l-3-1.5-1%201c-1.5-.5-3.5-2.5-4-4l1-1L9.5%206z%22%2F%3E%3C%2Fsvg%3E" /> WhatsApp Share</button>
             {shareText && <><textarea aria-label="Complete WhatsApp product list" dir="auto" readOnly value={shareText} onFocus={event => event.target.select()} /><a href="https://wa.me/" target="_blank" rel="noopener noreferrer">Open WhatsApp</a></>}
             {shareMessage && (shareMessage.startsWith('https://wa.me/') ? <a href={shareMessage} target="_blank" rel="noopener noreferrer">Open WhatsApp Share</a> : <span role="status">{shareMessage}</span>)}
 

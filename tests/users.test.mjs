@@ -53,6 +53,7 @@ async function page(users = records) {
     commitAccess: (_expected, value) => { access = value; return true; }, clearSession: () => false };
   const transport = createAuthTransport(storage, async (url, init) => {
     if (url.endsWith('/refresh-token')) { refreshes++; return new Response('{"accessToken":"fresh"}'); }
+    if (url.endsWith('/pricing')) return new Response(JSON.stringify({ classes: { A: {}, B: {}, C: {} }, defaultClass: 'C' }));
     if (init.method === 'PUT') { writes.push({ url, body: JSON.parse(init.body) }); return new Response('{"message":"Customer updated"}'); }
     assert.ok(url.startsWith(`${API_URL}/users/admin/all`)); requests++;
     return new Response(JSON.stringify(body), { status: init.headers.get('Authorization') === 'Bearer fresh' ? 200 : 401 });

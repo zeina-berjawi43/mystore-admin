@@ -20,8 +20,10 @@ const getUserName = (user) => {
 
 function Users() {
   const [users, setUsers] = useState([]);
+  const [pricingClasses, setPricingClasses] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  useEffect(() => { let active = true; axios.get(API_URL + '/pricing', { headers: { Authorization: `Bearer ${sessionStorageAdapter.getItem('accessToken')}` } }).then(({ data }) => { if (active) setPricingClasses(data.classes || {}); }).catch(() => { if (active) setError('Could not load pricing classes'); }); return () => { active = false; }; }, []);
 
   const [search, setSearchValue] = useState("");
   const [roleFilter, setRoleFilterValue] = useState("");
@@ -281,7 +283,7 @@ useEffect(() => {
       !roleFilter ||
       user.role === roleFilter;
 
-    const effectiveClass = ['A', 'B', 'C'].includes(user.priceClass) ? user.priceClass : 'B';
+    const effectiveClass = user.priceClass || 'B';
     return matchesSearch && matchesRole && (!priceClassFilter || (user.role === 'user' && effectiveClass === priceClassFilter));
   });
 
@@ -383,7 +385,7 @@ useEffect(() => {
 
         <select aria-label="Filter customers by price class" value={priceClassFilter} onChange={event => setPriceClassFilter(event.target.value)}>
           <option value="">All Price Classes</option>
-          {['A', 'B', 'C'].map(value => <option key={value} value={value}>{value}</option>)}
+          {Object.keys(pricingClasses).map(value => <option key={value} value={value}>{value}</option>)}
         </select>
         {(search || roleFilter || priceClassFilter) && (
           <button
@@ -472,7 +474,7 @@ useEffect(() => {
                   </td>
 
                   <td>{user.address || "—"}</td>
-                  <td>{user.role === "user" ? <CustomerClass key={`${user._id}:${user.priceClass}`} user={user} onSaved={priceClass => setUsers(previous => previous.map(item => item._id === user._id ? { ...item, priceClass } : item))} /> : "—"}</td>
+                  <td>{user.role === "user" ? <CustomerClass key={`${user._id}:${user.priceClass}`} user={user} classes={pricingClasses} onSaved={priceClass => setUsers(previous => previous.map(item => item._id === user._id ? { ...item, priceClass } : item))} /> : "—"}</td>
 
                   <td>
                     <span

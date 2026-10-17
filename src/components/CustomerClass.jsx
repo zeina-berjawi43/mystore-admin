@@ -1,3 +1,4 @@
+import { getPricingClassName } from '../utils/pricing-class';
 import { useRef, useState } from 'react';
 import api from '../utils/admin-api';
 import { getToken } from '../utils/auth';
@@ -19,6 +20,7 @@ export default function CustomerClass({ user, onSaved, classes }) {
     finally { busy.current = false; setSaving(false); }
   }
   return <div className="customer-class" aria-busy={saving}><label className="customer-class-label">Price class<select aria-label="Customer price class" disabled={saving} value={value} onChange={event => { setValue(event.target.value); setMessage(''); }}>
-    {Object.keys(classes).map(key => <option key={key} value={key}>{classes[key].name || key}</option>)}
-  </select></label><button className="customer-class-save" type="button" disabled={saving || value === saved} onClick={save}>{saving ? 'Saving...' : 'Save'}</button><span className="customer-class-status" role="status">{message || `Current: ${saved}`}</span></div>;
+    {!classes[value] && <option value={value} disabled>{getPricingClassName(classes, value)}</option>}
+    {Object.keys(classes).map(key => <option key={key} value={key}>{getPricingClassName(classes, key)}</option>)}
+  </select></label><button className="customer-class-save" type="button" disabled={saving || value === saved} onClick={save}>{saving ? 'Saving...' : 'Save'}</button><span className="customer-class-status" role="status">{message ? `${message} ? ` : ''}Current Class: {getPricingClassName(classes, saved)}</span></div>;
 }

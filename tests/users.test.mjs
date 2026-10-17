@@ -1,3 +1,4 @@
+import { getPricingClassName } from '../src/utils/pricing-class.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -45,7 +46,7 @@ const source = readFileSync(new URL('../src/pages/Users.jsx', import.meta.url), 
   .replace('export default Users;', 'globalThis.Users = Users; globalThis.getUserName = getUserName;');
 const { code } = await transformWithOxc(source, 'Users.jsx', { jsx: { runtime: 'classic' } });
 
-async function page(users = records) {
+async function page(users = records, pricingClasses = { A: {}, B: {}, C: {} }) {
   const body = await backendResponse(users);
   const states = [], effects = [], effectDeps = new Map(); let cursor = 0, refreshes = 0, requests = 0, confirmation, pagination;
   let access = 'expired'; const writes = [], messages = [];
@@ -53,12 +54,12 @@ async function page(users = records) {
     commitAccess: (_expected, value) => { access = value; return true; }, clearSession: () => false };
   const transport = createAuthTransport(storage, async (url, init) => {
     if (url.endsWith('/refresh-token')) { refreshes++; return new Response('{"accessToken":"fresh"}'); }
-    if (url.endsWith('/pricing')) return new Response(JSON.stringify({ classes: { A: {}, B: {}, C: {} }, defaultClass: 'C' }));
+    if (url.endsWith('/pricing')) return new Response(JSON.stringify({ classes: pricingClasses, defaultClass: 'C' }));
     if (init.method === 'PUT') { writes.push({ url, body: JSON.parse(init.body) }); return new Response('{"message":"Customer updated"}'); }
     assert.ok(url.startsWith(`${API_URL}/users/admin/all`)); requests++;
     return new Response(JSON.stringify(body), { status: init.headers.get('Authorization') === 'Bearer fresh' ? 200 : 401 });
   }, () => assert.fail('Unexpected logout'));
-  const context = { PasswordInput: props => React.createElement('input', { ...props, type: 'password' }), CustomerClass: ({ user }) => React.createElement("span", null, user.priceClass || "B"), React, axios: axios.create({ adapter: 'fetch', env: { fetch: transport.fetch, Request: null, Response: null } }),
+  const context = { getPricingClassName, PasswordInput: props => React.createElement('input', { ...props, type: 'password' }), CustomerClass: ({ user, classes }) => React.createElement("span", null, getPricingClassName(classes, user.priceClass || "B")), React, axios: axios.create({ adapter: 'fetch', env: { fetch: transport.fetch, Request: null, Response: null } }),
     sessionStorageAdapter: storage,
     alert: message => messages.push(message),
     useRef: initial => { const index = cursor++; return states[index] ||= { current: initial }; },
@@ -162,4 +163,37 @@ test('All/A/B/C filter combines with search, preserves records and resets pagina
   p.context.handlers.setPriceClassFilter('C'); p.render(); assert.deepEqual(ids(), ['C']);
   p.context.handlers.setPriceClassFilter(''); p.render(); assert.deepEqual(ids(), ['A', 'B', 'C']);
   assert.deepEqual(p.body.users, customers);
+});
+
+test('generated class filter uses names, retains ID values and refreshes renamed configuration', async () => {
+  const id = 'cls_1234567890123456789012345678';
+  const classes = { A: {}, B: {}, C: {}, [id]: { name: 'Wholesale Partners' } };
+  const p = await page([{ ...records[0], priceClass: id }, records[1]], classes);
+  let html = p.render();
+  assert.ok(html.includes(`value="${id}">Wholesale Partners</option>`));
+  assert.ok(!html.includes(`>${id}<`));
+  p.context.handlers.setPriceClassFilter(id); html = p.render();
+  assert.deepEqual(Array.from(p.context.handlers.filteredUsers, user => user._id), ['customer']);
+  p.context.handlers.openEditModal(p.body.users[0]); assert.ok(p.render().includes('Wholesale Partners'));
+  classes[id].name = 'Trade Partners'; await p.context.handlers.fetchUsers();
+  html = p.render(); assert.ok(html.includes('Trade Partners')); assert.ok(!html.includes('Wholesale Partners'));
+  assert.equal(p.context.handlers.filteredUsers[0].priceClass, id);
+});
+
+test('actual customer class editor saves IDs, displays saved names, and refreshes its current label', async () => {
+  const id = 'cls_1234567890123456789012345678', classes = { B: {}, [id]: { name: 'Trade Partners' } };
+  const source = readFileSync('src/components/CustomerClass.jsx', 'utf8').replace(/^import.*;\s*$/gm, '').replace('export default function', 'function') + '\nglobalThis.Screen=CustomerClass;';
+  const { code } = await transformWithOxc(source, 'CustomerClass.jsx', { jsx: { runtime: 'classic' } });
+  let cursor = 0, saved; const slots = [];
+  const context = { React, getPricingClassName, getToken: () => 'fixture', api: { put: async (_url, body) => { saved = body; } },
+    useRef: initial => { const i = cursor++; return slots[i] ||= { current: initial }; },
+    useState: initial => { const i = cursor++; if (!(i in slots)) slots[i] = initial; return [slots[i], value => { slots[i] = value; }]; } };
+  vm.runInNewContext(code, context);
+  const render = () => { cursor = 0; return context.Screen({ user: { _id: 'customer', priceClass: 'B' }, classes }); };
+  let tree = render(); tree.props.children[0].props.children[1].props.onChange({ target: { value: id } });
+  tree = render(); await tree.props.children[1].props.onClick();
+  assert.equal(saved.priceClass, id);
+  assert.match(renderToStaticMarkup(render()), /Current Class: Trade Partners/);
+  classes[id].name = 'Renamed Partners'; assert.match(renderToStaticMarkup(render()), /Current Class: Renamed Partners/);
+  assert.equal(getPricingClassName({}, id), 'Unknown class'); assert.equal(getPricingClassName({}, 'A'), 'Class A');
 });

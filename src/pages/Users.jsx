@@ -1,3 +1,4 @@
+import { getPricingClassName } from '../utils/pricing-class';
 import CustomerClass from "../components/CustomerClass";
 import PasswordInput from '../components/PasswordInput';
 import { sessionStorageAdapter } from '../utils/session-storage';
@@ -23,7 +24,6 @@ function Users() {
   const [pricingClasses, setPricingClasses] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  useEffect(() => { let active = true; axios.get(API_URL + '/pricing', { headers: { Authorization: `Bearer ${sessionStorageAdapter.getItem('accessToken')}` } }).then(({ data }) => { if (active) setPricingClasses(data.classes || {}); }).catch(() => { if (active) setError('Could not load pricing classes'); }); return () => { active = false; }; }, []);
 
   const [search, setSearchValue] = useState("");
   const [roleFilter, setRoleFilterValue] = useState("");
@@ -77,6 +77,8 @@ function Users() {
         }
       );
 
+      const pricing = await axios.get(`${API_URL}/pricing`, { headers: { Authorization: `Bearer ${token}` } });
+      setPricingClasses(pricing.data.classes || {});
       setUsers(response.data.users || []);
     } catch (error) {
       if (
@@ -385,7 +387,8 @@ useEffect(() => {
 
         <select aria-label="Filter customers by price class" value={priceClassFilter} onChange={event => setPriceClassFilter(event.target.value)}>
           <option value="">All Price Classes</option>
-          {Object.keys(pricingClasses).map(value => <option key={value} value={value}>{value}</option>)}
+          {priceClassFilter && !pricingClasses[priceClassFilter] && <option value={priceClassFilter} disabled>{getPricingClassName(pricingClasses, priceClassFilter)}</option>}
+          {Object.keys(pricingClasses).map(value => <option key={value} value={value}>{getPricingClassName(pricingClasses, value)}</option>)}
         </select>
         {(search || roleFilter || priceClassFilter) && (
           <button
@@ -576,6 +579,10 @@ useEffect(() => {
               </div>
 
               <div className="user-form-group">
+                {editingUser?.role === 'user' && <CustomerClass key={`editor:${editingUser._id}:${editingUser.priceClass}`} user={editingUser} classes={pricingClasses} onSaved={priceClass => {
+                  setEditingUser(previous => ({ ...previous, priceClass }));
+                  setUsers(previous => previous.map(item => item._id === editingUser._id ? { ...item, priceClass } : item));
+                }} />}
                 <label>{form.role === "admin" ? "Email *" : "Email (optional)"}</label>
                 <input
                   type="email"

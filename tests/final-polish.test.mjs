@@ -17,7 +17,7 @@ test('sidebar preserves pricing route/icon directly below Customers', () => {
 
 test('panel pricing loads authoritative Class C delivery values and saves all fields, guarding concurrent saves', async () => {
   const source = readFileSync('src/pages/PricingSettings.jsx', 'utf8').replace(/^import.*;\s*$/gm, '')
-    .replace('  return <div', '  globalThis.handlers={classes,setClasses,save,message,saving};\n  return <div');
+    .replace('  return <div', '  globalThis.handlers={classes,setClasses,save,manage,setNewClass,message,saving};\n  return <div');
   const { code } = await transformWithOxc(source.replace('export default function', 'function') + '\nglobalThis.Screen=PricingSettings;', 'Pricing.jsx', { jsx: { runtime: 'classic' } });
   const slots = []; let cursor = 0, effect, finish; const writes = [];
   const classes = { A: { adjustment: -4, minimum: 200 }, B: { adjustment: 1, minimum: 150 }, C: { adjustment: 25, minimum: 30, freeDeliveryThreshold: 100, deliveryFeeBelowThreshold: 5 } };
@@ -34,6 +34,16 @@ test('panel pricing loads authoritative Class C delivery values and saves all fi
   const first = render().save({ preventDefault() {} }); await render().save({ preventDefault() {} });
   assert.equal(writes.length, 1); assert.deepEqual(JSON.parse(JSON.stringify(writes[0].body)), { classes: Object.fromEntries(Object.entries(classes).map(([key,value]) => [key, { ...value, name: key }])) });
   assert.equal(render().saving, true); finish(); await first; assert.match(render().message, /saved/);
+  render().setNewClass({ name: 'Partners', adjustment: '12.5', minimum: '50' });
+  context.api.post = async (url, body) => {
+    assert.ok(url.endsWith('/pricing/classes'));
+    assert.deepEqual(JSON.parse(JSON.stringify(body)), { value: { name: 'Partners', adjustment: 12.5, minimum: 50 } });
+    return { data: { classes: { ...classes, cls_generated: body.value }, defaultClass: 'C' } };
+  };
+  await render().manage('create'); assert.equal(render().classes.cls_generated.name, 'Partners');
+  context.api.post = async () => { throw { response: { status: 404, data: { message: 'Route not found' } } }; };
+  await render().manage('create'); assert.match(render().message, /Route not found.*backend deployment/);
+
 });
 
 test('actual backend customer update accepts omitted/empty email, normalizes provided email and preserves admin requirement', async () => {

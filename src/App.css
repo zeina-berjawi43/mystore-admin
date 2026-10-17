@@ -88,6 +88,33 @@
   overflow-wrap: anywhere;
 }
 
+.pricing-create { margin-bottom: 24px; }
+.pricing-create h2 { margin: 0 0 18px; font-size: 18px; color: var(--text); }
+.pricing-create-fields { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 18px; }
+.pricing-page .pricing-card input {
+  box-sizing: border-box; width: 100%; padding: 11px 13px;
+  border: 1px solid var(--border-input); border-radius: var(--radius-md);
+  background: var(--surface-soft); color: var(--text); font: inherit;
+}
+.pricing-page .pricing-card input:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.pricing-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.pricing-secondary-button, .pricing-delete-button {
+  min-height: 44px; padding: 10px 14px; border-radius: var(--radius-md);
+  border: 1px solid var(--border); background: var(--surface-warm);
+  color: var(--text); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.pricing-delete-button { color: var(--danger); background: var(--danger-bg); border-color: var(--danger-border); }
+.pricing-card-actions button:disabled { opacity: 0.5; cursor: default; }
+.pricing-card-default { border-color: var(--success); }
+.pricing-default-badge {
+  display: inline-block; margin-left: 8px; padding: 4px 8px; border-radius: var(--radius-sm);
+  font-size: 11px; vertical-align: middle; color: var(--success); background: var(--success-bg);
+}
+@media (max-width: 680px) {
+  .pricing-create-fields { grid-template-columns: 1fr; gap: 0; }
+  .pricing-create > button { width: 100%; }
+}
+
 .customer-class {
   display: flex;
   align-items: flex-end;

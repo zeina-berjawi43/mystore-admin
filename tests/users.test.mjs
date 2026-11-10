@@ -197,3 +197,50 @@ test('actual customer class editor saves IDs, displays saved names, and refreshe
   classes[id].name = 'Renamed Partners'; assert.match(renderToStaticMarkup(render()), /Current Class: Renamed Partners/);
   assert.equal(getPricingClassName({}, id), 'Unknown class'); assert.equal(getPricingClassName({}, 'A'), 'Class A');
 });
+
+async function classEditor(user, classes, { confirm = true, fail } = {}) {
+  const source = readFileSync('src/components/CustomerClass.jsx', 'utf8').replace(/^import.*;\s*$/gm, '').replace('export default function', 'function') + '\nglobalThis.Screen=CustomerClass;';
+  const { code } = await transformWithOxc(source, 'CustomerClass.jsx', { jsx: { runtime: 'classic' } });
+  let cursor = 0; const slots = [], requests = [], confirmations = [];
+  const context = { React, getPricingClassName, getToken: () => 'fixture',
+    window: { confirm: message => { confirmations.push(message); return confirm; } },
+    api: { put: async (url, body) => { requests.push({ url, body }); if (fail) throw { response: { data: { message: fail } } }; } },
+    useRef: initial => { const i = cursor++; return slots[i] ||= { current: initial }; },
+    useState: initial => { const i = cursor++; if (!(i in slots)) slots[i] = initial; return [slots[i], value => { slots[i] = value; }]; } };
+  vm.runInNewContext(code, context);
+  const render = () => { cursor = 0; return context.Screen({ user, classes }); };
+  const select = value => render().props.children[0].props.children[1].props.onChange({ target: { value } });
+  const save = () => render().props.children[1].props.onClick();
+  return { render, select, save, requests, confirmations, html: () => renderToStaticMarkup(render()) };
+}
+test('DEMO is offered once in the existing class selector and requires confirmation before saving', async () => {
+  const classes = { A: {}, B: {}, C: {} }, user = { _id: 'customer', firstName: 'Maya', lastName: 'Haddad', priceClass: 'B' };
+  let e = await classEditor(user, classes, { confirm: false });
+  assert.equal((e.html().match(/<option[^>]*value="DEMO"/g) || []).length, 1);
+  e.select('DEMO'); await e.save();
+  assert.equal(e.requests.length, 0, 'cancelled confirmation sends nothing');
+  assert.match(e.confirmations[0], /Switch Maya Haddad to DEMO mode\?/);
+  assert.match(e.confirmations[0], /CANNOT place real orders/);
+  assert.match(e.html(), /Current Class: Class B/);
+  e = await classEditor(user, classes);
+  e.select('DEMO'); await e.save();
+  assert.deepEqual(JSON.parse(JSON.stringify(e.requests)), [{ url: 'https://mystore-backend-u6ey.onrender.com/pricing/customers/customer', body: { priceClass: 'DEMO', confirmDemo: true } }]);
+  assert.match(e.html(), /Saved \? Current Class: DEMO/);
+});
+test('removing DEMO needs an explicitly selected class and never asks for DEMO confirmation', async () => {
+  const classes = { A: {}, B: {}, C: {} };
+  const e = await classEditor({ _id: 'demo', priceClass: 'DEMO' }, classes);
+  assert.match(e.html(), /Current Class: DEMO/);
+  assert.match(e.html(), /<button[^>]*disabled=""[^>]*>Save/, 'nothing to save until a class is chosen');
+  assert.equal((e.html().match(/value="DEMO"/g) || []).length, 1, 'no duplicate placeholder option');
+  e.select('A'); await e.save();
+  assert.deepEqual(JSON.parse(JSON.stringify(e.requests.map(r => r.body))), [{ priceClass: 'A' }]);
+  assert.equal(e.confirmations.length, 0);
+  assert.match(e.html(), /Current Class: Class A/);
+});
+test('backend refusal (orders/invoices) is shown and the saved class stays unchanged', async () => {
+  const e = await classEditor({ _id: 'c', priceClass: 'C' }, { A: {}, B: {}, C: {} }, { fail: 'DEMO can only be assigned to a customer with no orders or invoices' });
+  e.select('DEMO'); await e.save();
+  assert.match(e.html(), /DEMO can only be assigned to a customer with no orders or invoices \? Current Class: Class C/);
+  assert.equal(getPricingClassName({}, 'DEMO'), 'DEMO');
+});

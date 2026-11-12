@@ -4,6 +4,7 @@ import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
 import {
 useEffect,
+useMemo,
 useRef,
 useState,
 } from "react";
@@ -94,6 +95,7 @@ availability: true,
 });
 
 const firstFilterRender = useRef(true);
+const productRequest = useRef(0);
 
 // ============================================================
 // TOKEN
@@ -174,6 +176,7 @@ const data = await response.json();
 // ============================================================
 
 const fetchProducts = async (showInitialLoading = false) => {
+const request = ++productRequest.current;
 try {
 if (showInitialLoading) {
 setLoading(true);
@@ -209,6 +212,7 @@ setLoading(true);
 
   const data = await response.json();
 
+  if (request !== productRequest.current) return;
   if (!response.ok) {
     throw new Error(
       data.message || "Failed to load products"
@@ -217,11 +221,12 @@ setLoading(true);
 
   setProducts(data.products || []);
 } catch (error) {
+  if (request !== productRequest.current) return;
   setError(
     error.message || "Failed to load products"
   );
 } finally {
-  if (showInitialLoading) {
+  if (request === productRequest.current) {
     setLoading(false);
   }
 }
@@ -240,7 +245,10 @@ const initialRequest = setTimeout(() => {
   fetchBrands();
   latestLoader.current(true);
 }, 0);
-return () => clearTimeout(initialRequest);
+return () => {
+  clearTimeout(initialRequest);
+  productRequest.current += 1;
+};
 }, []);
 
 // ============================================================
@@ -258,7 +266,10 @@ const timer = setTimeout(() => {
   latestLoader.current(false);
 }, 500);
 
-return () => clearTimeout(timer);
+return () => {
+  clearTimeout(timer);
+  productRequest.current += 1;
+};
 
 }, [search, categoryFilter, brandFilter, availabilityFilter]);
 
@@ -266,14 +277,19 @@ return () => clearTimeout(timer);
 // PAGINATION SLICE
 // ============================================================
 
+// Also keep inline availability edits consistent with the active server filter.
+const visibleProducts = useMemo(() => availabilityFilter === "" ? products :
+  products.filter(product => product.availability === (availabilityFilter === "true")),
+  [products, availabilityFilter]);
+
 const totalPages = Math.max(
 1,
-Math.ceil(products.length / pageSize)
+Math.ceil(visibleProducts.length / pageSize)
 );
 
 const safeCurrentPage = Math.min(currentPage, totalPages);
 
-const paginatedProducts = products.slice(
+const paginatedProducts = visibleProducts.slice(
 (safeCurrentPage - 1) * pageSize,
 safeCurrentPage * pageSize
 );
@@ -948,12 +964,13 @@ return ( <div className="products-page"> <div className="products-header"> <div>
     </select>
 
     <select
+      aria-label="Product availability"
       value={availabilityFilter}
       onChange={(event) =>
         setAvailabilityFilter(event.target.value)
       }
     >
-      <option value="">All Status</option>
+      <option value="">All Products</option>
       <option value="true">Available</option>
       <option value="false">Unavailable</option>
     </select>
@@ -984,7 +1001,7 @@ return ( <div className="products-page"> <div className="products-header"> <div>
   {/* COUNT */}
   <div className="products-count">
     <span>
-      {products.length} product{products.length !== 1 ? "s" : ""}
+      {visibleProducts.length} product{visibleProducts.length !== 1 ? "s" : ""}
     </span>
 
     {loading && <span>Updating...</span>}
@@ -1175,7 +1192,7 @@ return ( <div className="products-page"> <div className="products-header"> <div>
 
   <Pagination
     currentPage={safeCurrentPage}
-    totalItems={products.length}
+    totalItems={visibleProducts.length}
     pageSize={pageSize}
     onPageChange={setCurrentPage}
     onPageSizeChange={(size) => {

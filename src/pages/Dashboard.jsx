@@ -1,6 +1,7 @@
 import { sessionStorageAdapter } from '../utils/session-storage';
 import { useEffect, useState } from "react";
 import axios from "../utils/admin-api";
+import { sortChecklistProducts, uncheckedChecklistText } from '../utils/dashboard-checklist';
 
 const API_URL =
   "https://mystore-backend-u6ey.onrender.com";
@@ -19,27 +20,6 @@ function Dashboard() {
   const [shareBusy, setShareBusy] = useState(false);
   const [shareMessage, setShareMessage] = useState('');
   const [shareText, setShareText] = useState('');
-  const shareConfirmedProducts = async () => {
-    if (shareBusy) return;
-    // Reserve a browsing context during the click so popup blockers do not swallow async sharing.
-    const destination = window.open('about:blank', '_blank');
-    if (destination) destination.opener = null;
-    setShareBusy(true); setShareMessage(''); setShareText('');
-    try {
-      const token = sessionStorageAdapter.getItem('accessToken');
-      const { data } = await axios.get(`${API_URL}/dashboard/confirmed-products/share`, { headers: { Authorization: `Bearer ${token}` } });
-      if (!data.text) { destination?.close(); setShareMessage('No products in confirmed orders.'); return; }
-      const url = `https://wa.me/?text=${encodeURIComponent(data.text)}`;
-      if (url.length > 8000) {
-        destination?.close(); setShareText(data.text);
-        setShareMessage('Large list: copy the complete text below and paste it into WhatsApp.');
-        return;
-      }
-      if (destination) destination.location.replace(url);
-      else setShareMessage(url);
-    } catch { destination?.close(); setShareMessage('Unable to share confirmed products. Please retry.'); }
-    finally { setShareBusy(false); }
-  };
 
   const [
     selectedOrderId,
@@ -51,6 +31,27 @@ function Dashboard() {
     setCheckingProductId
   ] = useState(null);
 
+  const shareConfirmedProducts = async () => {
+    if (shareBusy || checkingProductId) return;
+    setShareMessage(''); setShareText('');
+    const text = uncheckedChecklistText(sortChecklistProducts(statistics?.confirmedProducts || []));
+    if (!text) { setShareMessage('No unchecked products to share.'); return; }
+    // Reserve a browsing context during the click so popup blockers do not swallow async sharing.
+    const destination = window.open('about:blank', '_blank');
+    if (destination) destination.opener = null;
+    setShareBusy(true);
+    try {
+      const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      if (url.length > 8000) {
+        destination?.close(); setShareText(text);
+        setShareMessage('Large list: copy the complete text below and paste it into WhatsApp.');
+        return;
+      }
+      if (destination) destination.location.replace(url);
+      else setShareMessage(url);
+    } catch { destination?.close(); setShareMessage('Unable to share confirmed products. Please retry.'); }
+    finally { setShareBusy(false); }
+  };
 
   // ============================================================
   // FETCH DASHBOARD DATA
@@ -347,9 +348,10 @@ function Dashboard() {
     totalUsers = 0,
     totalProducts = 0,
     ordersByStatus = {},
-    confirmedProducts = [],
+    confirmedProducts: unsortedConfirmedProducts = [],
     recentOrders = [],
   } = statistics;
+  const confirmedProducts = sortChecklistProducts(unsortedConfirmedProducts);
 
 
   const preparedProductsCount =
@@ -632,7 +634,7 @@ function Dashboard() {
 
 
           <div className="confirmed-products-summary">
-            <button className="whatsapp-share-button" type="button" onClick={shareConfirmedProducts} disabled={shareBusy}><img alt="" width="22" height="22" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%2325D366%22%20d%3D%22M12%201a11%2011%200%200%200-9.5%2016.5L1%2023l5.6-1.5A11%2011%200%201%200%2012%201z%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M8%206c-.5%200-1.5%201-1.5%202.5%200%203.5%205%208.5%208.5%208.5%201.5%200%203-1%203-2l-3-1.5-1%201c-1.5-.5-3.5-2.5-4-4l1-1L9.5%206z%22%2F%3E%3C%2Fsvg%3E" /> WhatsApp Share</button>
+            <button className="whatsapp-share-button" type="button" onClick={shareConfirmedProducts} disabled={shareBusy || Boolean(checkingProductId)}><img alt="" width="22" height="22" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%2325D366%22%20d%3D%22M12%201a11%2011%200%200%200-9.5%2016.5L1%2023l5.6-1.5A11%2011%200%201%200%2012%201z%22%2F%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M8%206c-.5%200-1.5%201-1.5%202.5%200%203.5%205%208.5%208.5%208.5%201.5%200%203-1%203-2l-3-1.5-1%201c-1.5-.5-3.5-2.5-4-4l1-1L9.5%206z%22%2F%3E%3C%2Fsvg%3E" /> WhatsApp Share</button>
             {shareText && <><textarea aria-label="Complete WhatsApp product list" dir="auto" readOnly value={shareText} onFocus={event => event.target.select()} /><a href="https://wa.me/" target="_blank" rel="noopener noreferrer">Open WhatsApp</a></>}
             {shareMessage && (shareMessage.startsWith('https://wa.me/') ? <a href={shareMessage} target="_blank" rel="noopener noreferrer">Open WhatsApp Share</a> : <span role="status">{shareMessage}</span>)}
 

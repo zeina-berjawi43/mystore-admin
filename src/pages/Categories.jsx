@@ -54,16 +54,6 @@ name,
 setName
 ] = useState("");
 
-const [
-image,
-setImage
-] = useState(null);
-
-const [
-imagePreview,
-setImagePreview
-] = useState("");
-
 // ============================================================
 // TOKEN
 // ============================================================
@@ -155,52 +145,6 @@ return () => clearTimeout(initialRequest);
 }, []);
 
 // ============================================================
-// IMAGE URL
-// ============================================================
-
-const buildImageUrl =
-(imagePath) => {
-
-
-  if (!imagePath) {
-
-    return "";
-
-  }
-
-
-  // MongoDB now stores the complete
-  // Supabase public URL.
-
-  if (
-    imagePath.startsWith(
-      "http://"
-    ) ||
-    imagePath.startsWith(
-      "https://"
-    ) ||
-    imagePath.startsWith(
-      "blob:"
-    )
-  ) {
-
-    return imagePath;
-
-  }
-
-
-  // Fallback for old records
-  // that may still contain a backend path.
-
-  return `${API_URL}/${imagePath.replace(
-    /^\/+/,
-    ""
-  )}`;
-
-};
-
-
-// ============================================================
 // OPEN ADD
 // ============================================================
 
@@ -211,10 +155,6 @@ setEditingCategory(null);
 setDepartmentId("");
 
 setName("");
-
-setImage(null);
-
-setImagePreview("");
 
 setShowModal(true);
 
@@ -238,112 +178,7 @@ const openEditModal =
   );
   setDepartmentId(typeof category.department === "object" ? category.department?._id || "" : category.department || "");
 
-  setImage(null);
-
-  setImagePreview(
-    buildImageUrl(
-      category.image
-    )
-  );
-
   setShowModal(true);
-
-};
-
-
-// ============================================================
-// IMAGE CHANGE
-// ============================================================
-
-const handleImageChange =
-(event) => {
-
-
-  const file =
-    event.target.files?.[0];
-
-
-  if (!file) {
-
-    return;
-
-  }
-
-
-  const allowedTypes = [
-
-    "image/jpeg",
-
-    "image/jpg",
-
-    "image/png",
-
-    "image/webp"
-
-  ];
-
-
-  if (
-    !allowedTypes.includes(
-      file.type
-    )
-  ) {
-
-    alert(
-      "Please select a JPG, JPEG, PNG or WEBP image."
-    );
-
-    event.target.value = "";
-
-    return;
-
-  }
-
-
-  if (
-    file.size >
-    5 * 1024 * 1024
-  ) {
-
-    alert(
-      "Image must be smaller than 5MB."
-    );
-
-    event.target.value = "";
-
-    return;
-
-  }
-
-
-  // ======================================================
-  // CLEAN OLD PREVIEW URL
-  // ======================================================
-
-  if (
-    imagePreview &&
-    imagePreview.startsWith(
-      "blob:"
-    )
-  ) {
-
-    URL.revokeObjectURL(
-      imagePreview
-    );
-
-  }
-
-
-  setImage(
-    file
-  );
-
-
-  setImagePreview(
-    URL.createObjectURL(
-      file
-    )
-  );
 
 };
 
@@ -362,30 +197,12 @@ if (saving) {
 }
 
 
-if (
-  imagePreview &&
-  imagePreview.startsWith(
-    "blob:"
-  )
-) {
-
-  URL.revokeObjectURL(
-    imagePreview
-  );
-
-}
-
-
 setShowModal(false);
 
 setEditingCategory(null);
 setDepartmentId("");
 
 setName("");
-
-setImage(null);
-
-setImagePreview("");
 
 
 };
@@ -468,54 +285,6 @@ async (event) => {
 
 
     formData.append("department", departmentId);
-
-    // ======================================================
-    // SEND REAL FILE
-    // ======================================================
-
-    if (
-      image
-    ) {
-
-      formData.append(
-        "image",
-        image
-      );
-
-      // IMPORTANT:
-      // The backend requires a valid image type.
-      // Category images must use "categories".
-      formData.append(
-        "type",
-        "categories"
-      );
-
-    }
-
-
-    console.log(
-      "Saving category..."
-    );
-
-    console.log(
-      "Name:",
-      trimmedName
-    );
-
-    console.log(
-      "Image:",
-      image
-        ? image.name
-        : "No new image"
-    );
-
-    console.log(
-      "Image type:",
-      image
-        ? "categories"
-        : "No new image"
-    );
-
 
     // ======================================================
     // SEND TO BACKEND
@@ -938,41 +707,9 @@ return (
                     <div
                       className="management-icon"
                     >
-
-                      {category.image ? (
-
-                        <img
-                          src={
-                            buildImageUrl(
-                              category.image
-                            )
-                          }
-                          alt={
-                            category.name
-                          }
-                          style={{
-                            width:
-                              "100%",
-
-                            height:
-                              "100%",
-
-                            objectFit:
-                              "cover",
-
-                            borderRadius:
-                              "inherit"
-                          }}
-                        />
-
-                      ) : (
-
-                        <span>
-                          📂
-                        </span>
-
-                      )}
-
+                      <span>
+                        📂
+                      </span>
                     </div>
 
 
@@ -1090,7 +827,7 @@ return (
             <p>
 
               {editingCategory
-                ? "Update the category name or image."
+                ? "Update the category name or department."
                 : "Create a new product category."}
 
             </p>
@@ -1146,90 +883,6 @@ return (
 
 
           <div className="management-form-group"><label htmlFor="category-department">Department *</label><select id="category-department" value={departmentId} onChange={event => setDepartmentId(event.target.value)} required><option value="">Select department</option>{departments.map(dept => <option key={dept._id} value={dept._id}>{dept.name}</option>)}</select></div>
-
-          {/* IMAGE */}
-
-          <div
-            className="management-form-group"
-          >
-
-            <label>
-              Category Image
-            </label>
-
-
-            <input
-              type="file"
-              accept="image/jpeg,image/jpg,image/png,image/webp"
-              onChange={
-                handleImageChange
-              }
-            />
-
-
-            <small
-              style={{
-                display:
-                  "block",
-
-                marginTop:
-                  "6px",
-
-                color:
-                  "#888"
-              }}
-            >
-              JPG, PNG or WEBP. Max 5MB.
-            </small>
-
-
-            {imagePreview && (
-
-              <div
-                style={{
-                  marginTop:
-                    "12px",
-
-                  width:
-                    "90px",
-
-                  height:
-                    "90px",
-
-                  borderRadius:
-                    "16px",
-
-                  overflow:
-                    "hidden",
-
-                  border:
-                    "1px solid #E0E0E0"
-                }}
-              >
-
-                <img
-                  src={
-                    imagePreview
-                  }
-                  alt="Preview"
-                  style={{
-                    width:
-                      "100%",
-
-                    height:
-                      "100%",
-
-                    objectFit:
-                      "cover"
-                  }}
-                />
-
-              </div>
-
-            )}
-
-          </div>
-
 
           {/* ACTIONS */}
 

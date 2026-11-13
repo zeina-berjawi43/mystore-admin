@@ -1,8 +1,15 @@
 import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const HOME_IMAGE_REQUIRED =
+  "A brand image is required to show this brand on the Home screen.";
+const REMOVE_IMAGE_WHILE_HOME =
+  'Turn off "Show on Home Screen" before removing the brand image.';
 
 function Brands() {
   const [brands, setBrands] = useState([]);
@@ -21,6 +28,23 @@ function Brands() {
     useState(null);
 
   const [name, setName] = useState("");
+
+  // Optional Home "Shop by Brands" fields.
+  const [existingImage, setExistingImage] = useState("");
+
+  const [imageFile, setImageFile] = useState(null);
+
+  const [imagePreview, setImagePreview] = useState("");
+
+  const [showOnHome, setShowOnHome] = useState(false);
+
+  const [order, setOrder] = useState("0");
+
+  const [formError, setFormError] = useState("");
+
+  const fileInputRef = useRef(null);
+
+  const hasImage = !!imageFile || !!existingImage;
 
   // ============================================================
   // AUTH / TOKEN REFRESH
@@ -77,12 +101,33 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
   }, []);
 
   // ============================================================
+  // FORM STATE
+  // ============================================================
+
+  const clearPreview = () => {
+    if (imagePreview && imagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreview);
+    }
+  };
+
+  const resetForm = () => {
+    clearPreview();
+    setEditingBrand(null);
+    setName("");
+    setExistingImage("");
+    setImageFile(null);
+    setImagePreview("");
+    setShowOnHome(false);
+    setOrder("0");
+    setFormError("");
+  };
+
+  // ============================================================
   // OPEN ADD
   // ============================================================
 
   const openAddModal = () => {
-    setEditingBrand(null);
-    setName("");
+    resetForm();
     setShowModal(true);
   };
 
@@ -91,8 +136,13 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
   // ============================================================
 
   const openEditModal = (brand) => {
+    resetForm();
     setEditingBrand(brand);
     setName(brand.name || "");
+    setExistingImage(brand.image || "");
+    setImagePreview(brand.image || "");
+    setShowOnHome(brand.showOnHome === true);
+    setOrder(String(brand.order ?? 0));
     setShowModal(true);
   };
 
@@ -104,8 +154,79 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
     if (saving) return;
 
     setShowModal(false);
-    setEditingBrand(null);
-    setName("");
+    resetForm();
+  };
+
+  // ============================================================
+  // IMAGE
+  // ============================================================
+
+  const chooseImage = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!IMAGE_TYPES.includes(file.type)) {
+      setFormError("Choose a JPG, PNG or WEBP image.");
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      setFormError("Image must be smaller than 5 MB.");
+      return;
+    }
+
+    clearPreview();
+    setFormError("");
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const removeImage = () => {
+    if (showOnHome) {
+      setFormError(REMOVE_IMAGE_WHILE_HOME);
+      return;
+    }
+
+    clearPreview();
+    setImageFile(null);
+    setExistingImage("");
+    setImagePreview("");
+    setFormError("");
+  };
+
+  const toggleShowOnHome = (checked) => {
+    if (checked && !hasImage) {
+      setFormError(HOME_IMAGE_REQUIRED);
+      return;
+    }
+
+    setFormError("");
+    setShowOnHome(checked);
+  };
+
+  // Same upload endpoint as Departments/Products/Slideshow.
+  const uploadImage = async (file) => {
+    const payload = new FormData();
+    payload.append("image", file);
+    payload.append("type", "brands");
+
+    const response = await authorizedFetch(`${API_URL}/upload/image`, {
+      method: "POST",
+      body: payload,
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || "Failed to upload image");
+
+    const imageUrl = typeof data.image === "string" ? data.image : "";
+
+    if (!/^https?:\/\//i.test(imageUrl)) {
+      throw new Error(
+        "Image uploaded but the server did not return a recognized URL."
+      );
+    }
+
+    return imageUrl;
   };
 
   // ============================================================
@@ -122,8 +243,24 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
       return;
     }
 
+    const displayOrder = Number(String(order).trim() || "0");
+
+    if (!Number.isInteger(displayOrder) || Math.abs(displayOrder) > 1000000) {
+      setFormError("Display order must be a whole number.");
+      return;
+    }
+
+    if (showOnHome && !hasImage) {
+      setFormError(HOME_IMAGE_REQUIRED);
+      return;
+    }
+
     try {
       setSaving(true);
+      setFormError("");
+
+      // Upload first; the brand is only saved once a public image URL exists.
+      const image = imageFile ? await uploadImage(imageFile) : existingImage;
 
       let url;
 
@@ -147,7 +284,10 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
           method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: trimmedName
+            name: trimmedName,
+            image,
+            showOnHome,
+            order: displayOrder
           })
         }
       );
@@ -167,7 +307,9 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
           : "Brand added successfully."
       );
 
-      closeModal();
+      setSaving(false);
+      setShowModal(false);
+      resetForm();
 
       await fetchBrands();
     } catch (error) {
@@ -281,7 +423,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
           </h1>
 
           <p>
-            Manage your product brands.
+            Manage your product brands and the Home &quot;Shop by Brands&quot; section.
           </p>
         </div>
 
@@ -389,6 +531,14 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
               </th>
 
               <th>
+                Home
+              </th>
+
+              <th>
+                Order
+              </th>
+
+              <th>
                 Created
               </th>
 
@@ -408,7 +558,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
               <tr>
 
                 <td
-                  colSpan="4"
+                  colSpan="6"
                   className="management-empty"
                 >
 
@@ -447,9 +597,24 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
 
                     <td>
 
-                     <div className="management-name">
-  <strong>{brand.name}</strong>
-</div>
+                      <div className="management-name">
+                        {brand.image && (
+                          <div className="management-icon" style={{ borderRadius: "50%", background: "#FFFFFF" }}>
+                            <img src={brand.image} alt="" style={{ objectFit: "contain" }} />
+                          </div>
+                        )}
+                        <strong>{brand.name}</strong>
+                      </div>
+                    </td>
+
+
+                    <td>
+                      {brand.showOnHome ? "Shown" : "Hidden"}
+                    </td>
+
+
+                    <td>
+                      {brand.order ?? 0}
                     </td>
 
 
@@ -542,7 +707,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
 
                 <p>
                   {editingBrand
-                    ? "Update the brand name."
+                    ? "Update the brand details."
                     : "Create a new product brand."}
                 </p>
 
@@ -569,11 +734,12 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
 
               <div className="management-form-group">
 
-                <label>
+                <label htmlFor="brand-name">
                   Brand Name *
                 </label>
 
                 <input
+                  id="brand-name"
                   type="text"
                   value={name}
                   onChange={(event) =>
@@ -585,6 +751,132 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
                 />
 
               </div>
+
+
+              {/* BRAND IMAGE (optional) */}
+
+              <div className="management-form-group">
+
+                <label>
+                  Brand Image{showOnHome ? " *" : " (optional)"}
+                </label>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                  disabled={saving}
+                  onChange={chooseImage}
+                  style={{ display: "none" }}
+                />
+
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div
+                    style={{
+                      width: 88,
+                      height: 88,
+                      borderRadius: "50%",
+                      border: "1px solid #E7DED1",
+                      background: "#FFFFFF",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Brand preview"
+                        style={{ width: 68, height: 68, objectFit: "contain" }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: 12, color: "#817B71" }}>No image</span>
+                    )}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <button
+                      type="button"
+                      className="management-cancel-button"
+                      disabled={saving}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {hasImage ? "Replace image" : "Choose image"}
+                    </button>
+
+                    {hasImage && (
+                      <button
+                        type="button"
+                        className="management-delete-button"
+                        disabled={saving}
+                        onClick={removeImage}
+                      >
+                        Remove image
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <span style={{ fontSize: 12, color: "#817B71" }}>
+                  JPG, PNG or WEBP · max 5 MB · square logos look best
+                </span>
+
+              </div>
+
+
+              {/* SHOW ON HOME */}
+
+              <div className="management-form-group">
+
+                <label htmlFor="brand-show-on-home">
+                  <input
+                    id="brand-show-on-home"
+                    type="checkbox"
+                    checked={showOnHome}
+                    disabled={saving}
+                    onChange={(event) => toggleShowOnHome(event.target.checked)}
+                  />
+                  {" "}Show on Home Screen
+                </label>
+
+                <span style={{ fontSize: 12, color: "#817B71" }}>
+                  Shows this brand in &quot;Shop by Brands&quot;. Requires an image. Brands without products stay hidden.
+                </span>
+
+              </div>
+
+
+              {/* DISPLAY ORDER */}
+
+              <div className="management-form-group">
+
+                <label htmlFor="brand-order">
+                  Display Order
+                </label>
+
+                <input
+                  id="brand-order"
+                  type="number"
+                  step="1"
+                  value={order}
+                  disabled={saving}
+                  onChange={(event) => setOrder(event.target.value)}
+                />
+
+                <span style={{ fontSize: 12, color: "#817B71" }}>
+                  Lower numbers appear first. Equal numbers are sorted by name.
+                </span>
+
+              </div>
+
+
+              {formError && (
+                <div className="management-error" role="alert">
+                  <span>{formError}</span>
+                </div>
+              )}
 
 
               <div className="management-form-actions">

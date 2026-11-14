@@ -18,3 +18,16 @@
 .frame-editor-circle .frame-editor-customer-preview { border-radius: 50%; background: #fff; border: 1px solid #efe6da;
   display: flex; align-items: center; justify-content: center; }
 .frame-editor-circle .frame-editor-customer-preview { max-width: 112px; }
+
+/* Brand forms also style thumbnail images. The crop canvas must use its own
+   geometry, without thumbnail caps, padding or borders changing the aspect ratio. */
+.frame-editor-circle .frame-editor-preview img,
+.frame-editor-circle .frame-editor-customer-preview img {
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}

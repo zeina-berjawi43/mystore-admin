@@ -7,7 +7,9 @@ export default function ImageFrameEditor(props) {
   return <Editor key={props.src} {...props} />;
 }
 
-function Editor({ src, value, onChange, disabled }) {
+// circle: Brand mode. Round previews matching the Customer Home Brand circle; without
+// framing the logo is contained in the inscribed square (same as the Customer app).
+function Editor({ src, value, onChange, disabled, circle, onClear }) {
   const [size, setSize] = useState(null);
   const [failed, setFailed] = useState(false);
   const drag = useRef(null);
@@ -19,9 +21,10 @@ function Editor({ src, value, onChange, disabled }) {
   const imageStyle = active && geometry ? {
     position: 'absolute', width: `${geometry.width * 100}%`, height: `${geometry.height * 100}%`,
     left: `${geometry.left * 100}%`, top: `${geometry.top * 100}%`, maxWidth: 'none', objectFit: 'fill',
-  } : { width: '100%', height: '100%', objectFit: active ? 'cover' : 'contain' };
-  return <div className="frame-editor">
-    <div className="frame-editor-preview" role="img" aria-label="Product image framing preview"
+  } : circle ? { width: '70%', height: '70%', objectFit: 'contain' }
+    : { width: '100%', height: '100%', objectFit: active ? 'cover' : 'contain' };
+  return <div className={circle ? 'frame-editor frame-editor-circle' : 'frame-editor'}>
+    <div className="frame-editor-preview" role="img" aria-label={circle ? 'Brand image framing preview' : 'Product image framing preview'}
       onPointerDown={event => {
         if (unavailable || event.button !== 0 || drag.current) return;
         event.currentTarget.setPointerCapture(event.pointerId);
@@ -34,11 +37,13 @@ function Editor({ src, value, onChange, disabled }) {
         const g = frameGeometry(size.width, size.height, start.width, start.width, start.frame);
         onChange(panFrame(start.frame, event.clientX - start.x, event.clientY - start.y, g.travelX, g.travelY));
       }} onPointerUp={stop} onPointerCancel={stop} onLostPointerCapture={stop}>
-      <img src={src} alt="Product preview" draggable={false} style={imageStyle}
+      <img src={src} alt={circle ? 'Brand preview' : 'Product preview'} draggable={false} style={imageStyle}
         onLoad={event => { setFailed(false); setSize({ width: event.currentTarget.naturalWidth, height: event.currentTarget.naturalHeight }); }}
         onError={() => { setFailed(true); setSize(null); }} />
     </div>
-    <p>{failed ? 'Unable to load image. Choose another image or try again.' : active ? 'Drag to position. Customer App cards use this centered square crop.' : 'Original fit preserved. Drag or zoom to set framing.'}</p>
+    <p>{failed ? 'Unable to load image. Choose another image or try again.' : circle
+      ? active ? 'Drag to position. The Customer Home brand circle uses this crop.' : 'Original logo fit (centered). Drag or zoom to frame it.'
+      : active ? 'Drag to position. Customer App cards use this centered square crop.' : 'Original fit preserved. Drag or zoom to set framing.'}</p>
     <div className="frame-editor-controls">
       <button type="button" disabled={unavailable || frame.zoom <= 1} aria-label="Zoom out" onClick={() => onChange({ ...frame, zoom: clamp(frame.zoom - .1, 1, MAX_ZOOM) })}>−</button>
       <input aria-label="Image zoom" type="range" min="1" max={MAX_ZOOM} step="0.01" value={frame.zoom} disabled={unavailable}
@@ -46,13 +51,14 @@ function Editor({ src, value, onChange, disabled }) {
       <button type="button" disabled={unavailable || frame.zoom >= MAX_ZOOM} aria-label="Zoom in" onClick={() => onChange({ ...frame, zoom: clamp(frame.zoom + .1, 1, MAX_ZOOM) })}>+</button>
       <span>{frame.zoom.toFixed(1)}×</span>
       <button type="button" disabled={unavailable} onClick={() => onChange({ ...DEFAULT_FRAME })}>Reset / Center</button>
+      {circle && onClear && <button type="button" disabled={disabled || !active} onClick={onClear}>Original fit</button>}
     </div>
     <div className="frame-editor-customer">
-      <p className="frame-editor-customer-label">Customer App Preview</p>
+      <p className="frame-editor-customer-label">{circle ? 'Customer Home Preview' : 'Customer App Preview'}</p>
       <div className="frame-editor-customer-preview">
-        <img src={src} alt="Customer App product image preview" draggable={false} style={imageStyle} />
+        <img src={src} alt={circle ? 'Customer Home brand image preview' : 'Customer App product image preview'} draggable={false} style={imageStyle} />
       </div>
     </div>
-    <p>Product Details keeps the full original image.</p>
+    {!circle && <p>Product Details keeps the full original image.</p>}
   </div>;
 }

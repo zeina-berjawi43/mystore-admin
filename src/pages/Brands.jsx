@@ -1,6 +1,9 @@
 import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
 import { useEffect, useRef, useState } from "react";
+import ImageFrameEditor from "../components/ImageFrameEditor";
+import ProductImage from "../components/ProductImage";
+import { validFrame } from "../utils/image-frame";
 
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
 
@@ -39,6 +42,9 @@ function Brands() {
   const [showOnHome, setShowOnHome] = useState(false);
 
   const [order, setOrder] = useState("0");
+
+  // Same framing contract and editor as Product images; null = original logo fit.
+  const [imageFrame, setImageFrame] = useState(null);
 
   const [formError, setFormError] = useState("");
 
@@ -119,6 +125,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
     setImagePreview("");
     setShowOnHome(false);
     setOrder("0");
+    setImageFrame(null);
     setFormError("");
   };
 
@@ -143,6 +150,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
     setImagePreview(brand.image || "");
     setShowOnHome(brand.showOnHome === true);
     setOrder(String(brand.order ?? 0));
+    setImageFrame(validFrame(brand.imageFrame) ? brand.imageFrame : null);
     setShowModal(true);
   };
 
@@ -180,6 +188,8 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
     setFormError("");
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
+    // A new image starts with the original logo fit.
+    setImageFrame(null);
   };
 
   const removeImage = () => {
@@ -192,6 +202,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
     setImageFile(null);
     setExistingImage("");
     setImagePreview("");
+    setImageFrame(null);
     setFormError("");
   };
 
@@ -286,6 +297,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
           body: JSON.stringify({
             name: trimmedName,
             image,
+            imageFrame: image ? imageFrame : null,
             showOnHome,
             order: displayOrder
           })
@@ -600,7 +612,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
                       <div className="management-name">
                         {brand.image && (
                           <div className="management-icon" style={{ borderRadius: "50%", background: "#FFFFFF" }}>
-                            <img src={brand.image} alt="" style={{ objectFit: "contain" }} />
+                            <ProductImage src={brand.image} alt="" imageFrame={brand.imageFrame} style={{ objectFit: "contain" }} />
                           </div>
                         )}
                         <strong>{brand.name}</strong>
@@ -822,6 +834,17 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
                 <span style={{ fontSize: 12, color: "#817B71" }}>
                   JPG, PNG or WEBP · max 5 MB · square logos look best
                 </span>
+
+                {imagePreview && (
+                  <ImageFrameEditor
+                    circle
+                    src={imagePreview}
+                    value={imageFrame}
+                    onChange={setImageFrame}
+                    onClear={() => setImageFrame(null)}
+                    disabled={saving}
+                  />
+                )}
 
               </div>
 

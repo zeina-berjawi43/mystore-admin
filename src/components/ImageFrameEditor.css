@@ -12,3 +12,9 @@
 .frame-editor-customer-preview img { pointer-events: none; display: block; }
 .image-upload-box.has-image { min-height: 64px; }
 .image-upload-box.has-image .image-upload-placeholder { padding: 12px; }
+
+/* Brand mode: round previews matching the Customer Home brand circle. */
+.frame-editor-circle .frame-editor-preview,
+.frame-editor-circle .frame-editor-customer-preview { border-radius: 50%; background: #fff; border: 1px solid #efe6da;
+  display: flex; align-items: center; justify-content: center; }
+.frame-editor-circle .frame-editor-customer-preview { max-width: 112px; }

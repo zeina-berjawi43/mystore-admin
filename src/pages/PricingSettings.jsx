@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import api from '../utils/admin-api';
 import { getToken } from '../utils/auth';
 const URL = 'https://mystore-backend-u6ey.onrender.com/pricing';
+const registrationClassIds = classes => Object.keys(classes).filter(key => ['C-D', 'B-D'].includes(classes[key].name ?? key));
 export default function PricingSettings() {
   const [classes, setClasses] = useState(null);
+  const [protectedClassIds, setProtectedClassIds] = useState([]);
   const [defaultClass, setDefaultClass] = useState('C');
   const [newClass, setNewClass] = useState({ name: '', adjustment: '0', minimum: '0' });
   const [message, setMessage] = useState('');
@@ -11,7 +13,7 @@ export default function PricingSettings() {
   const busy = useRef(false);
   useEffect(() => {
     let active = true;
-    api.get(URL, { headers: { Authorization: `Bearer ${getToken()}` } }).then(({ data }) => { if (active) { setClasses(data.classes); setDefaultClass(data.defaultClass); } })
+    api.get(URL, { headers: { Authorization: `Bearer ${getToken()}` } }).then(({ data }) => { if (active) { setClasses(data.classes); setProtectedClassIds(registrationClassIds(data.classes)); setDefaultClass(data.defaultClass); } })
       .catch(error => { if (active) setMessage(error.response?.data?.message || 'Could not load pricing settings'); });
     return () => { active = false; };
   }, []);
@@ -23,7 +25,7 @@ export default function PricingSettings() {
       const values = Object.fromEntries(Object.entries(classes).map(([key, value]) => [key, { name: value.name || key, adjustment: Number(value.adjustment), minimum: Number(value.minimum),
         ...(key === 'C' ? { freeDeliveryThreshold: Number(value.freeDeliveryThreshold), deliveryFeeBelowThreshold: Number(value.deliveryFeeBelowThreshold) } : {}) }]));
       const { data } = await api.put(URL, { classes: values }, { headers: { Authorization: `Bearer ${getToken()}` } });
-      setClasses(data.classes); setMessage('Pricing settings saved. Customer pricing updates on refresh.');
+      setClasses(data.classes); setProtectedClassIds(registrationClassIds(data.classes)); setMessage('Pricing settings saved. Customer pricing updates on refresh.');
     } catch (error) { setMessage(error.response?.data?.message || 'Could not save pricing settings'); }
     finally { busy.current = false; setSaving(false); }
   }
@@ -35,7 +37,7 @@ export default function PricingSettings() {
       const { data } = action === 'create' ? await api.post(URL + '/classes', { value: { name: newClass.name.trim(), adjustment: Number(newClass.adjustment), minimum: Number(newClass.minimum) } }, options)
         : action === 'default' ? await api.put(URL + '/classes/' + encodeURIComponent(key) + '/default', {}, options)
         : await api.delete(URL + '/classes/' + encodeURIComponent(key), options);
-      setClasses(previous => Object.fromEntries(Object.entries(data.classes).map(([id, value]) => [id, previous?.[id] || value]))); setDefaultClass(data.defaultClass); if (action === 'create') setNewClass({ name: '', adjustment: '0', minimum: '0' }); setMessage('Pricing classes updated');
+      setClasses(previous => Object.fromEntries(Object.entries(data.classes).map(([id, value]) => [id, previous?.[id] || value]))); setProtectedClassIds(registrationClassIds(data.classes)); setDefaultClass(data.defaultClass); if (action === 'create') setNewClass({ name: '', adjustment: '0', minimum: '0' }); setMessage('Pricing classes updated');
     } catch (error) { setMessage(action === 'create' && error.response?.status === 404 ? 'Route not found. Class creation requires POST /pricing/classes on the updated backend. Check the backend deployment.' : error.response?.data?.message || 'Could not update pricing classes'); }
     finally { busy.current = false; setSaving(false); }
   }
@@ -55,9 +57,10 @@ export default function PricingSettings() {
     {classes && <form onSubmit={save} aria-busy={saving}>
       <div className="pricing-grid">
       {Object.keys(classes).map(key => <fieldset className={`pricing-card${defaultClass === key ? ' pricing-card-default' : ''}`} key={key} disabled={saving}><legend>{classes[key].name || key}{defaultClass === key && <span className="pricing-default-badge">Default</span>}</legend>
-        <label className="management-form-group">Name <input required maxLength={80} value={classes[key].name || key} onChange={event => setClasses(previous => ({ ...previous, [key]: { ...previous[key], name: event.target.value } }))} /></label>
+        <label className="management-form-group">Name <input required readOnly={protectedClassIds.includes(key)} maxLength={80} value={classes[key].name || key} onChange={event => setClasses(previous => ({ ...previous, [key]: { ...previous[key], name: event.target.value } }))} /></label>
+        {protectedClassIds.includes(key) && <small>Registration class name is protected; cannot be renamed or deleted.</small>}
         <div className="pricing-card-actions"><button className="pricing-secondary-button" type="button" disabled={saving || defaultClass === key} onClick={() => manage('default', key)}>Set as Default</button>
-        <button className="pricing-delete-button" type="button" disabled={saving || defaultClass === key} onClick={() => manage('delete', key)}>Delete class</button></div>
+        <button className="pricing-delete-button" type="button" disabled={saving || defaultClass === key || protectedClassIds.includes(key)} onClick={() => manage('delete', key)}>Delete class</button></div>
         <label className="management-form-group">Adjustment (%) <input required type="number" min="-90" max="200" step="any" value={classes[key].adjustment}
           onChange={event => setClasses(previous => ({ ...previous, [key]: { ...previous[key], adjustment: event.target.value } }))} /></label>
         <label className="management-form-group">{key === 'C' ? 'Minimum Checkout Amount ($)' : 'Minimum order ($)'} <input required type="number" min="0" max="1000000" step="0.01" value={classes[key].minimum}

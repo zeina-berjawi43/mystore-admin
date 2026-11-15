@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { DEFAULT_FRAME, MAX_ZOOM, clamp, frameGeometry, panFrame, validFrame } from '../utils/image-frame';
+import { DEFAULT_BRAND_FRAME, brandFrameGeometry, containedBrandFrame, validBrandFrame } from '../utils/brand-image-frame';
 import './ImageFrameEditor.css';
 
 export default function ImageFrameEditor(props) {
@@ -13,9 +14,16 @@ function Editor({ src, value, onChange, disabled, circle, onClear }) {
   const [size, setSize] = useState(null);
   const [failed, setFailed] = useState(false);
   const drag = useRef(null);
-  const active = validFrame(value);
-  const frame = active ? value : DEFAULT_FRAME;
-  const geometry = size ? frameGeometry(size.width, size.height, 1, 1, frame) : null;
+  const active = circle ? validBrandFrame(value) : validFrame(value);
+  const frame = active ? value : circle ? DEFAULT_BRAND_FRAME : DEFAULT_FRAME;
+  const contained = circle && containedBrandFrame(frame);
+  const zoom = contained ? frame.scale : frame.zoom;
+  const geometryFor = circle ? brandFrameGeometry : frameGeometry;
+  const geometry = size ? geometryFor(size.width, size.height, 1, 1, frame) : null;
+  const changeZoom = next => {
+    const amount = clamp(circle ? Math.round(next * 100) / 100 : next, 1, MAX_ZOOM);
+    onChange(contained ? { ...frame, scale: amount } : { ...frame, zoom: amount });
+  };
   const unavailable = disabled || !size || failed;
   const stop = () => { drag.current = null; };
   const imageStyle = active && geometry ? {
@@ -34,7 +42,7 @@ function Editor({ src, value, onChange, disabled, circle, onClear }) {
       onPointerMove={event => {
         const start = drag.current;
         if (!start || unavailable || start.id !== event.pointerId) return;
-        const g = frameGeometry(size.width, size.height, start.width, start.width, start.frame);
+        const g = geometryFor(size.width, size.height, start.width, start.width, start.frame);
         onChange(panFrame(start.frame, event.clientX - start.x, event.clientY - start.y, g.travelX, g.travelY));
       }} onPointerUp={stop} onPointerCancel={stop} onLostPointerCapture={stop}>
       <img src={src} alt={circle ? 'Brand preview' : 'Product preview'} draggable={false} style={imageStyle}
@@ -45,12 +53,12 @@ function Editor({ src, value, onChange, disabled, circle, onClear }) {
       ? active ? 'Drag to position. The Customer Home brand circle uses this crop.' : 'Original logo fit (centered). Drag or zoom to frame it.'
       : active ? 'Drag to position. Customer App cards use this centered square crop.' : 'Original fit preserved. Drag or zoom to set framing.'}</p>
     <div className="frame-editor-controls">
-      <button type="button" disabled={unavailable || frame.zoom <= 1} aria-label="Zoom out" onClick={() => onChange({ ...frame, zoom: clamp(frame.zoom - .1, 1, MAX_ZOOM) })}>−</button>
-      <input aria-label="Image zoom" type="range" min="1" max={MAX_ZOOM} step="0.01" value={frame.zoom} disabled={unavailable}
-        onChange={event => onChange({ ...frame, zoom: Number(event.target.value) })} />
-      <button type="button" disabled={unavailable || frame.zoom >= MAX_ZOOM} aria-label="Zoom in" onClick={() => onChange({ ...frame, zoom: clamp(frame.zoom + .1, 1, MAX_ZOOM) })}>+</button>
-      <span>{frame.zoom.toFixed(1)}×</span>
-      <button type="button" disabled={unavailable} onClick={() => onChange({ ...DEFAULT_FRAME })}>Reset / Center</button>
+      <button type="button" disabled={unavailable || zoom <= 1} aria-label="Zoom out" onClick={() => changeZoom(zoom - .1)}>−</button>
+      <input aria-label="Image zoom" type="range" min="1" max={MAX_ZOOM} step="0.01" value={zoom} disabled={unavailable}
+        onChange={event => changeZoom(Number(event.target.value))} />
+      <button type="button" disabled={unavailable || zoom >= MAX_ZOOM} aria-label="Zoom in" onClick={() => changeZoom(zoom + .1)}>+</button>
+      <span>{zoom.toFixed(circle ? 2 : 1)}×</span>
+      <button type="button" disabled={unavailable} onClick={() => onChange({ ...(contained ? DEFAULT_BRAND_FRAME : DEFAULT_FRAME) })}>Reset / Center</button>
       {circle && onClear && <button type="button" disabled={disabled || !active} onClick={onClear}>Original fit</button>}
     </div>
     <div className="frame-editor-customer">

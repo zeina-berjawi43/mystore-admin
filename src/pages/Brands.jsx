@@ -2,8 +2,8 @@ import { authorizedFetch as fetch } from '../utils/admin-api';
 import { sessionStorageAdapter } from '../utils/session-storage';
 import { useEffect, useRef, useState } from "react";
 import ImageFrameEditor from "../components/ImageFrameEditor";
-import ProductImage from "../components/ProductImage";
-import { validFrame } from "../utils/image-frame";
+import ProductImage from "../components/BrandImage";
+import { validBrandFrame as validFrame } from "../utils/brand-image-frame";
 
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
 
@@ -298,6 +298,7 @@ const authorizedFetch = (url, options = {}) => fetch(url, { ...options, headers:
             name: trimmedName,
             image,
             imageFrame: image ? imageFrame : null,
+            imageFrameVersion: 2,
             showOnHome,
             order: displayOrder
           })

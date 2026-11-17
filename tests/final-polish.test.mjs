@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import { createRequire } from 'node:module';
 import { test } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -53,7 +54,9 @@ test('actual backend customer update accepts omitted/empty email, normalizes pro
     '../models/User': { findById: async () => user, findOne: async () => null },
     '../services/pricingManagement': { transaction: async work => work({ classes: { A: {}, B: {}, C: {} } }, {}) },
     '../middleware/authMiddleware': () => {}, '../middleware/adminMiddleware': () => {}, '../services/accountDeletionService': {},
-    '../services/demoMode': { DEMO_CLASS: 'DEMO', isDemo: user => !!user && user.role === 'user' && user.priceClass === 'DEMO' } };
+    '../services/demoMode': { DEMO_CLASS: 'DEMO', isDemo: user => !!user && user.role === 'user' && user.priceClass === 'DEMO' },
+    // Top-level import of userRoutes.js since backend 0a135d5 (streamed admin lists); unused by this update route.
+    '../services/cursorJsonResponse': createRequire(new URL('../../backend/routes/userRoutes.js', import.meta.url))('../services/cursorJsonResponse') };
   vm.runInNewContext(readFileSync('../backend/routes/userRoutes.js', 'utf8'), { module: { exports: {} }, console, require: name => dependencies[name] });
   async function update(role, body) {
     saved = false; user = { _id: 'fixture', role, save: async () => { saved = true; }, toObject: () => ({ ...user }) };

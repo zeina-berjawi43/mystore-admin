@@ -11,6 +11,7 @@ useState,
 
 import "./Products.css";
 import Pagination from "../components/Pagination";
+import { activeQuantityLimit, quantityLimitFormValues, quantityLimitPayload } from "../utils/quantity-limit";
 
 const API_URL = "https://mystore-backend-u6ey.onrender.com";
 
@@ -92,6 +93,8 @@ image: "",
 category: "",
 brand: "",
 availability: true,
+quantityLimitEnabled: false,
+maxQuantityPerOrder: "",
 });
 
 const firstFilterRender = useRef(true);
@@ -479,6 +482,8 @@ setForm({
   category: "",
   brand: "",
   availability: true,
+  quantityLimitEnabled: false,
+  maxQuantityPerOrder: "",
 });
 
 setImageFile(null);
@@ -518,6 +523,7 @@ setForm({
   category: product.category?._id || product.category || "",
   brand: product.brand?._id || product.brand || "",
   availability: product.availability !== false,
+  ...quantityLimitFormValues(product),
 });
 
 setShowModal(true);
@@ -582,6 +588,16 @@ if (discount < 0 || discount > 100) {
   return;
 }
 
+const quantityLimit = quantityLimitPayload(
+  form.quantityLimitEnabled,
+  form.maxQuantityPerOrder
+);
+
+if (quantityLimit.error) {
+  alert(quantityLimit.error);
+  return;
+}
+
 try {
   setSaving(true);
 
@@ -605,6 +621,7 @@ try {
     category: form.category,
     brand: form.brand,
     availability: form.availability,
+    ...quantityLimit.body,
   };
 
   let url;
@@ -1068,6 +1085,15 @@ return ( <div className="products-page"> <div className="products-header"> <div>
                       {product.description && (
                         <small>{product.description}</small>
                       )}
+
+                      {activeQuantityLimit(product) !== null && (
+                        <span
+                          className="quantity-limit-badge"
+                          title="Maximum quantity per order"
+                        >
+                          Max {activeQuantityLimit(product)} / order
+                        </span>
+                      )}
                     </div>
                   </div>
                 </td>
@@ -1423,6 +1449,51 @@ return ( <div className="products-page"> <div className="products-header"> <div>
               </span>
             </button>
           </div>
+
+          <div className="modal-availability-row">
+            <span>Limit Quantity Per Order</span>
+
+            <button
+              type="button"
+              role="switch"
+              aria-checked={form.quantityLimitEnabled}
+              aria-label="Limit Quantity Per Order"
+              className={`availability-switch modal-switch ${
+                form.quantityLimitEnabled ? "switch-on" : "switch-off"
+              }`}
+              onClick={() =>
+                setForm((previous) => ({
+                  ...previous,
+                  quantityLimitEnabled: !previous.quantityLimitEnabled,
+                }))
+              }
+            >
+              <span className="switch-track">
+                <span className="switch-thumb">
+                  {form.quantityLimitEnabled ? "✓" : "×"}
+                </span>
+              </span>
+            </button>
+          </div>
+
+          {form.quantityLimitEnabled && (
+            <div className="form-group">
+              <label htmlFor="product-max-quantity-per-order">Maximum Quantity Per Order *</label>
+              <input
+                id="product-max-quantity-per-order"
+                type="number"
+                name="maxQuantityPerOrder"
+                value={form.maxQuantityPerOrder}
+                onChange={handleChange}
+                placeholder="e.g. 6"
+                min="1"
+                max="1000000"
+                step="1"
+                inputMode="numeric"
+                required
+              />
+            </div>
+          )}
 
           <div className="product-form-actions">
             <button

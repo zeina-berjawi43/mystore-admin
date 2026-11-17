@@ -2,6 +2,9 @@ import { getPricingClassName } from '../src/utils/pricing-class.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import { createRequire } from 'node:module';
+import { Writable } from 'node:stream';
+import { EventEmitter } from 'node:events';
 import { test } from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -17,6 +20,19 @@ const records = [
 
 // Execute the real backend list handler with an offline database fixture.
 // No connection, credentials, real customer reads or writes are involved.
+// Since backend 0a135d5 the list streams through the real cursorJsonResponse
+// (bounded cursor -> temporary file -> response stream), so the fixture models
+// the Mongoose cursor contract and a writable HTTP response.
+const backendRequire = createRequire(new URL('../../backend/routes/userRoutes.js', import.meta.url));
+const { cursorJsonResponse } = backendRequire('../services/cursorJsonResponse');
+function offlineCursorQuery(rows) {
+  const query = {
+    getOptions: () => ({}), model: { db: { get: () => undefined }, populate: async documents => documents },
+    getPopulatedPaths: () => [], mongooseOptions: value => value === undefined ? {} : query, clone: () => query,
+    cursor: () => ({ async *[Symbol.asyncIterator]() { yield* rows; }, close: async () => {} }),
+  };
+  return query;
+}
 async function backendResponse(users = records) {
   const routes = new Map();
   const router = Object.fromEntries(['get','put','post','delete'].map(method => [method, (route, ...handlers) => routes.set(`${method} ${route}`, handlers.at(-1))]));
@@ -24,20 +40,26 @@ async function backendResponse(users = records) {
     express: { Router: () => router }, mongoose: {}, bcryptjs: {},
     '../models/User': { find: () => ({ select: fields => {
       assert.equal(fields, '-password');
-      return { sort: async () => users };
+      return { sort: order => { assert.equal(JSON.stringify(order), '{"createdAt":-1}'); return offlineCursorQuery(users); } };
     } }) },
     '../middleware/authMiddleware': () => {}, '../middleware/adminMiddleware': () => {},
     '../services/accountDeletionService': {},
+    '../services/cursorJsonResponse': { cursorJsonResponse },
   };
   const context = { module: { exports: {} }, console, require: name => {
     assert.ok(name in dependencies, `Unexpected dependency: ${name}`); return dependencies[name];
   } };
   vm.runInNewContext(readFileSync(new URL('../../backend/routes/userRoutes.js', import.meta.url), 'utf8'), context);
-  let body;
-  await routes.get('get /admin/all')({}, { status: status => {
-    assert.equal(status, 200); return { json: value => { body = JSON.parse(JSON.stringify(value)); } };
-  } });
-  return body;
+  const chunks = [], headers = {};
+  const res = new Writable({ write(chunk, _encoding, done) { chunks.push(Buffer.from(chunk)); done(); } });
+  res.set = (name, value) => { headers[name] = value; return res; };
+  res.status = status => assert.fail(`Unexpected status ${status}`);
+  const req = Object.assign(new EventEmitter(), { aborted: false });
+  await routes.get('get /admin/all')(req, res);
+  const raw = Buffer.concat(chunks);
+  assert.equal(headers['Content-Type'], 'application/json; charset=utf-8');
+  assert.equal(Number(headers['Content-Length']), raw.length);
+  return JSON.parse(raw.toString('utf8'));
 }
 
 const source = readFileSync(new URL('../src/pages/Users.jsx', import.meta.url), 'utf8')
